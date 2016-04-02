@@ -31,13 +31,24 @@ $ node -v
 # cordova 
 Issue:
 cordova cannot find module 'bplist-parser'
-
 Solution:
 $ sudo npm update -g
 
 $ cordova create testapp com.example.testapp "Test" --copy-from
 
 $ cordova plugin add cordova-plugin-media-capture
+
+
+# ionic
+$ npm install -g cordova ionic
+$ npm update -g cordova ionic
+
+Refer to "package.json":
+$ sudo npm install
+
+If it is a server:
+$ node server
+
 
 # ADB
 export ANDROID_LOG_TAGS="ActivityManager:I MyApp:D *:S"
