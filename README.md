@@ -27,6 +27,7 @@ $ sudo apt-get update
 $ sudo apt-get install nodejs npm
 $ node -v
 
+ref: https://main-tank.ssl-lolipop.jp/wp/2016/08/16/nodejs-samples/
 
 # cordova 
 Issue:
