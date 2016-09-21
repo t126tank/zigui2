@@ -8,6 +8,10 @@ var fs   = require('fs');
 var _    = require('lodash');
 
 var brandInfo = [
+   {code: "yyy", name: "YYY"}, {code: "zzz", name: "ZZZ"}
+];
+
+/*
    {code: "aaa", name: "AAA"}, {code: "bbb", name: "BBB"},
    {code: "ccc", name: "CCC"}, {code: "ddd", name: "DDD"},
    {code: "eee", name: "EEE"}, {code: "fff", name: "FFF"},
@@ -21,13 +25,23 @@ var brandInfo = [
    {code: "uuu", name: "UUU"}, {code: "vvv", name: "VVV"},
    {code: "www", name: "WWW"}, {code: "xxx", name: "XXX"},
    {code: "yyy", name: "YYY"}, {code: "zzz", name: "ZZZ"}
-];
+ */
 
 // start, range could be accepted from cmd line arguments
 var periodTypes = [
-   {start: 20160101, range: 300},   // DAILY
-   {start: 2016,  range: 50}        // WEEKLY
+   {start: 20160101, range: 20},         // DAILY
+   {start: 2016001, range: 150}           // WEEKLY
 ];
+
+/*
+   {start: 20160101000000, range: 300},   // SECOND
+   {start: 201601010000, range: 300},     // MINUTE
+   {start: 2016010100, range: 300},       // HOURLY
+   {start: 20160101, range: 200},         // DAILY
+   {start: 2016001, range: 150},          // WEEKLY
+   {start: 201601, range: 50},            // MONTHLY
+   {start: 2016,  range: 50}              // YEARLY
+ */
 
 function random(low, high) {
    var raw = Math.random() * (high - low) + low;
@@ -71,7 +85,7 @@ function calNewTp(s, p, add) {
       rnt.setDate(s.getDate() + add);
       break;
    case periods.WEEKLY:
-
+      rnt.setDate(s.getDate() + add * 7);
       break;
    case periods.MONTHLY:
       rnt.setMonth(s.getMonth() + add);
