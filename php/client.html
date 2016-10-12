@@ -8,7 +8,7 @@ header("Content-Type:text/html;charset=utf-8");
 ?>
 
 <head>
-<script type="text/javascript" src="pqs/js/jquery-3.1.1.min.js"></script>
+<script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
 <script type="text/javascript">
 
 $(function() {
@@ -34,11 +34,11 @@ $(function() {
             "location2":"2","quantity2":qty2,"price2":price2,
             "location3":"3","quantity3":qty3,"price3":price3
         } // Array
-        var dataString = JSON.stringify(postData);
-        data: {myData: dataString},
+        var dataString = JSON.stringify(postData); // Array 2 Json
+        data: {myData: dataString}, // "data" payload has KEY and Value
         */
 
-        var url = "pqs/doReq.php"; 
+        var url = "localhost or http://this.server.php"; 
         $.ajax({
             type: "post",
             url: url,
