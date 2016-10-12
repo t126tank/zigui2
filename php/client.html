@@ -1,1 +1,78 @@
-Dummy
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<title>php+jquery+ajax+json简单小例子</title>
+
+<?php  
+header("Content-Type:text/html;charset=utf-8");
+?>
+
+<head>
+<script type="text/javascript" src="pqs/js/jquery-3.1.1.min.js"></script>
+<script type="text/javascript">
+
+$(function() {
+    $("#subbtn").click(function() {
+        var params = $("input").serialize();
+
+        /*
+        var bid=$('#bid').val();
+        var myqty=new Array()
+        var myprice=new Array()
+
+        qty1=$('#qty10').val();
+        qty2=$('#qty11').val();
+        qty3=$('#qty12').val();
+
+        price1=$('#price1').val();
+        price2=$('#price2').val();
+        price3=$('#price3').val();
+
+        var postData = {
+            "bid":bid,
+            "location1":"1","quantity1":qty1,"price1":price1,
+            "location2":"2","quantity2":qty2,"price2":price2,
+            "location3":"3","quantity3":qty3,"price3":price3
+        } // Array
+        var dataString = JSON.stringify(postData);
+        data: {myData: dataString},
+        */
+
+        var url = "pqs/doReq.php"; 
+        $.ajax({
+            type: "post",
+            url: url,
+            dataType: "json",
+            data: params,
+            // contentType: "application/json; charset=utf-8", // For myData who has KEY and Value
+            success: function (msg) {
+                var backdata = "您提交的姓名为：" + msg.name +  
+                    "<br /> 您提交的密码为：" + msg.password;
+                $("#backdata").html(backdata);
+                $("#backdata").css({color: "green"});
+                alert('提交 success!');
+            },
+            error: function(e) {
+                console.log(e.message);
+            }
+        });
+    });
+});
+
+</script>
+</head>
+
+<body>
+    <p><label for="name">姓名：</label>
+    <input id="name" name="name" type="text" />
+    </p>
+      
+    <p><label for="password">密码：</label>
+    <input id="password" name="password" type="password" />
+    </p>
+      
+    <span id="backdata"></span>
+    <p><input id="subbtn" type="button" value="提交数据" /></p>
+</body>
+</html>
+
