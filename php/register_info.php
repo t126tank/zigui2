@@ -21,10 +21,10 @@ $age=intVal($postJson['age']);
 $gender=$postJson['gender'];
 
 $code1=$postJson['code1'];
-$keyworld1=$postJson['keyword1'];
+$keyword1=$postJson['keyword1'];
 
 $code2=$postJson['code2'];
-$keyworld2=$postJson['keyword2'];
+$keyword2=$postJson['keyword2'];
 
 // To protect MySQL injection (more detail about MySQL injection)
 $myusername = stripslashes($myusername);
@@ -39,6 +39,17 @@ $db->bindMore(array("email"=>$myusername, "password"=>$mypassword, "firstname"=>
 
 // Insert
 $insert = $db->query("INSERT INTO persons(Email,Password,Firstname,Lastname,Sex,Age) VALUES(:email,:password,:firstname,:lastname,:sex,:age)");
+
+// Get person Id
+$db->bindMore(array("email"=>$myusername, "password"=>$mypassword));
+$personId = $db->single("SELECT Id FROM persons WHERE Email = :email AND Password = :password");
+
+$db->bindMore(array("personId"=>$personId, "code"=>$code1, "keyword"=>$keyword1));
+// Insert
+$insert = $db->query("INSERT INTO interestings(PersonId,Code,Keyword) VALUES(:personId,:code,:keyword)");
+$db->bindMore(array("personId"=>$personId, "code"=>$code2, "keyword"=>$keyword2));
+$insert = $db->query("INSERT INTO interestings(PersonId,Code,Keyword) VALUES(:personId,:code,:keyword)");
+
 
 // Do something with the data 
 if ($insert > 0 ) {
