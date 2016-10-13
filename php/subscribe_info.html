@@ -27,18 +27,18 @@ $(function() {
             "firstname":firstname,"lastname":lastname,"age":age, "gender":gender,
             "code1":code1,"keyword1":keyword1,
             "code2":code2,"keyword2":keyword2
-        }; // AJson object
+        }; // Json object
         var dataString = JSON.stringify(postData); // Json 2 String
 
         var url = "register_info.php";
         $.ajax({
-            type: 'post',
+            type: 'POST',
             url: url,
-            // dataType: 'json', ★　Comment　dataType otherwise error for "undefined"!!!
-            data: {'registerData': dataString}, // payload has KEY and Value
-            contentType: 'application/json; charset=utf-8', // For myData who has KEY and Value
+            // dataType: 'json',
+            data: {'myData': dataString}, // payload has KEY and Value
+            // contentType: 'application/json; charset=utf-8', // For myData who has KEY and Value
             success: function (msg) {
-                var backdata = "Subscribe Result" + msg;
+                var backdata = "*** Subscribe Result: " + msg;
                 $("#backdata").html(backdata);
                 $("#backdata").css({color: "green"});
                 alert('Subscribe success!');
