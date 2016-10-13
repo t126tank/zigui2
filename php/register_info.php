@@ -43,6 +43,8 @@ $insert = $db->query("INSERT INTO persons(Email,Password,Firstname,Lastname,Sex,
 // Do something with the data 
 if ($insert > 0 ) {
   echo 'Succesfully registered your info. !';
+} else {
+  echo 'Failed to register your info. !';
 }
 
 ?>
