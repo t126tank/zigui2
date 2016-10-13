@@ -1,11 +1,14 @@
 <?php
 session_start();
-if (!session_is_registered(myusername) || !session_is_registered(mypassword) ||
+
+require_once ("dbg/dbg.php");
+
+if (!$_SESSION['myusername'] || !$_SESSION['myusername'] ||
     !$_SESSION['is_logged_in'] || $_SESSION['expires'] < time()) {
   session_unset();
   session_destroy();
   // exit;
-  header("location:main_login.php"); // Redirect to re-login
+  header("location:login.html"); // Redirect to re-login
 } else {
   $_SESSION['expires'] = time() + 3600; // refresh the lifetime
 }
