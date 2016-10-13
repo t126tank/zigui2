@@ -1,0 +1,139 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<title>php+jquery+ajax+json</title>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+<script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
+<script type="text/javascript">
+$(function() {
+    $("#subbtn").click(function() {
+
+        var myusername=$('#myusername').val();
+        var mypassword=$('#mypassword').val();
+        var firstname=$('#firstname').val();
+        var lastname=$('#lastname').val();
+        var age=$('#age').val();
+        var gender=$('#gender').val();
+        var code1=$('#code1').val();
+        var keyword1=$('#keyword1').val();
+        var code2=$('#code2').val();
+        var keyword2=$('#keyword2').val();
+
+        var postData = {
+            "myusername":myusername, "mypassword":mypassword,
+            "firstname":firstname,"lastname":lastname,"age":age, "gender":gender,
+            "code1":code1,"keyword1":keyword1,
+            "code2":code2,"keyword2":keyword2
+        }; // AJson object
+        var dataString = JSON.stringify(postData); // Json 2 String
+
+        var url = "register_info.php";
+        $.ajax({
+            type: 'post',
+            url: url,
+            // dataType: 'json', ★　Comment　dataType otherwise error for "undefined"!!!
+            data: {'registerData': dataString}, // payload has KEY and Value
+            contentType: 'application/json; charset=utf-8', // For myData who has KEY and Value
+            success: function (msg) {
+                var backdata = "Subscribe Result" + msg;
+                $("#backdata").html(backdata);
+                $("#backdata").css({color: "green"});
+                alert('Subscribe success!');
+            },
+            error: function(e) {
+                console.log(e.message);
+            }
+        });
+    });
+});
+</script>
+</head>
+
+<body>
+<table width="300" border="0" align="center" cellpadding="0" cellspacing="1" bgcolor="#CCCCCC">
+<tr>
+<!-- form name="form1" method="post" action="register_info.php" -->
+<td>
+<table width="100%" border="0" cellpadding="3" cellspacing="1" bgcolor="#FFFFFF">
+<tr>
+<td colspan="3"><strong>Subscribe </strong></td>
+</tr>
+<tr>
+<td width="78">Email</td>
+<td width="6">:</td>
+<td width="294"><input name="myusername" type="text" id="myusername"></td>
+</tr>
+<tr>
+<td>Password</td>
+<td>:</td>
+<td><input name="mypassword" type="text" id="mypassword"></td>
+</tr>
+<tr>
+<td>First Name</td>
+<td>:</td>
+<td><input name="firstname" type="text" id="firstname"></td>
+</tr>
+<tr>
+<td>Last Name</td>
+<td>:</td>
+<td><input name="lastname" type="text" id="lastname"></td>
+</tr>
+<tr>
+<td>Age</td>
+<td>:</td>
+<td><input name="age" type="text" id="age"></td>
+</tr>
+<tr>
+<td>Gender</td> <!-- Option radio-->
+<td>:</td>
+<td><input name="gender" type="text" id="gender"></td>
+
+</tr>
+<tr>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+
+<tr>
+<td>Code1</td>
+<td>:</td>
+<td><input name="code1" type="text" id="code1"></td>
+</tr>
+<tr>
+<td>Keyword1</td>
+<td>:</td>
+<td><input name="keyword1" type="text" id="keyword1"></td>
+</tr>
+
+</tr>
+<tr>
+<td>Code2</td>
+<td>:</td>
+<td><input name="code2" type="text" id="code2"></td>
+</tr>
+<tr>
+<td>Keyword2</td>
+<td>:</td>
+<td><input name="keyword2" type="text" id="keyword2"></td>
+</tr>
+
+<tr>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>
+    <span id="backdata"></span>
+    <p><input id="subbtn" type="button" value="Register" /></p>
+    <!-- input type="submit" name="Submit" value="Register" id="subbtn" -->
+</td>
+</tr>
+
+</table>
+</td>
+<!-- /form -->
+</tr>
+</table>
+</body>
+</html>
