@@ -51,6 +51,6 @@ $jsonObj = json_encode($jsonStr);
 
 $link = 'http://localhost/pqs/mt4/poor-post.php';
 
-echo postFromHTTP($link, $jsonObj);
+postFromHTTP($link, $jsonObj);
 
 ?>
