@@ -1,6 +1,6 @@
 <?php
 
-require_once('./json-post.php');
+require_once(__DIR__ .'/json-post.php');
 
 // $postJson = json_encode($_POST);
 // $json_input_data=json_decode(file_get_contents('php://input'), TRUE);
@@ -34,7 +34,7 @@ switch ($status_code) {
 }
 
 // trading
-sleep(2000);
+sleep(1);
 
 $link = 'http://localhost/pqs/mt4/rich-post.php';
 postFromHTTP($link, $jsonObj);
