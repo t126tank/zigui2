@@ -1,5 +1,5 @@
 <?php
-require_once('./json-post.php');
+require_once(__DIR__ .'/json-post.php');
 
 $time = date("Y:m:d g:i:s");
 
