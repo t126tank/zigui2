@@ -12,26 +12,12 @@ $channel = $connection->channel();
 
 $channel->queue_declare('hello', false, false, false, false);
 
+// $msg = new AMQPMessage($jsonObj);
 $msg = new AMQPMessage("rich-post.php");
-// $msg = new AMQPMessage(invertJsonObj($jsonObj));
+
 $channel->basic_publish($msg, '', 'hello');
 
 $channel->close();
 $connection->close();
-
-function invertJsonObj($obj) {
-    $ordArray = json_decode($obj, TRUE);
-
-    array_walk($ordArray, 'cb');
-
-    return json_encode($ordArray);
-}
-
-function cb(&$item) {
-    if ($item['type'] == 'buy')
-        $item['type'] = 'sell';
-    else
-        $item['type'] = 'buy';
-};
 
 ?>
