@@ -1,7 +1,8 @@
 
 <?php
-// require_once ("dbg/dbg.php");
-$newData = '';
+
+require_once ("dbg/dbg.php");
+$newData = 'aaa';
 
 require_once __DIR__ . '/mt4/vendor/autoload.php';
 use PhpAmqpLib\Connection\AMQPStreamConnection;
@@ -31,10 +32,20 @@ $connection->close();
 
 if (empty($newData)) {
     // return old.json only
-    generateTbl(getOld());
+    generateTbl(getJsonObj("old.json"), array());
 
     exit();
 }
+
+    // 1) merge buf.json & old.json as old.json
+    mergeJson();
+
+    // 2) new data sets as buf.json
+    writeJsonObj(getJsonObj("new.json"), "buf.json");
+
+    // 3) set marks to new data for highlights as new.json
+    // 4) display old.json & new json
+    generateTbl(getJsonObj("old.json"), getJsonObj("new.json"));
 
 function dbgTime() {
     $t = microtime(true);
@@ -46,9 +57,15 @@ function dbgTime() {
     return $str;
 }
 
+function mergeJson() {
+    $oldArr = getJsonObj("old.json");
+    $bufArr = getJsonObj("buf.json");
+    $result = array_merge($bufArr, $oldArr);
+    writeJsonObj($result, "old.json");
+}
 
-function getOld() {
-   $fileLocation = __DIR__ . '/data/old.json';
+function getJsonObj($jsonfile) {
+   $fileLocation = __DIR__ . '/data/'. $jsonfile;
 
    $file = fopen($fileLocation, "r");
    $jsonObj = trim(fread($file, 8192));
@@ -57,7 +74,15 @@ function getOld() {
    return json_decode($jsonObj, true);
 }
 
-function generateTbl($arr) {
+function writeJsonObj($arr, $jsonfile) {
+   $fileLocation = __DIR__ . '/data/'. $jsonfile;
+
+   $file = fopen($fileLocation, "w");
+   fwrite($file, json_encode($arr));
+   fclose($file);
+}
+
+function generateTbl($arr, $newArr) {
 echo <<<EOF
     <table class="hoge">
     <tr>
@@ -68,6 +93,18 @@ echo <<<EOF
 	    <th>見出し4</th>
     </tr>
 EOF;
+
+    if (sizeof($newArr) != 0) {
+        foreach ($newArr as $item) {
+            echo '<tr class="hv">';
+	        echo '<td>' .dbgTime().' </td>';
+	        echo '<td>' .$item['time'].' </td>';
+	        echo '<td>' .$item['ticket']. '</td>';
+	        echo '<td>' .$item['price'].'</td>';
+         	echo '<td>' .$item['type']. '</td>';
+            echo '</tr>';
+        }
+    }
 
     foreach ($arr as $item) {
         echo '<tr>';
