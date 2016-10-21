@@ -24,18 +24,18 @@ $channel->basic_consume('mmmmm', '', false, true, false, false, $callback);
 
 $timeout = 1;
 // while(count($channel->callbacks)) {
-//     $channel->wait(null, false, $timeout);
+//    $channel->wait(null, false, $timeout);
 // }
 
 $channel->close();
 $connection->close();
 
-if (empty($newData)) {
-    // return old.json only
-    generateTbl(getJsonObj("old.json"), array());
+    if (empty($newData)) {
+        // if there is no new data, just return old.json only
+        generateTbl(getJsonObj("old.json"), array());
 
-    exit();
-}
+        exit();
+    }
 
     // 1) merge buf.json & old.json as old.json
     mergeJson();
@@ -60,13 +60,30 @@ function dbgTime() {
 function mergeJson() {
     $oldArr = getJsonObj("old.json");
     $bufArr = getJsonObj("buf.json");
-    $result = array_merge($bufArr, $oldArr);
+
+    if (sizeof($oldArr) != 0) { // due to 8192 trunck
+        $result = array_merge($bufArr, $oldArr);
+    } else {
+        $result = $bufArr;
+    }
     writeJsonObj($result, "old.json");
 }
 
 function getJsonObj($jsonfile) {
    $fileLocation = __DIR__ . '/data/'. $jsonfile;
 
+
+   if (filesize($fileLocation) > 8192) {
+        // readout old.json.bak
+        $current = file_get_contents($fileLocation.'.bak');
+
+        // append new old.json into old.json.bak
+        file_put_contents($fileLocation.'.bak', file_get_contents($fileLocation).$current);
+
+        // clear new old.json
+        file_put_contents($fileLocation, 'null');
+   }
+   
    $file = fopen($fileLocation, "r");
    $jsonObj = trim(fread($file, 8192));
    fclose($file);
@@ -106,15 +123,18 @@ EOF;
         }
     }
 
-    foreach ($arr as $item) {
-        echo '<tr>';
-	    echo '<td>' .dbgTime().' </td>';
-	    echo '<td>' .$item['time'].' </td>';
-	    echo '<td>' .$item['ticket']. '</td>';
-	    echo '<td>' .$item['price'].'</td>';
-     	echo '<td>' .$item['type']. '</td>';
-        echo '</tr>';
+    if (sizeof($arr) != 0) {
+        foreach ($arr as $item) {
+            echo '<tr>';
+	        echo '<td>' .dbgTime().' </td>';
+	        echo '<td>' .$item['time'].' </td>';
+	        echo '<td>' .$item['ticket']. '</td>';
+	        echo '<td>' .$item['price'].'</td>';
+         	echo '<td>' .$item['type']. '</td>';
+            echo '</tr>';
+        }
     }
+
 echo <<<EOF
     </table>
 EOF;
