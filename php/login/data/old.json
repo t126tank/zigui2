@@ -1,0 +1,20 @@
+[
+   {
+      "time": "432",
+      "ticket": 43442,
+      "price": 8288.88,
+      "type" : "sell"
+   },
+   {
+      "time": "555",
+      "ticket": 888,
+      "price": 1626.6,
+      "type": "buy"
+   },
+   {
+      "time": "034",
+      "ticket": 686,
+      "price": 412.22,
+      "type": "sell"
+   }
+]
