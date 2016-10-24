@@ -19,22 +19,24 @@ var oldSum = sum;
  */
 function requestData() {
 	$.ajax({
-		url: 'live-server-data.php',
+		// url: 'live-server-data.php',
+		url: 'rich-worker.php',
 		success: function (points) {
 
             $.each(points, function(key, value) {
                 // alert(value);
-			    var series = chart.series[0],
-				    shift = series.data.length > 20; // shift if the series is longer than 20
+		var series = chart.series[0],
+		    shift = series.data.length > 20; // shift if the series is longer than 20
 
-		        var point = eval(value);
+		var point = eval(value);
                 sum.x  = (new Date()).getTime(); // point.ticket;
                 sum.y += parseFloat(point.profits);
                 chart.series[0].addPoint(eval(sum), true, shift);
+                setTimeout(null, 1000);
             }); 
 
 			// call it again after one second
-			setTimeout(requestData, 1000);	
+			setTimeout(requestData, 2000);
 		},
 		cache: false
 	});
