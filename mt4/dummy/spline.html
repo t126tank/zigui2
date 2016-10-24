@@ -11,20 +11,28 @@
 <!--
 
 var chart; // global
+var sum = {"x": 0, "y": 0};
+var oldSum = sum;
 		
 /**
  * Request data from the server, add it to the graph and set a timeout to request again
  */
 function requestData() {
 	$.ajax({
-		url: 'live-server-data.php', 
-		success: function(point) {
-			var series = chart.series[0],
-				shift = series.data.length > 20; // shift if the series is longer than 20
+		url: 'live-server-data.php',
+		success: function (points) {
 
-			// add the point
-			chart.series[0].addPoint(eval(point), true, shift);
-			
+            $.each(points, function(key, value) {
+                // alert(value);
+			    var series = chart.series[0],
+				    shift = series.data.length > 20; // shift if the series is longer than 20
+
+		        var point = eval(value);
+                sum.x  = (new Date()).getTime(); // point.ticket;
+                sum.y += parseFloat(point.profits);
+                chart.series[0].addPoint(eval(sum), true, shift);
+            }); 
+
 			// call it again after one second
 			setTimeout(requestData, 1000);	
 		},
@@ -66,14 +74,6 @@ $(document).ready(function() {
 
 -->
 </script>
-
-<!-- CSS -->
-<style type="text/css">
-    table.hoge tr.hv td {
-        background-color: #fff4f8;
-    }
-</style>
-
 
 </head>
 
