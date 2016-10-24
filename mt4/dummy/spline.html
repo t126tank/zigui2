@@ -75,9 +75,9 @@ $(document).ready(function() {
 });
 
 function convert2Date(dateString) {
-    dateTimeParts = dateString.split(' '),
-    timeParts = dateTimeParts[1].split(':'),
-    dateParts = dateTimeParts[0].split('.'),
+    dateTimeParts = dateString.split(' ');
+    timeParts = dateTimeParts[1].split(':');
+    dateParts = dateTimeParts[0].split('.');
 
     return new Date(dateParts[0], parseInt(dateParts[1], 10) - 1, dateParts[2], timeParts[0], timeParts[1]);
 }
