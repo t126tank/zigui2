@@ -29,7 +29,7 @@ function requestData() {
 		    shift = series.data.length > 20; // shift if the series is longer than 20
 
 		var point = eval(value);
-                sum.x  = (new Date()).getTime(); // point.ticket;
+                sum.x  = convert2Date(point.time);
                 sum.y += parseFloat(point.profits);
                 chart.series[0].addPoint(eval(sum), true, shift);
                 setTimeout(null, 1000);
@@ -73,6 +73,14 @@ $(document).ready(function() {
         }]
     });        
 });
+
+function convert2Date(dateString) {
+    dateTimeParts = dateString.split(' '),
+    timeParts = dateTimeParts[1].split(':'),
+    dateParts = dateTimeParts[0].split('.'),
+
+    return new Date(dateParts[0], parseInt(dateParts[1], 10) - 1, dateParts[2], timeParts[0], timeParts[1]);
+}
 
 -->
 </script>
