@@ -1,4 +1,6 @@
 <?php
+// require_once ("../dbg/dbg.php");
+
 include(__DIR__ . '/config.php');
 
 use PhpAmqpLib\Connection\AMQPStreamConnection;
@@ -8,13 +10,12 @@ $connection = new AMQPStreamConnection(HOST, PORT, USER, PASS, VHOST);
 $channel = $connection->channel();
 $channel->queue_declare(TCH, false, false, false, false);
 
-$tradeData = '';
+$GLOBALS['tradeData'] = '[';
 
 // echo ' [*] Waiting for messages. To exit press CTRL+C', "\n";
 $callback = function($msg) {
-   $tradeData .= $msg->body;  // offer inverted orders to richMT4
-   $tradeData .= ',';
-   echo $tradeData;
+   $GLOBALS['tradeData'] .= $msg->body;  // offer inverted orders to richMT4
+   $GLOBALS['tradeData'] .= ',';
 };
 
 $channel->basic_consume(TCH, '', false, true, false, false, $callback);
@@ -27,11 +28,9 @@ while (count($channel->callbacks)) {
         $channel->close();
         $connection->close();
 
-        $tradeData = rtrim($tradeData, ',');
-        // $tradeData  = substr($tradeData, 0, -1);
-        $tradeData = '[' . $tradeData;
-        $tradeData .= ']';
-        echo $tradeData;
+        $GLOBALS['tradeData']  = rtrim($GLOBALS['tradeData'], ',');
+        $GLOBALS['tradeData'] .= ']';
+        echo $GLOBALS['tradeData'];
 
         exit;
     }
