@@ -27,7 +27,8 @@ while (count($channel->callbacks)) {
         $channel->close();
         $connection->close();
 
-        $tradeData  = substr($tradeData, 0, -1);
+        $tradeData = rtrim($tradeData, ',');
+        // $tradeData  = substr($tradeData, 0, -1);
         $tradeData = '[' . $tradeData;
         $tradeData .= ']';
         echo $tradeData;
