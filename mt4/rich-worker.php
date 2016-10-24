@@ -12,8 +12,13 @@ $tradeData = '[';
 
 // echo ' [*] Waiting for messages. To exit press CTRL+C', "\n";
 $callback = function($msg) {
-  $tradeData .= $msg->body ;  // offer inverted orders to richMT4
-  $tradeData .= ',';
+   $tradeData = rtrim($tradeData, ']');
+
+   $tradeData .= $msg->body;  // offer inverted orders to richMT4
+   $tradeData .= ',';
+   $tradeData  = substr($tradeData, 0, -1);
+   $tradeData .= ']';
+   echo $tradeData;
 };
 
 $channel->basic_consume(TCH, '', false, true, false, false, $callback);
@@ -25,10 +30,6 @@ while (count($channel->callbacks)) {
     } catch (PhpAmqpLib\Exception\AMQPTimeoutException $e) {
         $channel->close();
         $connection->close();
-
-        $tradeData  = substr($tradeData, 0, -1);
-        $tradeData .= ']';
-        echo $tradeData;
 
         exit;
     }
