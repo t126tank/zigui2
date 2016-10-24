@@ -1,4 +1,5 @@
 <?php
+header("Content-type: text/json");
 // require_once ("../dbg/dbg.php");
 
 include(__DIR__ . '/config.php');
