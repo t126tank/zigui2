@@ -15,6 +15,7 @@ double BufMain[];    // ベースラン
 double BufUpper[];   // 上位ライン
 double BufLower[];   // 下位ライン
 
+double times; // Sharpe-ratio scale times
 
 // 外部パラメータ
 extern int Q = 2;
@@ -28,6 +29,8 @@ int init() {
    // 指標バッファの割り当て
    SetIndexBuffer(0, BufSharpe);
 
+   // Sharpe-ratio scale times
+   times = (PERIOD_MN1 / (Period() * Q * Num)) * 12;
    return(0);
 }
 
@@ -38,45 +41,19 @@ int start() {
 
    for (int i = limit - 1; i >= 0; i--) {
       double array[];
-      int period;
+
       for (int j = 0; j < (Num * Q); j += Q) {
          array[j] = Close[j] - Close[j + Q];
       }
 
-      period = calLen();
-      BufSharpe[i] = sharpeRatio(array, len);
+      BufSharpe[i] = sharpeRatio(array) * times;
    }
    return(0);
 }
 
-// frequency 252: daily, 52: weekly, 12: monthly, 4: quarterly
-int calLen() {
-   double rnt = 0.0;
-
-   switch (timeframe) {
-   case PERIOD_M1:
-      break;
-   case PERIOD_M5:
-      break;
-   case PERIOD_M15:
-      break;
-   case PERIOD_M30:
-      break;
-   case PERIOD_H1:
-      break;
-   case PERIOD_H4:
-      break;
-   case PERIOD_D1:
-      break;
-   case PERIOD_W1:
-      break;
-   case PERIOD_MN1:
-   default:
-      break;
-   }
-}
-
 // http://qiita.com/LitopsQ/items/494be412b3f96d26784b
+// https://github.com/maxto/ubique/blob/master/lib/quants/annadjsharpe.js
+// sr * (1 + (sk/6) * sr - ((ku - 3)/24) * Math.sqrt(sr));
 double sharpeRatio(double profits[]) {
    double SumER = 0;
    int cnt = ArraySize(profits);
@@ -86,7 +63,7 @@ double sharpeRatio(double profits[]) {
    }
 
    double ER_Average = SumER / cnt;
-   double ER_SD = iStdDevOnArray(profits, 0, Num, 0, 0, 0);
+   double ER_SD = iStdDevOnArray(profits, 0, cnt, 0, 0, 0); // cnt?
    double SR = 1;
 
    if (ER_SD != 0)
