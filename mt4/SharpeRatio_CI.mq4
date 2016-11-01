@@ -56,6 +56,7 @@ int start() {
 // sr * (1 + (sk/6) * sr - ((ku - 3)/24) * Math.sqrt(sr));
 
 // http://plusforex.blogspot.com/2012/09/bb-macd-bollinger-bands-with-moving.html
+// http://ameblo.jp/meta49/entry-11128736166.html
 double sharpeRatio(double profits[]) {
    double SumER = 0;
    int cnt = ArraySize(profits);
