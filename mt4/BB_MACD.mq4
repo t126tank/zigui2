@@ -93,7 +93,7 @@ int start() {
    if (counted_bars > 0) counted_bars--;
 
    if (barsCount > 0)
-         limit = MathMin(Bars - counted_bars,barsCount);
+         limit = MathMin(Bars - counted_bars, barsCount);
    else  limit = Bars - counted_bars;
 
 //----
