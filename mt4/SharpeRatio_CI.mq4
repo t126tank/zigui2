@@ -42,8 +42,8 @@ int start() {
    for (int i = limit - 1; i >= 0; i--) {
       double array[];
 
-      for (int j = 0; j < (Num * Q); j += Q) {
-         array[j] = Close[j] - Close[j + Q];
+      for (int j = 0; j < Num; j++) {
+         array[j] = Close[j * Q] - Close[(j+1) Q];
       }
 
       BufSharpe[i] = sharpeRatio(array) * times;
@@ -54,6 +54,8 @@ int start() {
 // http://qiita.com/LitopsQ/items/494be412b3f96d26784b
 // https://github.com/maxto/ubique/blob/master/lib/quants/annadjsharpe.js
 // sr * (1 + (sk/6) * sr - ((ku - 3)/24) * Math.sqrt(sr));
+
+// http://plusforex.blogspot.com/2012/09/bb-macd-bollinger-bands-with-moving.html
 double sharpeRatio(double profits[]) {
    double SumER = 0;
    int cnt = ArraySize(profits);
