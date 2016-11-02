@@ -65,8 +65,8 @@ double sharpeRatio(double profits[]) {
       SumER += profits[i];
    }
 
-   double ER_Average = SumER / cnt;
-   double ER_SD = iStdDevOnArray(profits, 0, cnt, 0, 0, 0); // cnt?
+   double ER_Average = SumER / cnt;　// iMAOnArray(profits, 0, Num, 0, MODE_SMA, 0);
+   double ER_SD = iStdDevOnArray(profits, 0, Num, 0, MODE_SMA, 0);
    double SR = 1;
 
    if (ER_SD != 0)
