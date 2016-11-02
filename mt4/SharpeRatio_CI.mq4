@@ -43,7 +43,7 @@ int start() {
       double array[];
 
       for (int j = 0; j < Num; j++) {
-         array[j] = Close[j * Q] - Close[(j+1) Q];
+         array[j] = Close[i + j * Q] - Close[i + (j+1) * Q];
       }
 
       BufSharpe[i] = sharpeRatio(array) * times;
