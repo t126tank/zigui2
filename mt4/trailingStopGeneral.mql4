@@ -78,9 +78,9 @@ void trailingStopGeneral(int aMagic, double aTS_StartPips, double aTS_StopPips)
           orderModifyReliable(oTicket, 0.0, modifyStopLoss, 0.0, 0, gArrowColor[oType]);
         }
         // 示例：usd/jpy， start = 5，stop = 3
-        // 在汇率 120（oPrice） 开仓做【卖空】，假定此时止损位价格指定为 123（oStopLoss = 120 + 3）
-        // 当汇率变动至 110（price（ASK）），按止损幅值应设定【新止损位价格】113 （modifyStopLoss = 110 + 3）
-        // 因 110（price（ASK）） <= 115 【120（oPrice）- start (5)】并且 113（modifyStopLoss）< 123（oStopLoss）
+        // 在汇率 120（oPrice） 开仓做【卖空】，假定此时止损位价格指定为 127（oStopLoss = 120 + 7（任意））
+        // 当汇率变动至 110（price（ASK）），按止损幅值应设定【新止损位价格】113（modifyStopLoss = 110 + 3（stop））
+        // 因 110（price（ASK）） <= 115 【120（oPrice）- start (5)】并且 113（modifyStopLoss）< 127（oStopLoss）
         // 即可下调 当前【空】订单（仓）的止损位价格为【新止损位价格】113（modifyStopLoss = 110 + 3）
       }
     }
