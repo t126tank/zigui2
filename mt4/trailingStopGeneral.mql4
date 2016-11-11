@@ -1,5 +1,5 @@
 //+------------------------------------------------------------------+
-//|【功能】通用行情跟随式止损                                        |
+//|【功能】行情跟随式止损的通常算法                                  |
 //|                                                                  |
 //|【参数】 IN OUT  参数名             说明                          |
 //|        --------------------------------------------------------- |
@@ -11,7 +11,7 @@
 //|                                                                  |
 //|【备注】从原平仓价格处以 aTS_StartPips 幅度跟随步进，在新设定     |
 //|        的平仓价格处按 aTS_StopPips 幅度设定止损位价格            |
-//|        a - arguments, g - glocal variables, o - order            |
+//|        a - arguments, g - global variables, o - order            |
 //+------------------------------------------------------------------+
 void trailingStopGeneral(int aMagic, double aTS_StartPips, double aTS_StopPips)
 {
