@@ -6,7 +6,7 @@
 //|         ○      aMagic             魔法数                        |
 //|         ○      aTS_StartPips      跟随步进幅值（pips）          |
 //|         ○      aTS_StopPips       止损幅值（pips）              |
-//|         △      aTS_StepPips       止损幅值更改间隔（pips）      |
+//|         △      aTS_StepPips       止损幅值更改阈值（pips）      |
 //|                                                                  |
 //|【返值】无                                                        |
 //|                                                                  |
