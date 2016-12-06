@@ -85,6 +85,7 @@ int deinit() {
 //| Custom indicator iteration function                              |
 //+------------------------------------------------------------------+
 int start() {
+   // counted_bars 首次为零； 之后为所有已经计算过的 Bar 的个数
    int counted_bars = IndicatorCounted();
 //---- 
    ArrayCopySeries(EurUsd, MODE_CLOSE, "EURUSD", Period());
@@ -94,7 +95,7 @@ int start() {
    ArrayCopySeries(UsdJpy, MODE_CLOSE, "USDJPY", Period());
    ArrayCopySeries(UsdCad, MODE_CLOSE, "USDCAD", Period());
 
-   //
+   // temp0 为 出现 Bar 的个数减一
    temp0 = Bars - 1;
    if (ArraySize(EurUsd) < temp0 + 1) {
        temp0 = ArraySize(EurUsd) - 1;
