@@ -127,13 +127,13 @@ int start() {
        Comment("UsdCad " + Period() + " " + ArraySize(UsdCad));
    }
 
-   //
+   // 历史记录不足制定的参考个数
    if (line_centre >= temp0) {
        Comment("Wrong line centre.... ");
        return(0);
    }
  
-   //
+   // Bars - counted_bars 首次为未计算过的Bar的个数；之后 应为 1 即 temp1
    if (temp0 - line_centre < Bars - counted_bars)
        temp1 = temp0 - line_centre;
    else  
