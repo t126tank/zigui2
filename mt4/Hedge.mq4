@@ -8,6 +8,7 @@
 #property indicator_color1 Red
 #property indicator_level1 0
 
+// セカンド separate window
 
 // 指標バッファ用の配列の宣言
 double BufCorrel[];  // 相関度
@@ -49,7 +50,6 @@ int init() {
 // 指標計算関数
 int start() {
    int counted_bars = IndicatorCounted();
-
    temp0 = Bars - 1;
 
    //
