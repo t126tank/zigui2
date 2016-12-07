@@ -1,4 +1,4 @@
-// Hedge.mq4
+// Hedge.mq4 http://www.forexfactory.com/showthread.php?t=160912
 #property copyright "Copyright (c) 2016, aabbccddee"
 #property link      "http://aabbccddee.com/"
 
