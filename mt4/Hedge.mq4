@@ -115,7 +115,7 @@ int start() {
 double correl(double gbp[], double eur[]) {
    double GBP_Average = iMAOnArray(gbp, 0, Num, 0, MODE_SMA, 0);
    double GBP_SD      = iStdDevOnArray(gbp, 0, Num, MODE_SMA, 0, 0);
-   double Sxy = 0.0;
+   double Sxy = 0.0; // 协方差
 
    double EUR_Average = iMAOnArray(eur, 0, Num, 0, MODE_SMA, 0);
    double EUR_SD      = iStdDevOnArray(eur, 0, Num, MODE_SMA, 0, 0);
@@ -123,6 +123,6 @@ double correl(double gbp[], double eur[]) {
    for (int i; i < Num; i++) {
       Sxy += (gbp[i] - GBP_Average) * (eur[i] - EUR_Average);
    }
-
+   // 当相关系数的绝对值大于2/sqrt(N)，N为样本点的数量时，我们认为线性关系是存在的
    return Sxy/(Num-1)/(GBP_SD * EUR_SD);
 }
