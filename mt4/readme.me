@@ -1,0 +1,69 @@
+★Static: Pair1 vs Pair2, Long-Period(Daily), Short-Period(M5), Trend(Up/Dn)
+★Params: RShort, RLong, Threshold, RIndicatorN, Entry, TIndicatorN, TakeProfits, Step, Exit
+★Values: Profits, Lots, TTime  (Open - Profits: null)
+
+R: Relation
+T: Trade
+
+●MT4、Tradestation
+・Input
+  * {★Static}
+  * {★Params}
+
+・Output
+  * {★Static}
+  * {★Params}
+  * {★Values}
+
+・Processing
+  # 
+  # 
+
+
+●TF
+・Input
+  * Training dataset (Validation ?)
+  * Predicting candidate ★Params randomly
+
+・Output
+  * Suggested ★Params
+
+・Processing
+  # Training
+  # Validation
+  # Predicting and Ranking
+
+
+●PQS
+・Input FROM MT4、TS
+  * {★Static}
+  * {★Params}
+  * {★Values}
+
+・Output TO TF
+
+・Input FROM TF
+
+・Output TO MT4、TS
+
+・Processing
+  * FROM MT4、TS
+    # ★LABEL: {★Values(Profits/diff-TTime) ⇒ Classification}
+      ** 0 (Worst)   - less than minus average
+      ** 1 (Worse)   - negative
+      ** 2 (General) - positive
+      ** 3 (Good)    - greater than positive average
+      ** 4 (Better)  - greater than positive average + 1sigma
+      ** 5 (Best)    - greater than positive average + 2sigma
+    # Save / Update Same ★Params
+    # Generate CSV / Training data set (Validation ?)
+    # Generate predicting candidate ★Params randomly
+
+  * TO TF
+
+  * FROM TF
+    # Receive suggested ★Params
+
+  * TO MT4、TS
+    ** {★Static}
+    ** Suggested {★Params}
