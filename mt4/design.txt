@@ -16,8 +16,14 @@ T: Trade
   * {★Values}
 
 ・Processing
-  # 
-  # 
+  # Refresh indicators
+  # Check Entry(1) / Exist(-1) signal
+  # Initialize positions (Pair positions number)
+  # Check Positions
+  # Order Close - Pairs
+  # Order Open  - Pairs
+  # Trailing-Stop
+  # HTTP Post Json
 
 
 ●TF
@@ -41,10 +47,14 @@ T: Trade
   * {★Values}
 
 ・Output TO TF
+  * Training dataset
+  * Candidate {★Params}
 
 ・Input FROM TF
+  * Suggested {★Params}
 
 ・Output TO MT4、TS
+  * Suggested {★Params}
 
 ・Processing
   * FROM MT4、TS
