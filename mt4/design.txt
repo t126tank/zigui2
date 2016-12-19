@@ -16,14 +16,30 @@ T: Trade
   * {★Values}
 
 ・Processing
-  # Refresh indicators
-  # Check Entry(1) / Exist(-1) signal
-  # Initialize positions (Pair positions number)
-  # Check Positions
-  # Order Close - Pairs
-  # Order Open  - Pairs
-  # Trailing-Stop
-  # HTTP Post Json
+  * Initial: int init()
+    # Initialize positions
+  * On Tick: int start()
+    # Refresh indicators
+    # Update positions
+    # Check Entry/Exit signals for Each position
+    ## Entry signal > 0
+    ### Position not exists
+    ### Open
+    ## Exit signal < 0
+    ### Profits <= 0
+    ### Profits >  0 → Both Trailing Stop
+    # return 0
+  * Refresh indicators
+  * Check Entry(1) / Exist(-1) signal
+  * Initialize positions: void MyInitPosition(int magic of pair)
+    # pips adjustments
+    # retrieve positions
+    ## 
+  * Check Positions
+  * Order Close - Pairs
+  * Order Open  - Pairs
+  * Trailing-Stop
+  * HTTP Post Json
 
 
 ●TF
@@ -77,3 +93,50 @@ T: Trade
   * TO MT4、TS
     ** {★Static}
     ** Suggested {★Params}
+
+//// Data Structure ////
+■struct ZiGuiPos[MAX_POS] {
+    struct ZiGuiHedge;
+    int  pos;       // order ticket
+    inr  magic_b;   // magic number of buy
+    double slOrd;   // stop loss
+    double tpOrd;   // take profits
+}
+
+■enum ZiGuiSymbol {
+    GBPJPY = 0,
+    EURJPY,
+    GBPUSD,
+    EURUSD,
+    ...
+    SYM_LAST
+}
+
+■string Symbol[SYM_LAST] = {
+    "GBPJPY", "EURJPY", "GBPUSD", "EURUSD", ...
+};
+
+■struct ZiGuiPair {
+    string sym;
+    double pipPoint;    // pips adjustment
+    double slippagePips;// slippage
+}
+
+■struct ZiGuiHedge[] {
+    int idx;
+    int pos;
+    double lots;
+    struct ZiGuiPair p1;
+    struct ZiGuiPair p2;
+}
+
+int idx = 0;
+for (int i = GBPJPY; i < SYM_LAST - 1; i++) {
+    for (int j = i + 1; j < SYM_LAST; j++) {
+        ZiGuiHedge[idx].idx  = idx / 2;
+        ZiGuiHedge[idx].pos  = inPos;
+        ZiGuiHedge[idx].lots = inLots;
+        ZiGuiHedge[idx].p1.sym   = Symbol[i];
+        ZiGuiHedge[idx++].p2.sym = Symbol[j];
+    }
+}
