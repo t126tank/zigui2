@@ -97,10 +97,6 @@ T: Trade
 //// Data Structure ////
 ■struct ZiGuiPos[MAX_POS] {
     struct ZiGuiHedge;
-    int  pos;       // order ticket
-    inr  magic_b;   // magic number of buy
-    double slOrd;   // stop loss
-    double tpOrd;   // take profits
 }
 
 ■enum ZiGuiSymbol {
@@ -118,6 +114,10 @@ T: Trade
 
 ■struct ZiGuiPair {
     string sym;
+    int  pos;       // order ticket
+    inr  magic_b;   // magic number of buy
+    double slOrd;   // stop loss
+    double tpOrd;   // take profits
     double pipPoint;    // pips adjustment
     double slippagePips;// slippage
 }
@@ -130,6 +130,37 @@ T: Trade
     struct ZiGuiPair p2;
 }
 
+■Initialize positions
+// retrieve positions
+for (int idx = 0; i < POSITIONS; i++) {
+    // bind magic number
+    ZiGuiHedge[idx].p1.magic_b = magic + idx * 2;
+    ZiGuiHedge[idx].p2.magic_b = magic + idx * 2 + 1;
+    // init order ticket
+    ZiGuiHedge[idx].p1.pos = 0;
+    ZiGuiHedge[idx].p2.pos = 0;
+    // stop loss
+    ZiGuiHedge[idx].p1.slOrd = 0;
+    ZiGuiHedge[idx].p2.slOrd = 0;
+    // take profits
+    ZiGuiHedge[idx].p1.tpOrd = 0;
+    ZiGuiHedge[idx].p2.tpOrd = 0;
+
+    for (int k = 0; k < OrdersTotal(); k++) {
+        if (OrderSelect(k, SELECT_BY_POS) == false) break;
+
+        if (OrderSymbol() == ZiGuiHedge[idx].p1.sym &&
+            OrderMagicNumber() == ZiGuiHedge[idx].p1.magic_b) {
+            ZiGuiHedge[idx].p1.pos = OrderTicket();
+            break;
+        }
+        if (OrderSymbol() == ZiGuiHedge[idx].p2.sym &&
+            OrderMagicNumber() == ZiGuiHedge[idx].p2.magic_b) {
+            ZiGuiHedge[idx].p2.pos = OrderTicket();
+            break;
+        }
+    }
+}
 int idx = 0;
 for (int i = GBPJPY; i < SYM_LAST - 1; i++) {
     for (int j = i + 1; j < SYM_LAST; j++) {
