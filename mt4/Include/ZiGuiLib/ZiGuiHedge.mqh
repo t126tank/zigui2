@@ -1,9 +1,9 @@
-// ZiGuiHedge.mqh Version
-#property copyright "Copyright (c) 2013, abc"
+// ZiGuiHedge.mqh   Version 0.01
+
+#property copyright "Copyright (c) 2016, abc"
 #property link      "http://aabbccc.com/"
 
-#include <stderror.mqh>
-#include <stdlib.mqh>
+#include <ZiGuiLib\RakutenSym.mqh>
 
 // order type extension
 #define OP_NONE -1
@@ -11,19 +11,6 @@
 struct ZiGuiPos[MAX_POS] {
     struct ZiGuiHedge;
 }
-
-enum ZiGuiSymbol {
-    GBPJPY = 0,
-    EURJPY,
-    GBPUSD,
-    EURUSD,
-    ...
-    SYM_LAST
-};
-
-string ZiGuiSym[SYM_LAST] = {
-    "GBPJPY", "EURJPY", "GBPUSD", "EURUSD", ...
-};
 
 struct ZiGuiPair {
     string sym;
@@ -47,7 +34,7 @@ struct ZiGuiHedgePara {
     double Exit;        // Ex: Momentum abs(diff) < +30 or > -30 - CLOSE
 };
 
-struct ZiGuiHedge[] {
+struct ZiGuiHedge {
     int idx;
     int pos;
     double lots;
