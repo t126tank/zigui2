@@ -4,6 +4,7 @@
 
 
 #define POSITIONS 2     // hedge pair positions
+
 #include <ZiGuiLib\ZiGuiHedge.mqh>
 #include <ZiGuiLib\MyPosition.mqh>
 
@@ -16,11 +17,10 @@ extern int hostPort = 80;
 
 MqlNet INet;
 
-
 int Magic = 20161220;
 string EAname[POSITIONS] = {
-   RakutenSymStr[GBPUSD],
-   RakutenSymStr[EURUSD]
+   "GBPUSD",   // RakutenSymStr[GBPUSD],
+   "EURUSD"    // RakutenSymStr[EURUSD]
 }; // Buy pair name
 
 
@@ -39,8 +39,8 @@ extern int BBDev = 1;
 
 //----
 double corrThreshold = 0.25;
-double openThreshold = 10;
-double closThreshold = 2;
+double openThreshold = 0.5;
+double closThreshold = 0.1;
 
 string p1 = RakutenSymStr[GBPUSD];
 string p2 = RakutenSymStr[EURUSD];
@@ -60,7 +60,7 @@ void RefreshIndicators()
       SlowMA[i] = iMA(NULL, 0, SlowMAPeriod, 0, MODE_SMA, PRICE_CLOSE, i);
       BB_U[i] = iBands(NULL, 0, BBPeriod, BBDev, 0, PRICE_CLOSE, MODE_UPPER, i);
       BB_L[i] = iBands(NULL, 0, BBPeriod, BBDev, 0, PRICE_CLOSE, MODE_LOWER, i);
-      Correlation[i] = iCustom(NULL, 0, "\\ZiGuiIndicators\Correlation", p1, p2, PERIOD_D1, nCo, 0, 0);
+      Correlation[i] = iCustom(NULL, 0, "ZiGuiIndicators\\Correlation", p1, p2, PERIOD_D1, nCo, 0, 0);
       Pair1[i] = iMomentum(p1, 0, nMo, PRICE_CLOSE, 0);
       Pair2[i] = iMomentum(p2, 0, nMo, PRICE_CLOSE, 0);
    }
@@ -90,7 +90,7 @@ bool CrossDownClose(double& ind2[], int shift)
 int HedgeSignal1() {
    int ret = 0; // 1: buy, -1: sell, 0: none
 
-   if (abs(Pair1[0] - Pair2[0]) > openThreshold) {
+   if (MathAbs(Pair1[0] - Pair2[0]) > openThreshold) {
       if (Pair1[0] > Pair2[0])
          ret = -1;
       else
@@ -103,17 +103,17 @@ int HedgeSignal1() {
 // Open Signals > 0, Close Signals < 0
 int EntrySignal() {
    // Judge position op is BUY or SELL or null
-   double pos = MyOrderOpenLots(pos_id);
+   // double pos = MyOrderOpenLots(pos_id);
    int ret = 0;   // -1: close, 1: buy Pair1/sell Pair2, 2: sell Pair1/buy Pair2
 
    if (Correlation[0] > corrThreshold) {
-      if (HedgeSignal1 == 1)
+      if (HedgeSignal1() ==  1)
          return 1;   // buy Pair1
-      if (HedgeSignal1 == -1)
+      if (HedgeSignal1() == -1)
          return 2;   // buy Pair2
    }
  
-   if (abs(Pair1[0] - Pair2[0]) > closThreshold) {
+   if (MathAbs(Pair1[0] - Pair2[0]) < closThreshold) {
       ret = -1;
    }
    return(ret);
@@ -148,7 +148,7 @@ int start()
 
    return(0);
 
-#if 0
+#ifdef abcde
    for (int i = 0; i < POSITIONS; i++) {
       int sig_entry = EntrySignal(i);
 
