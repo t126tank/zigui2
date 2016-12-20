@@ -14,8 +14,9 @@
 #property indicator_minimum -1.05
 
 //---- input parameters
-extern string    Symbol1="GBPJPY";//"GBPUSD";
-extern string    Symbol2="CHFJPY";//"EURUSD";
+extern string    Symbol1="GBPUSD";
+extern string    Symbol2="EURUSD";
+extern int       tf=0;            //timeframe
 extern int       cPeriod=20;
 
 //---- buffers
@@ -42,7 +43,7 @@ int init()
    IndicatorShortName(short_name);
    SetIndexLabel(0,short_name);
    
-   SetIndexDrawBegin(0, 2*cPeriod);
+   SetIndexDrawBegin(0,2*cPeriod);
    return(0);
   }
 //+------------------------------------------------------------------+
@@ -61,42 +62,37 @@ int deinit()
 int start()
   {
    int shift,limit,counted_bars=IndicatorCounted();
-
+   
    if ( counted_bars < 0 ) return(-1);
    if ( counted_bars ==0 ) limit=Bars-cPeriod-1;
-
-   if ( counted_bars < 1 )
-      for (int i=1;i<2*cPeriod;i++)
-         Correlation[Bars-i]=0;
-
-   if (counted_bars>0)
-      limit=Bars-counted_bars;
-
+   if ( counted_bars < 1 ) 
+   for(int i=1;i<2*cPeriod;i++) Correlation[Bars-i]=0;    
+      
+   if(counted_bars>0) limit=Bars-counted_bars;
    limit--;
-
-   for ( shift=limit; shift>=0; shift--) {
+   
+   for( shift=limit; shift>=0; shift--)
+   {
 //----
-   DiffBuffer1[shift]=iClose(Symbol1,0,shift)-iMA(Symbol1,0,cPeriod,0,MODE_SMA,PRICE_CLOSE,shift);
-   DiffBuffer2[shift]=iClose(Symbol2,0,shift)-iMA(Symbol2,0,cPeriod,0,MODE_SMA,PRICE_CLOSE,shift);
+   DiffBuffer1[shift]=iClose(Symbol1,0,shift)-iMA(Symbol1,tf,cPeriod,0,MODE_SMA,PRICE_CLOSE,shift);
+   DiffBuffer2[shift]=iClose(Symbol2,0,shift)-iMA(Symbol2,tf,cPeriod,0,MODE_SMA,PRICE_CLOSE,shift);
+   PowDiff1[shift]=MathPow(DiffBuffer1[shift],2);
+   PowDiff2[shift]=MathPow(DiffBuffer2[shift],2);
 
-   PowDiff1[shift]=MathPow(DiffBuffer1[shift], 2);
-   PowDiff2[shift]=MathPow(DiffBuffer2[shift], 2);
+      double u=0,l=0,s=0;
 
-   double u=0,l=0,s=0;
-
-   for ( i = cPeriod-1 ;i >= 0 ;i--) {
+      for( i = cPeriod-1 ;i >= 0 ;i--)
+      {
       u += DiffBuffer1[shift+i]*DiffBuffer2[shift+i];
       l += PowDiff1[shift+i];
       s += PowDiff2[shift+i];
-   }
+      }
 
-   if (l*s >0)
-      Correlation[shift]=u/MathSqrt(l*s);
+   if(l*s >0) Correlation[shift]=u/MathSqrt(l*s);
 
   }
-
+  
 //----
    return(0);
   }
 //+------------------------------------------------------------------+
-
