@@ -3,15 +3,15 @@
 #ifndef RAKUTENSYM_MQH
 #define RAKUTENSYM_MQH
 
-#if 1
+#ifdef RAKUTENSYM_MQH
 enum RakutenSym {
-    GBPUSD,
+    GBPUSD = 0,
     EURUSD,
     AUDUSD,
     SYM_LAST
 };
 
-string RakutenSymStr[SYM_LAST] = {
+const string RakutenSymStr[SYM_LAST] = {
     "GBPUSD", "EURUSD", "AUDUSD"
 };
 
