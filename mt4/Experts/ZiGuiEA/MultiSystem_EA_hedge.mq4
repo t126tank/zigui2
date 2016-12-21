@@ -107,12 +107,19 @@ int EntrySignal() {
    int ret = 0;   // -1: close, 1: buy Pair1/sell Pair2, 2: sell Pair1/buy Pair2
 
    double delta = MathAbs(Pair1[0] - Pair2[0]);
-/*
-SendMail("MT4 Hedge", "delta = " + delta + ", " +
-                                    "Pair1[0]" + Pair1[0] + ", " +
-                                    "Pair2[0]" + Pair2[0] + ", " +
-                                    "Correlation[0]" + Correlation[0]);
-*/
+   static datetime oldTime = 0;
+
+   if (oldTime == 0)
+      oldTime = Time[0];
+   else if (oldTime < Time[0]) {
+      oldTime = Time[0];
+      SendMail("MT4 Hedge: " + oldTime,
+         "delta = " + delta + ", " +
+         "Pair1[0] = " + Pair1[0] + ", " +
+         "Pair2[0] = " + Pair2[0] + ", " +
+         "Correlation[0] = " + Correlation[0]);
+   }
+
    if (Correlation[0] > corrThreshold && delta > openThreshold) {
       if (Pair1[0] > Pair2[0])
          ret = 2;
@@ -292,5 +299,3 @@ int make_request(datetime time, int ticket, string op, double price, string type
    // Print(request);
    return(0);
 }
-
-
