@@ -39,8 +39,8 @@ extern int BBDev = 1;
 
 //----
 double corrThreshold = 0.25;
-double openThreshold = 0.5;
-double closThreshold = 0.1;
+double openThreshold = 0.1868;
+double closThreshold = 0.0666;
 
 string p1 = RakutenSymStr[GBPUSD];
 string p2 = RakutenSymStr[EURUSD];
@@ -86,18 +86,18 @@ bool CrossDownClose(double& ind2[], int shift)
    return(Close[shift+1] >= ind2[shift+1] && Close[shift] < ind2[shift]);
 }
 
-// Instructs how to trade Pair1
-int HedgeSignal1() {
-   int ret = 0; // 1: buy, -1: sell, 0: none
+// Instructs how to trade Pair1 or Pair2
+int HedgeSignal() {
+   int ret = 0; // 1: buy pair1, 2: buy pair2, 0: none
 
    if (MathAbs(Pair1[0] - Pair2[0]) > openThreshold) {
       if (Pair1[0] > Pair2[0])
-         ret = -1;
+         ret = 2;
       else
          ret = 1;
    }
 
-   return ret;
+   return(ret);
 }
 
 // Open Signals > 0, Close Signals < 0
@@ -107,12 +107,9 @@ int EntrySignal() {
    int ret = 0;   // -1: close, 1: buy Pair1/sell Pair2, 2: sell Pair1/buy Pair2
 
    if (Correlation[0] > corrThreshold) {
-      if (HedgeSignal1() ==  1)
-         return 1;   // buy Pair1
-      if (HedgeSignal1() == -1)
-         return 2;   // buy Pair2
+      ret = HedgeSignal();
    }
- 
+
    if (MathAbs(Pair1[0] - Pair2[0]) < closThreshold) {
       ret = -1;
    }
@@ -285,5 +282,3 @@ int make_request(datetime time, int ticket, string op, double price, string type
    // Print(request);
    return(0);
 }
-
-
