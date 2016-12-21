@@ -38,9 +38,9 @@ extern int BBPeriod = 15;
 extern int BBDev = 1;
 
 //----
-double corrThreshold = 0.25;
-double openThreshold = 0.1868;
-double closThreshold = 0.0666;
+double corrThreshold = 0.11;
+double openThreshold = 0.03;// 0.1568;
+double closThreshold = 0.003; //0.0166;
 
 string p1 = RakutenSymStr[GBPUSD];
 string p2 = RakutenSymStr[EURUSD];
@@ -60,9 +60,9 @@ void RefreshIndicators()
       SlowMA[i] = iMA(NULL, 0, SlowMAPeriod, 0, MODE_SMA, PRICE_CLOSE, i);
       BB_U[i] = iBands(NULL, 0, BBPeriod, BBDev, 0, PRICE_CLOSE, MODE_UPPER, i);
       BB_L[i] = iBands(NULL, 0, BBPeriod, BBDev, 0, PRICE_CLOSE, MODE_LOWER, i);
-      Correlation[i] = iCustom(NULL, 0, "ZiGuiIndicators\\Correlation", p1, p2, PERIOD_D1, nCo, 0, 0);
-      Pair1[i] = iMomentum(p1, 0, nMo, PRICE_CLOSE, 0);
-      Pair2[i] = iMomentum(p2, 0, nMo, PRICE_CLOSE, 0);
+      Correlation[i] = iCustom(NULL, PERIOD_D1, "ZiGuiIndicators\\Correlation", p1, p2, PERIOD_D1, nCo, 0, 0);
+      Pair1[i] = iMomentum(p1, PERIOD_M5, nMo, PRICE_CLOSE, 0);
+      Pair2[i] = iMomentum(p2, PERIOD_M5, nMo, PRICE_CLOSE, 0);
    }
 }
 
@@ -150,26 +150,28 @@ int start()
 
    // Open Signals
    if (sig_entry > 0) {
-      while (!deal) {
-         deal = MyOrderSend2(sig_entry - 1, EAname[sig_entry - 1], OP_BUY, Lots, 0, 0, 0, EAname[sig_entry - 1]);
-      }
+   int s = 2-sig_entry;
+   int b = sig_entry-1;
+//      while (!deal) {
+         deal = MyOrderSend2(b, EAname[b], OP_BUY, Lots, 0, 0, 0, EAname[b]);
+//      }
 
       deal = false;
-      while (!deal) {
-        deal =  MyOrderSend2(2 - sig_entry, EAname[2 - sig_entry], OP_SELL, Lots, 0, 0, 0, EAname[2 - sig_entry]);
-      }
+//      while (!deal) {
+        deal =  MyOrderSend2(s, EAname[s], OP_SELL, Lots, 0, 0, 0, EAname[s]);
+//      }
    }
 
    // Close Signals
    if (sig_entry < 0) {
-      while (!deal) {
+//      while (!deal) {
          deal = MyOrderClose(0);
-      }
+//      }
 
       deal = false;
-      while (!deal) {
+//      while (!deal) {
          deal = MyOrderClose(1);
-      }
+//      }
    }
    return(0);
 
