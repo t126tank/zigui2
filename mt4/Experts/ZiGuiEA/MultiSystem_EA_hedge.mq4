@@ -146,19 +146,31 @@ int start()
    MyCheckPosition();
    
    int sig_entry = EntrySignal();
-   
+   bool deal = false;
+
    // Open Signals
    if (sig_entry > 0) {
-      MyOrderSend2(sig_entry - 1, EAname[sig_entry - 1], OP_BUY,  Lots, 0, 0, 0, EAname[sig_entry - 1]);
-      MyOrderSend2(2 - sig_entry, EAname[2 - sig_entry], OP_SELL, Lots, 0, 0, 0, EAname[2 - sig_entry]);
+      while (!deal) {
+         deal = MyOrderSend2(sig_entry - 1, EAname[sig_entry - 1], OP_BUY, Lots, 0, 0, 0, EAname[sig_entry - 1]);
+      }
+
+      deal = false;
+      while (!deal) {
+        deal =  MyOrderSend2(2 - sig_entry, EAname[2 - sig_entry], OP_SELL, Lots, 0, 0, 0, EAname[2 - sig_entry]);
+      }
    }
 
    // Close Signals
    if (sig_entry < 0) {
-      MyOrderClose(0);
-      MyOrderClose(1);
-   }
+      while (!deal) {
+         deal = MyOrderClose(0);
+      }
 
+      deal = false;
+      while (!deal) {
+         deal = MyOrderClose(1);
+      }
+   }
    return(0);
 
 #ifdef abcde
