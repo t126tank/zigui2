@@ -1,5 +1,7 @@
 // Hedge.mq4 http://www.forexfactory.com/showthread.php?t=160912
 // http://www.mataf.net/en/tools/01-01-correlation
+// https://www.server-world.info/query?os=Ubuntu_14.04&p=ftp
+
 #property copyright "Copyright (c) 2016, aabbccddee"
 #property link      "http://aabbccddee.com/"
 
