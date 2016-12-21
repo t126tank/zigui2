@@ -149,9 +149,8 @@ int start()
    
    // Open Signals
    if (sig_entry > 0) {
-
-      MyOrderSend(sig_entry - 1, OP_BUY, Lots, 0, 0, 0, EAname[sig_entry - 1]);
-      MyOrderSend(2 - sig_entry, OP_SELL, Lots, 0, 0, 0, EAname[2 - sig_entry]);
+      MyOrderSend2(sig_entry - 1, EAname[sig_entry - 1], OP_BUY,  Lots, 0, 0, 0, EAname[sig_entry - 1]);
+      MyOrderSend2(2 - sig_entry, EAname[2 - sig_entry], OP_SELL, Lots, 0, 0, 0, EAname[2 - sig_entry]);
    }
 
    // Close Signals
