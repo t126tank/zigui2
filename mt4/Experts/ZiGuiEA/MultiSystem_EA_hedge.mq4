@@ -1,9 +1,9 @@
-// MultiSystem_EA.mq4
-#property copyright "Copyright (c) 2012, Toyolab FX"
-#property link      "http://forex.toyolab.com/"
+// MultiSystem_EA_hedge.mq4
+#property copyright "Copyright (c) 2016, aabbccdd"
+#property link      "http://aabbccdd.com/"
 
 
-#define POSITIONS 2     // hedge pair positions
+#define POSITIONS (3*2)     // hedge pair positions * 2
 
 #include <ZiGuiLib\MyPosition.mqh>
 #include <ZiGuiLib\ZiGuiHedge.mqh>
@@ -137,14 +137,14 @@ int EntrySignal() {
 
 int init()
 {
-   MyInitPosition(Magic);
    initHedgePairList();
+   MyInitPosition2(Magic);
    return(0);
 }
 
 int start()
 {
-   ZiGuiHedge* data;
+   ZiGuiHedge *data;
    for (data = hedgePairList.GetFirstNode(); data != NULL; data = hedgePairList.GetNextNode()) {
       // RefreshIndicators
       data.refreshIndicators();
@@ -156,8 +156,7 @@ int start()
       data.trade();
    }
 
-   return(0);
-
+#ifdef abcde // COMMENTED
 
    RefreshIndicators();
 
@@ -193,7 +192,6 @@ int start()
    }
    return(0);
 
-#ifdef abcde
    for (int i = 0; i < POSITIONS; i++) {
       int sig_entry = EntrySignal(i);
 
@@ -293,8 +291,9 @@ int start()
          }
       }
    }
-   return(0);
 #endif
+
+   return(0);
 }
 
 int make_request(datetime time, int ticket, string op, double price, string type, double lots,  double profits) {
@@ -342,8 +341,8 @@ void initHedgePairList() {
          // Parameters to be optimized for each
          ZiGuiHedgePara zghp;
          zghp.RShort = 16;       // Correlation Short period
-         zghp.RLong  = 20;       // Correlation Long period
-         zghp.Threshold = 0.25;  // Correlation threshold (-80, +80)
+         zghp.RLong  = 20;       // Correlation Long  period
+         zghp.RThreshold = 0.25; // Correlation threshold (-80, +80)
          zghp.RIndicatorN;       // reserved 
          zghp.Entry = 0.1;       // Ex: Momentum abs(diff) > +80 or < -80 - OPEN
          zghp.TIndicatorN = 14;  // Ex: Trade indicator period - 14
@@ -358,13 +357,61 @@ void initHedgePairList() {
          zgh.setZiGuiHedgePara(&zghp);
 
          // Set hedge pair index
-         zgh.setIndex(idx++);
+         zgh.setIndex(idx);
 
          hedgePairList.Add(zgh);
 
          ZiGuiHedge[idx].idx  = idx / 2;
          ZiGuiHedge[idx].pos  = inPos;
          ZiGuiHedge[idx].lots = inLots;
+
+      }
+   }
+}
+
+
+void MyInitPosition2(int magic)
+{
+   // pips adjustment marketinfo
+   if (Digits == 3 || Digits == 5)
+   {
+      Slippage = SlippagePips * 10;
+      PipPoint = Point * 10;
+   }
+   else
+   {
+      Slippage = SlippagePips;
+      PipPoint = Point;
+   }
+
+   // retrieve positions
+   for (int i = 0; i < POSITIONS; i++)
+   {
+      int hedgeIdx = i / 2;
+      ZiGuiHedge *data = hedgePairList.GetNodeAtIndex(hedgeIdx);
+
+      int pairIdx = i % 2;
+      data.zgp[Idx].magic_b = magic+i;
+      data.zgp[Idx].slOrd = 0;
+      data.zgp[Idx].tpOrd = 0;
+      data.zgp[Idx].pipPoint = PipPoint;
+      data.zgp[Idx].slippagePips = Slippage;
+
+      MAGIC_B[i] = magic+i;
+      MyPos[i] = 0;
+      SLorder[i] = 0;
+      TPorder[i] = 0;
+
+      for (int k = 0; k < OrdersTotal(); k++)
+      {
+         if (OrderSelect(k, SELECT_BY_POS) == false) break;
+
+         if (OrderSymbol() == data.zgp[Idx].sym &&
+             OrderMagicNumber() == data.zgp[Idx].magic_b)
+         {
+            data.zgp[Idx].pos = OrderTicket();
+            break;
+         }
       }
    }
 }
