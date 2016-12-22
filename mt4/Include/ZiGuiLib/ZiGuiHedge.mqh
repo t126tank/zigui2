@@ -26,7 +26,7 @@ public:
                      ZiGuiHedge(string pair1, string pair2);
                     ~ZiGuiHedge(void);
    //--- methods set
-   void              setZiGuiHedgePara(const ZiGuiHedgePara &rPara) const { para = rPara};
+   void              setZiGuiHedgePara(const ZiGuiHedgePara &rPara) { para = rPara};
    //--- method indicators
    void              refreshIndicators(void);
    //--- method trade
