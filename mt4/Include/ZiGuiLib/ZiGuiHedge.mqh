@@ -194,7 +194,7 @@ int ZiGuiHedge::entrySignal(void)
       else
          ret = 1;
 
-      // corrlation = true; // inverse or mirroring
+      // corrlation = true; // inverse or mirroring AND RThreshold * (-1)
    }
 
    // 
