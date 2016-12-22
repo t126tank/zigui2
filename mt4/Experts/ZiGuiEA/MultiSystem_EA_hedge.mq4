@@ -150,7 +150,7 @@ int start()
       data.refreshIndicators();
 
       // MyCheckPosition
-      MyCheckPosition();
+      MyCheckPosition2();
 
       // Hedge pair trade
       data.trade();
@@ -412,6 +412,41 @@ void MyInitPosition2(int magic)
             break;
          }
       }
+   }
+}
+
+// check MyPosition to be called in start()
+void MyCheckPosition2()
+{
+   for (int i = 0; i < POSITIONS; i++)
+   {
+      int hedgeIdx = i / 2;
+      ZiGuiHedge *data = hedgePairList.GetNodeAtIndex(hedgeIdx);
+
+      int pairIdx = i % 2;
+
+      int pos = 0;
+      for (int k = 0; k < OrdersTotal(); k++)
+      { 
+         if (OrderSelect(k, SELECT_BY_POS) == false) break;
+
+         if (OrderTicket() == data.zgp[Idx].pos)
+         {
+            pos = data.zgp[Idx].pos;
+            break;
+         }
+      }
+      if (pos > 0)
+      {
+         // send SL and TP orders
+         if ((data.zgp[Idx].slOrd > 0 || data.zgp[Idx].tpOrd > 0) &&
+             MyOrderModify(i, 0, data.zgp[Idx].slOrd, data.zgp[Idx].tpOrd))
+         {
+            data.zgp[Idx].slOrd = 0;
+            data.zgp[Idx].tpOrd = 0;
+         }
+      }
+      else data.zgp[Idx].pos = 0;
    }
 }
 
