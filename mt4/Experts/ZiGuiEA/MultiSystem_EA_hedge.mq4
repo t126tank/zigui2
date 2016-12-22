@@ -5,8 +5,8 @@
 
 #define POSITIONS 2     // hedge pair positions
 
-#include <ZiGuiLib\ZiGuiHedge.mqh>
 #include <ZiGuiLib\MyPosition.mqh>
+#include <ZiGuiLib\ZiGuiHedge.mqh>
 
 #include <ZiGuiLib\http\mq4-http.mqh>
 #include <ZiGuiLib\http\hash.mqh>
@@ -26,7 +26,7 @@ string EAname[POSITIONS] = {
 
 extern double Lots = 0.1;
 
-#define MaxBars 3
+
 double FastMA[MaxBars];
 double SlowMA[MaxBars];
 extern int FastMAPeriod = 15;
@@ -51,6 +51,8 @@ int    nCo = 20;
 double Pair1[MaxBars];
 double Pair2[MaxBars];
 int    nMo = 12;
+
+CList hedgePairList;
 
 void RefreshIndicators()
 {
@@ -136,15 +138,31 @@ int EntrySignal() {
 int init()
 {
    MyInitPosition(Magic);
+   initHedgePairList();
    return(0);
 }
 
 int start()
 {
+   ZiGuiHedge* data;
+   for (data = hedgePairList.GetFirstNode(); data != NULL; data = hedgePairList.GetNextNode()) {
+      // RefreshIndicators
+      data.refreshIndicators();
+
+      // MyCheckPosition
+      MyCheckPosition();
+
+      // Hedge pair trade
+      data.trade();
+   }
+
+   return(0);
+
+
    RefreshIndicators();
-   
+
    MyCheckPosition();
-   
+
    int sig_entry = EntrySignal();
    bool deal = false;
 
@@ -312,3 +330,42 @@ int make_request(datetime time, int ticket, string op, double price, string type
    // Print(request);
    return(0);
 }
+
+void initHedgePairList() {
+   int idx = 0;
+
+   for (int i = GBPJPY; i < SYM_LAST - 1; i++) {
+      for (int j = i + 1; j < SYM_LAST; j++) {
+         // Init ZiGuiHedge object
+         ZiGuiHedge zgh = new ZiGuiHedge(ZiGuiSym[i], ZiGuiSym[j]);
+
+         // Parameters to be optimized for each
+         ZiGuiHedgePara zghp;
+         zghp.RShort = 16;       // Correlation Short period
+         zghp.RLong  = 20;       // Correlation Long period
+         zghp.Threshold = 0.25;  // Correlation threshold (-80, +80)
+         zghp.RIndicatorN;       // reserved 
+         zghp.Entry = 0.1;       // Ex: Momentum abs(diff) > +80 or < -80 - OPEN
+         zghp.TIndicatorN = 14;  // Ex: Trade indicator period - 14
+         zghp.TakeProfits = 300; // StopLoss?
+         zghp.Step  = 100;       // Trailing Stop step width
+         zghp.Exit = 0.01;       // Ex: Momentum abs(diff) < +30 or > -30 - CLOSE
+
+         zghp.RPeriod = PERIOD_D1;
+         zghp.TPeriod = PERIOD_M5;
+
+         // Set hedge parameters
+         zgh.setZiGuiHedgePara(&zghp);
+
+         // Set hedge pair index
+         zgh.setIndex(idx++);
+
+         hedgePairList.Add(zgh);
+
+         ZiGuiHedge[idx].idx  = idx / 2;
+         ZiGuiHedge[idx].pos  = inPos;
+         ZiGuiHedge[idx].lots = inLots;
+      }
+   }
+}
+
