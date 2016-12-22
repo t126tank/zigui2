@@ -336,7 +336,7 @@ void initHedgePairList() {
    for (int i = GBPJPY; i < SYM_LAST - 1; i++) {
       for (int j = i + 1; j < SYM_LAST; j++) {
          // Init ZiGuiHedge object
-         ZiGuiHedge zgh = new ZiGuiHedge(ZiGuiSym[i], ZiGuiSym[j]);
+         ZiGuiHedge zgh = new ZiGuiHedge(RakutenSymStr[i], RakutenSymStr[j]);
 
          // Parameters to be optimized for each
          ZiGuiHedgePara zghp;
@@ -357,14 +357,13 @@ void initHedgePairList() {
          zgh.setZiGuiHedgePara(&zghp);
 
          // Set hedge pair index
-         zgh.setIndex(idx);
+         zgh.setIndex(idx++);
+
+         // Set hedge pair Lots
+         // TODO: lots balance ...
+         zgh.setLots(0.1);
 
          hedgePairList.Add(zgh);
-
-         ZiGuiHedge[idx].idx  = idx / 2;
-         ZiGuiHedge[idx].pos  = inPos;
-         ZiGuiHedge[idx].lots = inLots;
-
       }
    }
 }
