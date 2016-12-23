@@ -16,7 +16,7 @@
 //---- input parameters
 extern string    Symbol1="GBPUSD";
 extern string    Symbol2="EURUSD";
-extern int       tf=0;            //timeframe
+// extern int       tf=0;            //timeframe
 extern int       cPeriod=20;
 
 //---- buffers
@@ -74,8 +74,8 @@ int start()
    for( shift=limit; shift>=0; shift--)
    {
 //----
-   DiffBuffer1[shift]=iClose(Symbol1,0,shift)-iMA(Symbol1,tf,cPeriod,0,MODE_SMA,PRICE_CLOSE,shift);
-   DiffBuffer2[shift]=iClose(Symbol2,0,shift)-iMA(Symbol2,tf,cPeriod,0,MODE_SMA,PRICE_CLOSE,shift);
+   DiffBuffer1[shift]=iClose(Symbol1,0,shift)-iMA(Symbol1,0,cPeriod,0,MODE_SMA,PRICE_CLOSE,shift);
+   DiffBuffer2[shift]=iClose(Symbol2,0,shift)-iMA(Symbol2,0,cPeriod,0,MODE_SMA,PRICE_CLOSE,shift);
    PowDiff1[shift]=MathPow(DiffBuffer1[shift],2);
    PowDiff2[shift]=MathPow(DiffBuffer2[shift],2);
 
@@ -96,3 +96,4 @@ int start()
    return(0);
   }
 //+------------------------------------------------------------------+
+
