@@ -2,8 +2,8 @@
 #property copyright "Copyright (c) 2016, aabbccdd"
 #property link      "http://aabbccdd.com/"
 
-
-#define POSITIONS    (3*2)     // hedge pair positions * 2
+#include <ZiGuiLib\RakutenSym.mqh>
+#define POSITIONS    (SYM_LAST*2)     // hedge pair positions * 2
 
 #include <ZiGuiLib\MyPosition.mqh>
 #include <ZiGuiLib\ZiGuiHedge.mqh>
@@ -21,10 +21,11 @@ MqlNet INet;
 
 int Magic = 20161223;
 
-CList hedgePairList;
+CList *hedgePairList;
 
 int init()
 {
+   hedgePairList = new CList();
    initHedgePairList();
    MyInitPosition2(Magic);
    return(0);
@@ -35,22 +36,24 @@ void deinit() {
       while (hedgePairList.DeleteCurrent())
          ;
    }
+   delete hedgePairList;
 }
 
 int start()
 {
-   ZiGuiHedge *data;
-   for (data = hedgePairList.GetFirstNode(); data != NULL; data = hedgePairList.GetNextNode()) {
-      // RefreshIndicators
-      data.refreshIndicators();
+   ZiGuiHedge *hedge;
 
-      // MyCheckPosition
-      MyCheckPosition2();
+   // MyCheckPosition
+   MyCheckPosition2();
+
+   for (hedge = hedgePairList.GetFirstNode(); hedge != NULL; hedge = hedgePairList.GetNextNode()) {
+      // RefreshIndicators
+      hedge.refreshIndicators();
 
       // Hedge pair trade
-      data.trade();
-   }
-
+      hedge.trade();
+    }
+   //printSummary();
 
 #ifdef abcde
    RefreshIndicators();
@@ -224,6 +227,16 @@ int make_request(datetime time, int ticket, string op, double price, string type
    return(0);
 }
 
+void printSummary(void)
+{
+    ZiGuiHedge* h;
+
+    for (h = hedgePairList.GetFirstNode(); h != NULL; h = hedgePairList.GetNextNode()) {
+      PrintFormat("[%d][0]  %s: OK", h.getIndex(), h.zgp[0].sym);
+      PrintFormat("[%d][1]  %s: OK", h.getIndex(), h.zgp[1].sym);
+    }
+}
+
 void initHedgePairList() {
    int idx = 0;
 
@@ -234,7 +247,7 @@ void initHedgePairList() {
 
          // Parameters to be optimized for each
          ZiGuiHedgePara zghp;
-         zghp.RShort = 16;       // Correlation Short period
+         zghp.RShort = 18;       // Correlation Short period
          zghp.RLong  = 20;       // Correlation Long  period
          zghp.RThreshold = 0.25; // Correlation threshold (-80, +80)
          zghp.RIndicatorN = 0.1; // reserved 
@@ -268,14 +281,14 @@ void MyInitPosition2(int magic)
    for (int i = 0; i < POSITIONS; i++)
    {
       int hedgeIdx = i / 2;
-      ZiGuiHedge *data = hedgePairList.GetNodeAtIndex(hedgeIdx);
+      ZiGuiHedge *hedge = hedgePairList.GetNodeAtIndex(hedgeIdx);
 
       int pairIdx = i % 2;
 
       // pips adjustment marketinfo
-      int d = (int) MarketInfo(data.zgp[pairIdx].sym, MODE_DIGITS);
+      int d = (int) MarketInfo(hedge.zgp[pairIdx].sym, MODE_DIGITS);
       double slippage = 0; // customized slip-page
-      double pipPoint = MarketInfo(data.zgp[pairIdx].sym, MODE_POINT);
+      double pipPoint = MarketInfo(hedge.zgp[pairIdx].sym, MODE_POINT);
 
       if (d == 3 || d == 5)
       {
@@ -283,25 +296,21 @@ void MyInitPosition2(int magic)
          pipPoint *= 10;
       }
 
-      data.zgp[pairIdx].magic_b = magic+i;
-      data.zgp[pairIdx].slOrd = 0;
-      data.zgp[pairIdx].tpOrd = 0;
-      data.zgp[pairIdx].slippagePips = slippage;
-      data.zgp[pairIdx].pipPoint = pipPoint;
-
-      MAGIC_B[i] = magic+i;
-      MyPos[i] = 0;
-      SLorder[i] = 0;
-      TPorder[i] = 0;
+      hedge.zgp[pairIdx].magic_b = magic+i;
+      hedge.zgp[pairIdx].slOrd = 0;
+      hedge.zgp[pairIdx].tpOrd = 0;
+      hedge.zgp[pairIdx].slippagePips = slippage;
+      hedge.zgp[pairIdx].pipPoint = pipPoint;
+      hedge.zgp[pairIdx].pos = 0;
 
       for (int k = 0; k < OrdersTotal(); k++)
       {
          if (OrderSelect(k, SELECT_BY_POS) == false) break;
 
-         if (OrderSymbol() == data.zgp[pairIdx].sym &&
-             OrderMagicNumber() == data.zgp[pairIdx].magic_b)
+         if (OrderSymbol() == hedge.zgp[pairIdx].sym &&
+             OrderMagicNumber() == hedge.zgp[pairIdx].magic_b)
          {
-            data.zgp[pairIdx].pos = OrderTicket();
+            hedge.zgp[pairIdx].pos = OrderTicket();
             break;
          }
       }
@@ -314,7 +323,7 @@ void MyCheckPosition2()
    for (int i = 0; i < POSITIONS; i++)
    {
       int hedgeIdx = i / 2;
-      ZiGuiHedge *data = hedgePairList.GetNodeAtIndex(hedgeIdx);
+      ZiGuiHedge *hedge = hedgePairList.GetNodeAtIndex(hedgeIdx);
 
       int pairIdx = i % 2;
 
@@ -323,22 +332,25 @@ void MyCheckPosition2()
       { 
          if (OrderSelect(k, SELECT_BY_POS) == false) break;
 
-         if (OrderTicket() == data.zgp[pairIdx].pos)
+         if (OrderTicket() == hedge.zgp[pairIdx].pos)
          {
-            pos = data.zgp[pairIdx].pos;
+            pos = hedge.zgp[pairIdx].pos;
             break;
          }
       }
       if (pos > 0)
       {
          // send SL and TP orders
-         if ((data.zgp[pairIdx].slOrd > 0 || data.zgp[pairIdx].tpOrd > 0) &&
-             MyOrderModify(i, 0, data.zgp[pairIdx].slOrd, data.zgp[pairIdx].tpOrd))
+         if ((hedge.zgp[pairIdx].slOrd > 0 || hedge.zgp[pairIdx].tpOrd > 0) &&
+             MyOrderModify(i, 0, hedge.zgp[pairIdx].slOrd, hedge.zgp[pairIdx].tpOrd))
          {
-            data.zgp[pairIdx].slOrd = 0;
-            data.zgp[pairIdx].tpOrd = 0;
+            hedge.zgp[pairIdx].slOrd = 0;
+            hedge.zgp[pairIdx].tpOrd = 0;
          }
       }
-      else data.zgp[pairIdx].pos = 0;
+      else hedge.zgp[pairIdx].pos = 0;
    }
 }
+
+
+
