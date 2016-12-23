@@ -3,10 +3,12 @@
 #property link      "http://aabbccdd.com/"
 
 
-#define POSITIONS (3*2)     // hedge pair positions * 2
+#define POSITIONS    (3*2)     // hedge pair positions * 2
 
 #include <ZiGuiLib\MyPosition.mqh>
 #include <ZiGuiLib\ZiGuiHedge.mqh>
+
+#include <Arrays\List.mqh>
 
 #include <ZiGuiLib\http\mq4-http.mqh>
 #include <ZiGuiLib\http\hash.mqh>
@@ -17,129 +19,22 @@ extern int hostPort = 80;
 
 MqlNet INet;
 
-int Magic = 20161220;
-string EAname[POSITIONS] = {
-   "GBPUSD",   // RakutenSymStr[GBPUSD],
-   "EURUSD"    // RakutenSymStr[EURUSD]
-}; // Buy pair name
-
-
-extern double Lots = 0.1;
-
-
-double FastMA[MaxBars];
-double SlowMA[MaxBars];
-extern int FastMAPeriod = 15;
-extern int SlowMAPeriod = 25;
-
-double BB_U[MaxBars];
-double BB_L[MaxBars];
-extern int BBPeriod = 15;
-extern int BBDev = 1;
-
-//----
-double corrThreshold = 0.11;
-double openThreshold = 0.03;// 0.1568;
-double closThreshold = 0.003; //0.0166;
-
-string p1 = RakutenSymStr[GBPUSD];
-string p2 = RakutenSymStr[EURUSD];
-
-double Correlation[MaxBars];
-int    nCo = 20;
-
-double Pair1[MaxBars];
-double Pair2[MaxBars];
-int    nMo = 12;
+int Magic = 20161223;
 
 CList hedgePairList;
-
-void RefreshIndicators()
-{
-   for(int i=0; i<MaxBars; i++)
-   {
-      FastMA[i] = iMA(NULL, 0, FastMAPeriod, 0, MODE_SMA, PRICE_CLOSE, i);
-      SlowMA[i] = iMA(NULL, 0, SlowMAPeriod, 0, MODE_SMA, PRICE_CLOSE, i);
-      BB_U[i] = iBands(NULL, 0, BBPeriod, BBDev, 0, PRICE_CLOSE, MODE_UPPER, i);
-      BB_L[i] = iBands(NULL, 0, BBPeriod, BBDev, 0, PRICE_CLOSE, MODE_LOWER, i);
-      Correlation[i] = iCustom(NULL, PERIOD_D1, "ZiGuiIndicators\\Correlation", p1, p2, PERIOD_D1, nCo, 0, 0);
-      Pair1[i] = iMomentum(p1, PERIOD_M5, nMo, PRICE_CLOSE, 0);
-      Pair2[i] = iMomentum(p2, PERIOD_M5, nMo, PRICE_CLOSE, 0);
-   }
-}
-
-bool CrossUp(double& ind1[], double& ind2[], int shift)
-{
-   return(ind1[shift+1] <= ind2[shift+1] && ind1[shift] > ind2[shift]);
-}
-
-bool CrossDown(double& ind1[], double& ind2[], int shift)
-{
-   return(ind1[shift+1] >= ind2[shift+1] && ind1[shift] < ind2[shift]);
-}
-
-bool CrossUpClose(double& ind2[], int shift)
-{
-   return(Close[shift+1] <= ind2[shift+1] && Close[shift] > ind2[shift]);
-}
-
-bool CrossDownClose(double& ind2[], int shift)
-{
-   return(Close[shift+1] >= ind2[shift+1] && Close[shift] < ind2[shift]);
-}
-
-// Instructs how to trade Pair1 or Pair2
-int HedgeSignal() {
-   int ret = 0; // 1: buy pair1, 2: buy pair2, 0: none
-
-   if (MathAbs(Pair1[0] - Pair2[0]) > openThreshold) {
-      if (Pair1[0] > Pair2[0])
-         ret = 2;
-      else
-         ret = 1;
-   }
-
-   return(ret);
-}
-
-// Open Signals > 0, Close Signals < 0
-int EntrySignal() {
-   // Judge position op is BUY or SELL or null
-   // double pos = MyOrderOpenLots(pos_id);
-   int ret = 0;   // -1: close, 1: buy Pair1/sell Pair2, 2: sell Pair1/buy Pair2
-
-   double delta = MathAbs(Pair1[0] - Pair2[0]);
-   static datetime oldTime = 0;
-
-   if (oldTime == 0)
-      oldTime = Time[0];
-   else if (oldTime < Time[0]) {
-      oldTime = Time[0];
-      SendMail("MT4 Hedge: " + oldTime,
-         "delta = " + delta + ", " +
-         "Pair1[0] = " + Pair1[0] + ", " +
-         "Pair2[0] = " + Pair2[0] + ", " +
-         "Correlation[0] = " + Correlation[0]);
-   }
-
-   if (Correlation[0] > corrThreshold && delta > openThreshold) {
-      if (Pair1[0] > Pair2[0])
-         ret = 2;
-      else
-         ret = 1;
-   }
-
-   if (delta < closThreshold) {
-      ret = -1;
-   }
-   return(ret);
-}
 
 int init()
 {
    initHedgePairList();
    MyInitPosition2(Magic);
    return(0);
+}
+
+void deinit() {
+   if (hedgePairList.GetLastNode() != NULL) {
+      while (hedgePairList.DeleteCurrent())
+         ;
+   }
 }
 
 int start()
@@ -156,12 +51,12 @@ int start()
       data.trade();
    }
 
-#ifdef abcde // COMMENTED
 
+#ifdef abcde
    RefreshIndicators();
-
+   
    MyCheckPosition();
-
+   
    int sig_entry = EntrySignal();
    bool deal = false;
 
@@ -292,7 +187,6 @@ int start()
       }
    }
 #endif
-
    return(0);
 }
 
@@ -333,17 +227,17 @@ int make_request(datetime time, int ticket, string op, double price, string type
 void initHedgePairList() {
    int idx = 0;
 
-   for (int i = GBPJPY; i < SYM_LAST - 1; i++) {
+   for (int i = GBPUSD; i < SYM_LAST - 1; i++) {
       for (int j = i + 1; j < SYM_LAST; j++) {
          // Init ZiGuiHedge object
-         ZiGuiHedge zgh = new ZiGuiHedge(RakutenSymStr[i], RakutenSymStr[j]);
+         ZiGuiHedge *zgh = new ZiGuiHedge(RakutenSymStr[i], RakutenSymStr[j]);
 
          // Parameters to be optimized for each
          ZiGuiHedgePara zghp;
          zghp.RShort = 16;       // Correlation Short period
          zghp.RLong  = 20;       // Correlation Long  period
          zghp.RThreshold = 0.25; // Correlation threshold (-80, +80)
-         zghp.RIndicatorN;       // reserved 
+         zghp.RIndicatorN = 0.1; // reserved 
          zghp.Entry = 0.1;       // Ex: Momentum abs(diff) > +80 or < -80 - OPEN
          zghp.TIndicatorN = 14;  // Ex: Trade indicator period - 14
          zghp.TakeProfits = 300; // StopLoss?
@@ -354,7 +248,7 @@ void initHedgePairList() {
          zghp.TPeriod = PERIOD_M5;
 
          // Set hedge parameters
-         zgh.setZiGuiHedgePara(&zghp);
+         zgh.setZiGuiHedgePara(zghp);
 
          // Set hedge pair index
          zgh.setIndex(idx++);
@@ -368,21 +262,8 @@ void initHedgePairList() {
    }
 }
 
-
 void MyInitPosition2(int magic)
 {
-   // pips adjustment marketinfo
-   if (Digits == 3 || Digits == 5)
-   {
-      Slippage = SlippagePips * 10;
-      PipPoint = Point * 10;
-   }
-   else
-   {
-      Slippage = SlippagePips;
-      PipPoint = Point;
-   }
-
    // retrieve positions
    for (int i = 0; i < POSITIONS; i++)
    {
@@ -390,11 +271,23 @@ void MyInitPosition2(int magic)
       ZiGuiHedge *data = hedgePairList.GetNodeAtIndex(hedgeIdx);
 
       int pairIdx = i % 2;
-      data.zgp[Idx].magic_b = magic+i;
-      data.zgp[Idx].slOrd = 0;
-      data.zgp[Idx].tpOrd = 0;
-      data.zgp[Idx].pipPoint = PipPoint;
-      data.zgp[Idx].slippagePips = Slippage;
+
+      // pips adjustment marketinfo
+      int d = (int) MarketInfo(data.zgp[pairIdx].sym, MODE_DIGITS);
+      double slippage = 0; // customized slip-page
+      double pipPoint = MarketInfo(data.zgp[pairIdx].sym, MODE_POINT);
+
+      if (d == 3 || d == 5)
+      {
+         slippage *= 10;
+         pipPoint *= 10;
+      }
+
+      data.zgp[pairIdx].magic_b = magic+i;
+      data.zgp[pairIdx].slOrd = 0;
+      data.zgp[pairIdx].tpOrd = 0;
+      data.zgp[pairIdx].slippagePips = slippage;
+      data.zgp[pairIdx].pipPoint = pipPoint;
 
       MAGIC_B[i] = magic+i;
       MyPos[i] = 0;
@@ -405,10 +298,10 @@ void MyInitPosition2(int magic)
       {
          if (OrderSelect(k, SELECT_BY_POS) == false) break;
 
-         if (OrderSymbol() == data.zgp[Idx].sym &&
-             OrderMagicNumber() == data.zgp[Idx].magic_b)
+         if (OrderSymbol() == data.zgp[pairIdx].sym &&
+             OrderMagicNumber() == data.zgp[pairIdx].magic_b)
          {
-            data.zgp[Idx].pos = OrderTicket();
+            data.zgp[pairIdx].pos = OrderTicket();
             break;
          }
       }
@@ -430,23 +323,22 @@ void MyCheckPosition2()
       { 
          if (OrderSelect(k, SELECT_BY_POS) == false) break;
 
-         if (OrderTicket() == data.zgp[Idx].pos)
+         if (OrderTicket() == data.zgp[pairIdx].pos)
          {
-            pos = data.zgp[Idx].pos;
+            pos = data.zgp[pairIdx].pos;
             break;
          }
       }
       if (pos > 0)
       {
          // send SL and TP orders
-         if ((data.zgp[Idx].slOrd > 0 || data.zgp[Idx].tpOrd > 0) &&
-             MyOrderModify(i, 0, data.zgp[Idx].slOrd, data.zgp[Idx].tpOrd))
+         if ((data.zgp[pairIdx].slOrd > 0 || data.zgp[pairIdx].tpOrd > 0) &&
+             MyOrderModify(i, 0, data.zgp[pairIdx].slOrd, data.zgp[pairIdx].tpOrd))
          {
-            data.zgp[Idx].slOrd = 0;
-            data.zgp[Idx].tpOrd = 0;
+            data.zgp[pairIdx].slOrd = 0;
+            data.zgp[pairIdx].tpOrd = 0;
          }
       }
-      else data.zgp[Idx].pos = 0;
+      else data.zgp[pairIdx].pos = 0;
    }
 }
-
