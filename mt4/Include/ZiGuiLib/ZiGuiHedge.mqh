@@ -66,7 +66,6 @@ private:
    double               lots;
    double               times;      // Ex: 10 - ZARJPY(1.0 lots) vs USDJPY(0.1 lots)
    bool                 corrlation; // true: positive, false: negative
-   bool                 opening;    // Pair is under Opening
    ZiGuiHedgePara       para;
    ZiGuiHedgeIndicator  indicator;
 
@@ -161,6 +160,8 @@ void ZiGuiHedge::trade(void)
 
    // Close Signals OR ONE pair is on trailing-stop
    if (sig_entry < 0 || isHalfHedgeOpening()) {
+      MyOrderTS(b);
+      MyOrderTS(s);
 
 #ifdef originalclose
 //      while (!deal) {
