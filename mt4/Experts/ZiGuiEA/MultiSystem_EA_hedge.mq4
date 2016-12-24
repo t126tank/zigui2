@@ -281,9 +281,8 @@ void MyInitPosition2(int magic)
    for (int i = 0; i < POSITIONS; i++)
    {
       int hedgeIdx = i / 2;
+      int pairIdx  = i % 2;
       ZiGuiHedge *hedge = hedgePairList.GetNodeAtIndex(hedgeIdx);
-
-      int pairIdx = i % 2;
 
       // pips adjustment marketinfo
       int d = (int) MarketInfo(hedge.zgp[pairIdx].sym, MODE_DIGITS);
@@ -323,10 +322,24 @@ void MyCheckPosition2()
    for (int i = 0; i < POSITIONS; i++)
    {
       int hedgeIdx = i / 2;
+      int pairIdx  = i % 2;
       ZiGuiHedge *hedge = hedgePairList.GetNodeAtIndex(hedgeIdx);
 
-      int pairIdx = i % 2;
+      hedge.zgp[pairIdx].pos = 0;
 
+      for (int k = 0; k < OrdersTotal(); k++)
+      {
+         if (OrderSelect(k, SELECT_BY_POS) == false) break;
+
+         if (OrderSymbol() == hedge.zgp[pairIdx].sym &&
+             OrderMagicNumber() == hedge.zgp[pairIdx].magic_b)
+         {
+            hedge.zgp[pairIdx].pos = OrderTicket();
+            break;
+         }
+      }
+
+#ifdef sendslandtporders
       int pos = 0;
       for (int k = 0; k < OrdersTotal(); k++)
       { 
@@ -349,8 +362,6 @@ void MyCheckPosition2()
          }
       }
       else hedge.zgp[pairIdx].pos = 0;
+#endif
    }
 }
-
-
-
