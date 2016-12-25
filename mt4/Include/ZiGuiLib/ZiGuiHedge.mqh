@@ -394,7 +394,7 @@ bool ZiGuiHedge::MyOrderTS(int pos_id)
    if (type == OP_BUY)
    {
       double price          = MarketInfo(sym, MODE_BID);
-      double modifyStopLoss = iHigh(sym, 0, iHighest(sym, 0, MODE_HIGH, para.TPeriod, 1));
+      double modifyStopLoss = iHigh(sym, para.TPeriod, iHighest(sym, para.TPeriod, MODE_HIGH, para.TIndicatorN, 1));
 
       if (price - modifyStopLoss >= stopLevel) {
          if (modifyStopLoss > oStopLoss) {
@@ -404,7 +404,8 @@ bool ZiGuiHedge::MyOrderTS(int pos_id)
    } else if (type == OP_SELL) {
       // iLowはBidで算出。ショートの決済はAskになるので、スプレッドを足す必要がある
       price          = MarketInfo(sym, MODE_ASK);
-      modifyStopLoss = iLow(sym, 0, iLowest(sym, 0, MODE_LOW, para.TPeriod, 1)) + MarketInfo(sym, MODE_SPREAD);
+      modifyStopLoss = iLow(sym, para.TPeriod, iLowest(sym, para.TPeriod, MODE_LOW, para.TIndicatorN, 1)) +
+                        MarketInfo(sym, MODE_SPREAD);
 
       // ショートの場合、条件式にoStopLoss == 0.0が必要
       // oStopLoss = 0.0の場合、modifyStopLossには価格（正の値）が格納されるため、
