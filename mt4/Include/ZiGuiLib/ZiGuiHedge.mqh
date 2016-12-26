@@ -1,196 +1,644 @@
-// MultiSystem_EA_hedge.mq4
-#property copyright "Copyright (c) 2016, aabbccdd"
-#property link      "http://aabbccdd.com/"
+// ZiGuiHedge.mqh   Version 0.01
 
+#property copyright "Copyright (c) 2016, abc"
+#property link      "http://aabbccc.com/"
+
+#include <Object.mqh>
 #include <ZiGuiLib\RakutenSym.mqh>
-#define POSITIONS    (SYM_LAST*2)     // hedge pair positions * 2
-
-#include <ZiGuiLib\MyPosition.mqh>
-
-#include <Arrays\List.mqh>
-
-#include <ZiGuiLib\http\mq4-http.mqh>
-#include <ZiGuiLib\http\hash.mqh>
-#include <ZiGuiLib\http\json.mqh>
-
-#include <ZiGuiLib\ZiGuiHedge.mqh>
 
 
-int Magic = 20161223;
+//+------------------------------------------------------------------+
+//| 定数定義                                                         |
+//+------------------------------------------------------------------+
+#define MAX_RETRY_TIME   10.0 // 秒
+#define SLEEP_TIME        0.1 // 秒
+#define MILLISEC_2_SEC 1000.0 // ミリ秒
+#define ZIGUI_CORRELATION  "ZiGuiIndicators\\Correlation"
+#define MaxBars            3
+#define HOST_IP            "katokunou.com"
+#define HOST_PORT          80
 
-CList *hedgePairList;
+MqlNet INet;
 
-int init()
-{
-   hedgePairList = new CList();
-   initHedgePairList();
-   MyInitPosition2(Magic);
-   return(0);
-}
+//+------------------------------------------------------------------+
+//| Structures                                                       |
+//+------------------------------------------------------------------+
+struct ZiGuiHedgePair {
+    string sym;
+    int  pos;       // order ticket
+    int  magic_b;   // magic number of buy
+    double slOrd;   // stop loss
+    double tpOrd;   // take profits
+    double pipPoint;    // pips adjustment
+    double slippagePips;// slippage
+};
 
-void deinit() {
-   if (hedgePairList.GetLastNode() != NULL) {
-      while (hedgePairList.DeleteCurrent())
-         ;
+struct ZiGuiHedgePara {
+   int RShort; // Correlation Short period
+   int RLong;  // Correlation Long period
+   double RThreshold;   // Correlation threshold (-80, +80)
+   double RIndicatorN;  // reserved
+   double Entry;        // Ex: Momentum abs(diff) > +80 or < -80 - OPEN
+   double TIndicatorN;  // Ex: Trade indicator period - 14
+   double TakeProfits;  // StopLoss?
+   double Step;         // Trailing Stop step width
+   double Exit;         // Ex: Momentum abs(diff) < +30 or > -30 - CLOSE
+
+   // NOT FOR DATA MINING
+   double RPeriod;      // default: PERIOD_D1
+   double TPeriod;      // defalut: PERIOD_M5
+};
+
+struct ZiGuiHedgeIndicator {
+   // long/short correlation
+   double rShort[MaxBars];
+   double rLong[MaxBars];
+
+   // open/close indicators' buffer: momentum etc
+   double buf0[MaxBars];
+   double buf1[MaxBars];
+};
+
+//+------------------------------------------------------------------+
+//| MAIN CLASS                                                       |
+//+------------------------------------------------------------------+
+class ZiGuiHedge : public CObject
+  {
+private:
+   int                  idx;
+   int                  pos;
+   double               lots;
+   double               times;      // Ex: 10 - ZARJPY(1.0 lots) vs USDJPY(0.1 lots)
+   bool                 corrlation; // true: positive, false: negative
+   bool                 isTSStarted;
+   ZiGuiHedgePara       para;
+   ZiGuiHedgeIndicator  indicator;
+
+public:
+                     ZiGuiHedge(string aPair1, string aPair2);
+                    ~ZiGuiHedge(void);
+   //--- methods set
+   void              setZiGuiHedgePara(const ZiGuiHedgePara &aPara);
+   void              setIndex(int aIdx)      { idx = aIdx; };
+   void              setLots(double aLots)   { lots = aLots; };
+   void              setTSStarted(bool aflg) { isTSStarted = aflg; };   // trailing-stop started flag
+   //--- methods get
+   ZiGuiHedgePair       zgp[2];
+//    ZiGuiHedgePair    getZiGuiHedgePair(int aIdx)     { return zgp[aIdx]; }; // ONLY Class Object has pointer
+   int               getIndex(void)          { return idx;};
+   bool              isHedgeOpening();
+   bool              isBothHedgeOpening();
+   bool              isHalfHedgeOpening();
+   //--- method indicators
+   void              refreshIndicators(void);
+   //--- method trade
+   void              trade(void);
+private:
+   //--- method signal
+   int               entrySignal();
+   int               exitSignal();
+   bool              MyOrderSend2(int pos_id, int type,
+                                  double price, double sl, double tp,
+                                  string comment="");
+   bool              MyOrderClose2(int pos_id);
+   int               MyOrderType2(int pos_id);
+   double            MyOrderOpenLots2(int pos_id);
+   bool              MyOrderTS(int pos_id);  // Trailing-Stop
+   bool              orderModifyReliable(int aTicket, double aPrice, double aStoploss, double aTakeprofit, datetime aExpiration, color aArrow_color = CLR_NONE);
+   int               make_request(datetime time, int ticket, string op, double price, string type, double lots,  double profits);
+protected:
+   //--- method others
+   int               Compare(const CObject *node,const int mode=0) const;
+  };
+//+------------------------------------------------------------------+
+//| Constructor                                                      |
+//+------------------------------------------------------------------+
+ZiGuiHedge::ZiGuiHedge(string aPair1, string aPair2)
+  {
+      zgp[0].sym = aPair1;
+      zgp[1].sym = aPair2;
+  }
+//+------------------------------------------------------------------+
+//| Destructor                                                       |
+//+------------------------------------------------------------------+
+ZiGuiHedge::~ZiGuiHedge(void)
+  {
+  }
+//+------------------------------------------------------------------+
+//| Refresh Indicator for Hedge sigals                               |
+//+------------------------------------------------------------------+
+void ZiGuiHedge::refreshIndicators(void)
+  {
+   for (int i = 0; i < MaxBars; i++)
+   {
+      indicator.rShort[i] = iCustom(NULL, para.RPeriod, ZIGUI_CORRELATION,
+         zgp[0].sym, zgp[1].sym, para.RShort, 0, 0);
+      indicator.rLong[i]  = iCustom(NULL, para.RPeriod, ZIGUI_CORRELATION,
+         zgp[0].sym, zgp[1].sym, para.RLong,  0, 0);
+
+      indicator.buf0[i] = iMomentum(zgp[0].sym, para.TPeriod, para.TIndicatorN, PRICE_CLOSE, 0);
+      indicator.buf1[i] = iMomentum(zgp[1].sym, para.TPeriod, para.TIndicatorN, PRICE_CLOSE, 0);
    }
-   delete hedgePairList;
-}
-
-int start()
-{
-   ZiGuiHedge *hedge;
-
-   // MyCheckPosition
-   MyCheckPosition2();
-
-   for (hedge = hedgePairList.GetFirstNode(); hedge != NULL; hedge = hedgePairList.GetNextNode()) {
-      // RefreshIndicators
-      hedge.refreshIndicators();
-
-      // Hedge pair trade
-      hedge.trade();
-    }
-   //printSummary();
-
-#ifdef abcde
-   RefreshIndicators();
-   
-   MyCheckPosition();
-   
-   int sig_entry = EntrySignal();
+  }
+//+------------------------------------------------------------------+
+//| Trade based on Hedge sigals                                      |
+//+------------------------------------------------------------------+
+void ZiGuiHedge::trade(void)
+  {
+   int sig_entry = entrySignal();
    bool deal = false;
+   int b = 0, s = 1;
 
    // Open Signals
    if (sig_entry > 0) {
-   int s = 2-sig_entry;
-   int b = sig_entry-1;
+      b = sig_entry-1;
+      s = 2-sig_entry;
+
+      do {
+   //      while (!deal) {
+            // ❶ close -> open ❷ open -> keep open ❸ ts (opening) -> keep ts
+            deal = MyOrderSend2(b, OP_BUY, 0, zgp[b].slOrd, zgp[b].tpOrd, zgp[b].sym); // NOT specify stop-loss NOR take-profits
+   //      }
+
+         deal = false;
+   //      while (!deal) {
+           deal =  MyOrderSend2(s, OP_SELL, 0, zgp[s].slOrd, zgp[s].tpOrd, zgp[s].sym);
+   //      }
+      } while (!isBothHedgeOpening()); // secure both pairs open
+   }
+
+   if (isHalfHedgeOpening())
+      isTSStarted = true;
+
+   // Close Signals OR hedge is on trailing-stop
+   if (sig_entry < 0 || isTSStarted) {
+      isTSStarted = true;
+
+      MyOrderTS(b);
+      MyOrderTS(s);
+
+#ifdef originalclose
 //      while (!deal) {
-         deal = MyOrderSend2(b, EAname[b], OP_BUY, Lots, 0, 0, 0, EAname[b]);
+         deal = MyOrderClose2(b);
 //      }
 
       deal = false;
 //      while (!deal) {
-        deal =  MyOrderSend2(s, EAname[s], OP_SELL, Lots, 0, 0, 0, EAname[s]);
+         deal = MyOrderClose2(s);
 //      }
-   }
-
-   // Close Signals
-   if (sig_entry < 0) {
-//      while (!deal) {
-         deal = MyOrderClose(0);
-//      }
-
-      deal = false;
-//      while (!deal) {
-         deal = MyOrderClose(1);
-//      }
-   }
-   return(0);
-
-   for (int i = 0; i < POSITIONS; i++) {
-      int sig_entry = EntrySignal(i);
-
-
-      // json order init
-      int ticket = -1;
-      string op = "sell";  // "buy"
-      double price = 0.0;
-      string type = "close";  // "open"
-      double lots = 0.1;
-      datetime ctime;
-      datetime otime;
-      double profits = 0.0;
-      bool req = false;
-
-      if (sig_entry > 0)
-      {
-         // Judge if Order is Open
-         if (MyOrderOpenLots(i) != 0) {
-            ticket = MyPos[i];
-            op = "sell";
-            type = "close";
-            lots = MyOrderOpenLots(i);
-            req = true;
-         }
-
-         MyOrderClose(i);
-
-         // Fetch Close order info
-         if (req) {
-            if (OrderSelect(ticket, SELECT_BY_TICKET, MODE_HISTORY)) {
-               ctime = OrderCloseTime();
-               profits = OrderProfit();
-               price = OrderClosePrice();
-            } else
-               Print("OrderSelect failed error code is", GetLastError());
-
-            // Send close order op
-            make_request(ctime, ticket, op, price, type, lots, profits);
-            req = false;
-         }
- 
-         MyOrderSend(i, OP_BUY, Lots, 0, 0, 0, EAname[i]);
-
-         //  Judge if Order is Open
-         if (MyOrderOpenLots(i) != 0) {
-            ticket = MyPos[i];
-            op = "buy";
-            price = OrderOpenPrice();
-            type = "open";
-            lots = MyOrderOpenLots(i);
-            otime = OrderOpenTime();
-            profits = OrderProfit();
-            make_request(otime, ticket, op, price, type, lots, profits);
-         }
-      }
-
-      if (sig_entry < 0)
-      {
-         // Judge if Order is Open
-         if (MyOrderOpenLots(i) != 0) {
-            ticket = MyPos[i];
-            op = "buy";
-            type = "close";
-            lots = MyOrderOpenLots(i);
-            req = true;
-         }
-
-         MyOrderClose(i);
-
-         // Fetch Close order info
-         if (req) {
-            if (OrderSelect(ticket, SELECT_BY_TICKET, MODE_HISTORY)) {
-               ctime = OrderCloseTime();
-               profits = OrderProfit();
-               price = OrderClosePrice();
-            } else
-               Print("OrderSelect failed error code is", GetLastError());
-
-            // Send close order op
-            make_request(ctime, ticket, op, price, type, lots, profits);
-            req = false;
-         }
-
-         MyOrderSend(i, OP_SELL, Lots, 0, 0, 0, EAname[i]);
-
-         //  Judge if Order is Open
-         if (MyOrderOpenLots(i) != 0) {
-            ticket = MyPos[i];
-            op = "sell";
-            price = OrderOpenPrice();
-            type = "open";
-            lots = MyOrderOpenLots(i);
-            otime = OrderOpenTime();
-            profits = OrderProfit();
-            make_request(otime, ticket, op, price, type, lots, profits);
-         }
-      }
-   }
 #endif
+   }
+  }
+//+------------------------------------------------------------------+
+//| Generate entry signal for buying                                 |
+//| Open Signals > 0 or Close Signals < 0                            |
+//| -1: Close Pair1 and Pair2                                        |
+//|  1: buy Pair1 and sell Pair2                                     |
+//|  2: buy Pair2 and sell Pair1                                     |
+//+------------------------------------------------------------------+
+int ZiGuiHedge::entrySignal(void)
+ {
+   int ret = 0;
+
+   double delta = MathAbs(indicator.buf0[0] - indicator.buf1[0]);
+   static datetime oldTime[SYM_LAST];
+
+   // Send monitor mail during generating new Bar
+   if (oldTime[idx] == 0)
+      oldTime[idx] = Time[0];
+   else if (oldTime[idx] < Time[0]) {
+      oldTime[idx] = Time[0];
+      SendMail("MT4 time: " + oldTime[idx] + " hedge idx: " + idx,
+         "delta = " + delta + ", " +
+         "Pair1[" + zgp[0].sym + "] = " + indicator.buf0[0] + ", " +
+         "Pair2[" + zgp[1].sym + "] = " + indicator.buf1[0] + ", " +
+         "Correlation[0] = " + indicator.rShort[0]);
+   }
+
+   // Hedge pairs should be opened simultaneously
+   if (!isHedgeOpening()) {
+      isTSStarted = false; // Both pairs are CLOSE so not on tailing-stop for either
+
+      // Up/Dn trends (rShort vs rLong) + Positive/Negative
+      if (indicator.rShort[0] > para.RThreshold &&
+          delta > para.Entry) {
+         if (indicator.buf0[0] > indicator.buf1[0])
+            ret = 2;
+         else
+            ret = 1;
+   
+         // corrlation = true; // inverse or mirroring AND RThreshold * (-1)
+      }
+   }
+   // 
+   if (delta < para.Exit) {
+      ret = -1;
+   }
+   return(ret);
+ }
+//+------------------------------------------------------------------+
+//| Generate entry signal for buying                                 |
+//| Open Signals > 0 or Close Signals < 0                            |
+//| -1: Close Pair1 and Pair2                                        |
+//|  1: buy Pair1 and sell Pair2                                     |
+//|  2: buy Pair2 and sell Pair1                                     |
+//+------------------------------------------------------------------+
+int ZiGuiHedge::exitSignal(void)
+ {
    return(0);
+ }
+//+------------------------------------------------------------------+
+//| Judge Hedge Pair is Opening or not                               |
+//+------------------------------------------------------------------+
+bool ZiGuiHedge::isHedgeOpening()
+ {
+   bool ret = false;
+   if (zgp[0].pos > 0 || zgp[1].pos > 0)
+      ret = true;
+
+   return (ret);
+ }
+//+------------------------------------------------------------------+
+//| Judge Hedge Pair is BOTH Opening or not                          |
+//+------------------------------------------------------------------+
+bool ZiGuiHedge::isBothHedgeOpening()
+ {
+   bool ret = false;
+   if (zgp[0].pos > 0 && zgp[1].pos > 0)
+      ret = true;
+
+   return (ret);
+ }
+//+------------------------------------------------------------------+
+//| Judge Hedge Pair is XOR Opening or not                           |
+//+------------------------------------------------------------------+
+bool ZiGuiHedge::isHalfHedgeOpening(void)
+ {
+   bool ret = false;
+   if ((zgp[0].pos > 0  && zgp[1].pos == 0) ||
+       (zgp[0].pos == 0 && zgp[1].pos >  0))
+      ret = true;
+
+   return (ret);
+ }
+//+------------------------------------------------------------------+
+//| Set parameters of ZiGuiHedgePara                                 |
+//+------------------------------------------------------------------+
+void ZiGuiHedge::setZiGuiHedgePara(const ZiGuiHedgePara &aPara)
+ {
+   para.RShort = aPara.RShort;
+   para.RLong  = aPara.RLong;
+   para.RThreshold  = aPara.RThreshold;
+   para.RIndicatorN = aPara.RIndicatorN;
+   para.Entry = aPara.Entry;
+   para.TIndicatorN = aPara.TIndicatorN;
+   para.TakeProfits = aPara.TakeProfits;
+   para.Step = aPara.Step;
+   para.Exit = aPara.Exit;
+
+   para.RPeriod = aPara.RPeriod;
+   para.TPeriod = aPara.TPeriod;
+ }
+ 
+//+------------------------------------------------------------------+
+//| Send Order2 for Open                                                     |
+//+------------------------------------------------------------------+
+bool ZiGuiHedge::MyOrderSend2(int pos_id, int type,
+                 double price, double sl, double tp,
+                 string comment="")
+{
+   if (MyOrderType2(pos_id) != OP_NONE) return(true);
+   // for no order
+   string sym = zgp[pos_id].sym;
+   double d = MarketInfo(sym, MODE_DIGITS);
+   price = NormalizeDouble(price, d); // Digits
+   sl = NormalizeDouble(sl, d);
+   tp = NormalizeDouble(tp, d);
+
+   // market price
+   if (type == OP_BUY)  price = MarketInfo(sym, MODE_ASK);
+   if (type == OP_SELL) price = MarketInfo(sym, MODE_BID); // Bid;
+   
+   int ret = OrderSend(sym, type, lots, price,
+               zgp[pos_id].slippagePips, 0, 0, comment,
+               zgp[pos_id].magic_b, 0, ArrowColor[type]);
+   if (ret == -1)
+   {
+      int err = GetLastError();
+      Print("MyOrderSend : ", err, " " ,
+            ErrorDescription(err));
+      zgp[pos_id].pos = 0;
+      return(false);
+   }
+
+   // show open position
+   zgp[pos_id].pos = ret;
+
+   // Post Order info
+   OrderSelect(zgp[pos_id].pos, SELECT_BY_TICKET));
+            ticket = MyPos[i];
+
+   string opStr = "sell";
+   if (type == OP_BUY)
+      opStr = "buy";
+
+   make_request(OrderOpenTime(), zgp[pos_id].pos,
+                opStr, OrderOpenPrice(), "open",
+                MyOrderOpenLots2(pos_id), OrderProfit());
+
+   // send SL and TP orders
+   if (sl > 0) zgp[pos_id].slOrd = sl;
+   if (tp > 0) zgp[pos_id].tpOrd = tp;
+   return(true);
 }
 
-int make_request(datetime time, int ticket, string op, double price, string type, double lots,  double profits) {
+//+------------------------------------------------------------------+
+//| send close order 2                                               |
+//+------------------------------------------------------------------+
+bool ZiGuiHedge::MyOrderClose2(int pos_id)
+{
+   if (MyOrderOpenLots2(pos_id) == 0) return(true);
+
+   // for open position
+   int type = MyOrderType2(pos_id);
+   bool ret = OrderClose(zgp[pos_id].pos, OrderLots(),
+                 OrderClosePrice(), Slippage,
+                 ArrowColor[type]);
+   if (!ret)
+   {
+      int err = GetLastError();
+      Print("MyOrderClose : ", err, " ",
+            ErrorDescription(err));
+      return(false);
+   }
+   zgp[pos_id].pos = 0;
+   return(true);
+}
+
+//+------------------------------------------------------------------+
+//| get order type                                                   |
+//+------------------------------------------------------------------+
+int ZiGuiHedge::MyOrderType2(int pos_id)
+{
+   int type = OP_NONE;
+
+   if (zgp[pos_id].pos > 0 &&
+      OrderSelect(zgp[pos_id].pos, SELECT_BY_TICKET))
+      type = OrderType();
+
+   return(type);
+}
+
+//+------------------------------------------------------------------+
+//| get signed lots of open position                                 |
+//+------------------------------------------------------------------+
+double ZiGuiHedge::MyOrderOpenLots2(int pos_id)
+{
+   int type = MyOrderType2(pos_id);
+   double l = 0;
+   if (type == OP_BUY)  l =  OrderLots();
+   if (type == OP_SELL) l = -OrderLots();
+   return(l);
+}
+
+//+------------------------------------------------------------------+
+//| trailing-stop                                                    |
+//+------------------------------------------------------------------+
+bool ZiGuiHedge::MyOrderTS(int pos_id)
+{
+   if (MyOrderOpenLots2(pos_id) == 0) return(true);
+   // (!((MyOrderOpenLots2(pos_id) > 0) || (MyOrderOpenLots2(pos_id) < 0))) due to double type
+
+   // for open position
+   int type = MyOrderType2(pos_id);
+   string sym = zgp[pos_id].sym;
+   double digits = MarketInfo(sym, MODE_DIGITS);
+
+   double oPrice    = NormalizeDouble(OrderOpenPrice(), digits);
+   double oStopLoss = NormalizeDouble(OrderStopLoss(),  digits);
+   int    oTicket   = zgp[pos_id].pos; // OrderTicket();
+   double stopLevel = MarketInfo(sym, MODE_STOPLEVEL) *
+                        MarketInfo(sym, MODE_POINT);
+
+   if (type == OP_BUY)
+   {
+      double price          = MarketInfo(sym, MODE_BID);
+      double modifyStopLoss = iHigh(sym, para.TPeriod, iHighest(sym, para.TPeriod, MODE_HIGH, para.TIndicatorN, 1));
+
+      if (price - modifyStopLoss >= stopLevel) {
+         if (modifyStopLoss > oStopLoss) {
+            orderModifyReliable(oTicket, 0.0, modifyStopLoss, 0.0, 0, ArrowColor[type]);
+         }
+      }
+   } else if (type == OP_SELL) {
+      // iLowはBidで算出。ショートの決済はAskになるので、スプレッドを足す必要がある
+      price          = MarketInfo(sym, MODE_ASK);
+      modifyStopLoss = iLow(sym, para.TPeriod, iLowest(sym, para.TPeriod, MODE_LOW, para.TIndicatorN, 1)) +
+                        MarketInfo(sym, MODE_SPREAD);
+
+      // ショートの場合、条件式にoStopLoss == 0.0が必要
+      // oStopLoss = 0.0の場合、modifyStopLossには価格（正の値）が格納されるため、
+      // modifyStopLoss < oStopLossの条件が永久に成立しなくなるため
+      if (modifyStopLoss - price >= stopLevel) {
+         if (modifyStopLoss < oStopLoss || oStopLoss == 0.0) {
+            orderModifyReliable(oTicket, 0.0, modifyStopLoss, 0.0, 0, ArrowColor[type]);
+         }
+      }
+   }
+
+   return(true);
+}
+
+//+------------------------------------------------------------------+
+//|【関数】信頼できる注文変更                                        |
+//|                                                                  |
+//|【引数】 IN OUT  引数名             説明                          |
+//|        --------------------------------------------------------- |
+//|         ○      aTicket            チケット番号                  |
+//|         ○      aPrice             待機注文の新しい仕掛け価格    |
+//|         ○      aStoploss          損切り価格                    |
+//|         ○      aTakeprofit        利食い価格                    |
+//|         ○      aExpiration        待機注文の有効期限            |
+//|         △      aArrow_color       チャート上の矢印の色          |
+//|                                                                  |
+//|【戻値】true ：正常終了                                           |
+//|        false：異常終了                                           |
+//|                                                                  |
+//|【備考】△：既定値あり                                            |
+//+------------------------------------------------------------------+
+bool ZiGuiHedge::orderModifyReliable(int aTicket, double aPrice, double aStoploss, double aTakeprofit, datetime aExpiration, color aArrow_color = CLR_NONE)
+{
+   bool result = false;
+
+   int startTime = GetTickCount();
+
+   Print("Attempted orderModifyReliable(#" + aTicket + ", " + aPrice + ", SL:"+ aStoploss + ", TP:" + aTakeprofit + ", Expiration:" + TimeToStr(aExpiration) + ", ArrowColor:" + aArrow_color + ")");
+
+   bool selected = OrderSelect(aTicket, SELECT_BY_TICKET, MODE_TRADES);
+
+   string symbol = OrderSymbol();
+   int    type   = OrderType();
+
+   double digits = MarketInfo(symbol, MODE_DIGITS);
+
+   double price      = NormalizeDouble(OrderOpenPrice(), digits);
+   double stoploss   = NormalizeDouble(OrderStopLoss(), digits);
+   double takeprofit = NormalizeDouble(OrderTakeProfit(), digits);
+
+   aPrice      = NormalizeDouble(aPrice,      digits);
+   aStoploss   = NormalizeDouble(aStoploss,   digits);
+   aTakeprofit = NormalizeDouble(aTakeprofit, digits);
+
+   double stopLevel   = MarketInfo(symbol, MODE_STOPLEVEL) * MarketInfo(symbol, MODE_POINT);
+   double freezeLevel = MarketInfo(symbol, MODE_FREEZELEVEL) * MarketInfo(symbol, MODE_POINT);
+
+   while (true) {
+      if (IsStopped()) {
+         Print("Trading is stopped!");
+         return(false);
+      }
+
+      if (GetTickCount() - startTime > MAX_RETRY_TIME * MILLISEC_2_SEC) {
+         Print("Retry attempts maxed at " + MAX_RETRY_TIME + "sec");
+         return(false);
+      }
+
+      double ask = NormalizeDouble(MarketInfo(symbol, MODE_ASK), digits);
+      double bid = NormalizeDouble(MarketInfo(symbol, MODE_BID), digits);
+
+      // 仕掛け／損切り／利食いがストップレベル未満かフリーズレベル以下の場合、エラー
+      if (type == OP_BUY) {
+         if (MathAbs(bid - aStoploss) < stopLevel) {
+            Print("StopLevel: SL was too close to brokers min distance (" + stopLevel + ")");
+            return(false);
+         } else if (MathAbs(aTakeprofit - bid) < stopLevel) {
+            Print("StopLevel: TP was too close to brokers min distance (" + stopLevel + ")");
+            return(false);
+         } else if (MathAbs(bid - aStoploss) <= freezeLevel) {
+            Print("FreezeLevel: SL was too close to brokers min distance (" + stopLevel + ")");
+            return(false);
+         } else if (MathAbs(aTakeprofit - bid) <= freezeLevel) {
+            Print("FreezeLevel: TP was too close to brokers min distance (" + stopLevel + ")");
+            return(false);
+         }
+      } else if (type == OP_SELL) {
+         if (MathAbs(aStoploss - ask) < stopLevel) {
+            Print("StopLevel: SL was too close to brokers min distance (" + stopLevel + ")");
+            return(false);
+         } else if (MathAbs(ask - aTakeprofit) < stopLevel) {
+            Print("StopLevel: TP was too close to brokers min distance (" + stopLevel + ")");
+            return(false);
+         } else if (MathAbs(aStoploss - ask) <= freezeLevel) {
+            Print("FreezeLevel: SL was too close to brokers min distance (" + stopLevel + ")");
+            return(false);
+         } else if (MathAbs(ask - aTakeprofit) <= freezeLevel) {
+            Print("FreezeLevel: TP was too close to brokers min distance (" + stopLevel + ")");
+            return(false);
+         }
+      } else if (type == OP_BUYLIMIT) {
+         if (MathAbs(ask - aPrice) < stopLevel && (aPrice != 0.0 && aPrice != price)) {
+            Print("StopLevel: OpenPrice was too close to brokers min distance (" + stopLevel + ")");
+            return(false);
+         } else if (MathAbs(aPrice - aStoploss) < stopLevel && ((aPrice != 0.0 && aPrice != price) || (aStoploss != 0.0 && aStoploss != stoploss))) {
+            Print("StopLevel: SL was too close to brokers min distance (" + stopLevel + ")");
+            return(false);
+         } else if (MathAbs(aTakeprofit - aPrice) < stopLevel && ((aPrice != 0.0 && aPrice != price) || (aTakeprofit != 0.0 && aTakeprofit != takeprofit))) {
+            Print("StopLevel: TP was too close to brokers min distance (" + stopLevel + ")");
+            return(false);
+         } else if (MathAbs(ask - aPrice) <= freezeLevel && (aPrice != 0.0 && aPrice != price)) {
+            Print("FreezeLevel: OpenPrice was too close to brokers min distance (" + stopLevel + ")");
+            return(false);
+         }
+      } else if (type == OP_SELLLIMIT) {
+         if (MathAbs(aPrice - bid) < stopLevel && (aPrice != 0.0 && aPrice != price)) {
+            Print("StopLevel: OpenPrice was too close to brokers min distance (" + stopLevel + ")");
+            return(false);
+         } else if (MathAbs(aStoploss - aPrice) < stopLevel && ((aPrice != 0.0 && aPrice != price) || (aStoploss != 0.0 && aStoploss != stoploss))) {
+            Print("StopLevel: SL was too close to brokers min distance (" + stopLevel + ")");
+            return(false);
+         } else if (MathAbs(aPrice - aTakeprofit) < stopLevel && ((aPrice != 0.0 && aPrice != price) || (aTakeprofit != 0.0 && aTakeprofit != takeprofit))) {
+            Print("StopLevel: TP was too close to brokers min distance (" + stopLevel + ")");
+            return(false);
+         } else if (MathAbs(aPrice - bid) <= freezeLevel && (aPrice != 0.0 && aPrice != price)) {
+            Print("FreezeLevel: OpenPrice was too close to brokers min distance (" + stopLevel + ")");
+            return(false);
+         }
+      } else if (type == OP_BUYSTOP) {
+         if (MathAbs(aPrice - ask) < stopLevel && (aPrice != 0.0 && aPrice != price)) {
+            Print("StopLevel: OpenPrice was too close to brokers min distance (" + stopLevel + ")");
+            return(false);
+         } else if (MathAbs(aPrice - aStoploss) < stopLevel && ((aPrice != 0.0 && aPrice != price) || (aStoploss != 0.0 && aStoploss != stoploss))) {
+            Print("StopLevel: SL was too close to brokers min distance (" + stopLevel + ")");
+            return(false);
+         } else if (MathAbs(aTakeprofit - aPrice) < stopLevel && ((aPrice != 0.0 && aPrice != price) || (aTakeprofit != 0.0 && aTakeprofit != takeprofit))) {
+            Print("StopLevel: TP was too close to brokers min distance (" + stopLevel + ")");
+            return(false);
+         } else if (MathAbs(aPrice - ask) <= freezeLevel && (aPrice != 0.0 && aPrice != price)) {
+            Print("FreezeLevel: OpenPrice was too close to brokers min distance (" + stopLevel + ")");
+            return(false);
+         }
+      } else if (type == OP_SELLSTOP) {
+         if (MathAbs(bid - aPrice) < stopLevel && (aPrice != 0.0 && aPrice != price)) {
+            Print("StopLevel: OpenPrice was too close to brokers min distance (" + stopLevel + ")");
+            return(false);
+         } else if (MathAbs(aStoploss - aPrice) < stopLevel && ((aPrice != 0.0 && aPrice != price) || (aStoploss != 0.0 && aStoploss != stoploss))) {
+            Print("StopLevel: SL was too close to brokers min distance (" + stopLevel + ")");
+            return(false);
+         } else if (MathAbs(aPrice - aTakeprofit) < stopLevel && ((aPrice != 0.0 && aPrice != price) || (aTakeprofit != 0.0 && aTakeprofit != takeprofit))) {
+            Print("StopLevel: TP was too close to brokers min distance (" + stopLevel + ")");
+            return(false);
+         } else if (MathAbs(bid - aPrice) <= freezeLevel && (aPrice != 0.0 && aPrice != price)) {
+            Print("FreezeLevel: OpenPrice was too close to brokers min distance (" + stopLevel + ")");
+            return(false);
+         }
+      }
+
+      if (IsTradeContextBusy()) {
+         Print("Must wait for trade context");
+      } else {
+         result = OrderModify(aTicket, aPrice, aStoploss, aTakeprofit, aExpiration, aArrow_color);
+         if (result) {
+            Print("Success! Ticket #", aTicket, " order modified, details follow");
+            selected = OrderSelect(aTicket, SELECT_BY_TICKET, MODE_TRADES);
+            OrderPrint();
+            return(result);
+         }
+
+         int err = GetLastError();
+
+         // 一時的エラーの場合はリトライするが、恒常的エラーの場合は処理中断（リトライしてもエラーになるため）
+         if (err == ERR_NO_ERROR || 
+            err == ERR_COMMON_ERROR ||
+            err == ERR_SERVER_BUSY ||
+            err == ERR_NO_CONNECTION ||
+            err == ERR_TRADE_TIMEOUT ||
+            err == ERR_INVALID_PRICE ||
+            err == ERR_PRICE_CHANGED ||
+            err == ERR_OFF_QUOTES ||
+            err == ERR_BROKER_BUSY ||
+            err == ERR_REQUOTE ||
+            err == ERR_TRADE_CONTEXT_BUSY) {
+            Print("Temporary Error: " + err + " " + ErrorDescription(err) + ". waiting");
+         } else {
+            Print("Permanent Error: " + err + " " + ErrorDescription(err) + ". giving up");
+            return(result);
+         }
+
+         // 最適化とバックテスト時はリトライは不要
+         if (IsOptimization() || IsTesting()) {
+            return(result);
+         }
+      }
+
+      Sleep(SLEEP_TIME * MILLISEC_2_SEC);
+  }
+
+  return(result);
+}
+//+------------------------------------------------------------------+
+//| trailing-stop                                                    |
+//+------------------------------------------------------------------+
+int ZiGuiHedge::make_request(datetime time, int ticket, string op, double price, string type, double lots,  double profits) {
 
    //Create the client request. This is in JSON format but you can send any string
    string request =  "{\"time\":  \""
@@ -216,7 +664,7 @@ int make_request(datetime time, int ticket, string op, double price, string type
    //Make the connection
    if (!INet.Open(hostIp, hostPort)) return(-1);
 
-   if (!INet.RequestJson("POST", "/ifis/mt4/poor-post.php", response, false, true, request, false)) {
+   if (!INet.RequestJson("POST", "/ifis/mt4/hedge-post.php", response, false, true, request, false)) {
       // printDebug("-Err download ");
       return(-1);
    }
@@ -224,154 +672,3 @@ int make_request(datetime time, int ticket, string op, double price, string type
    return(0);
 }
 
-void printSummary(void)
-{
-    ZiGuiHedge* h;
-
-    for (h = hedgePairList.GetFirstNode(); h != NULL; h = hedgePairList.GetNextNode()) {
-      PrintFormat("[%d][0]  %s: OK", h.getIndex(), h.zgp[0].sym);
-      PrintFormat("[%d][1]  %s: OK", h.getIndex(), h.zgp[1].sym);
-    }
-}
-
-void initHedgePairList() {
-   int idx = 0;
-
-   for (int i = GBPUSD; i < SYM_LAST - 1; i++) {
-      for (int j = i + 1; j < SYM_LAST; j++) {
-         // Init ZiGuiHedge object
-         ZiGuiHedge *zgh = new ZiGuiHedge(RakutenSymStr[i], RakutenSymStr[j]);
-
-         // Parameters to be optimized for each
-         ZiGuiHedgePara zghp;
-         zghp.RShort = 18;       // Correlation Short period
-         zghp.RLong  = 20;       // Correlation Long  period
-         zghp.RThreshold = 0.25; // Correlation threshold (-80, +80)
-         zghp.RIndicatorN = 0.1; // reserved 
-         zghp.Entry = 0.1;       // Ex: Momentum abs(diff) > +80 or < -80 - OPEN
-         zghp.TIndicatorN = 14;  // Ex: Trade indicator period - 14
-         zghp.TakeProfits = 300; // StopLoss?
-         zghp.Step  = 100;       // Trailing Stop step width
-         zghp.Exit = 0.01;       // Ex: Momentum abs(diff) < +30 or > -30 - CLOSE
-
-         zghp.RPeriod = PERIOD_D1;
-         zghp.TPeriod = PERIOD_M5;
-
-         // Set hedge parameters
-         zgh.setZiGuiHedgePara(zghp);
-
-         // Set hedge pair index
-         zgh.setIndex(idx++);
-
-         // Set hedge pair Lots
-         // TODO: lots balance ...
-         zgh.setLots(0.1);
-
-/*
-         Trailing Stop Details(TSFlag):
-         # Init
-           Assume all hedge pairs are NOT on trailing-stop -> TSFlog = false
-
-         # Trade
-           * Both hedge pairs are closed -> TSFlag = false (Set in MyCheckPosition2())
-           * Half hedge pair  is  closed -> TSFlag = true
-           * sig < 0 means to close hege pairs -> TSFlag = true
-           * Trailing-Stop started -> TSFlag = true (Continue CLOSE by TS until Both closed)
-*/
-         zgh.setTSStarted(false); // Assume hedge pairs are NOT on trailing-stop
-
-         hedgePairList.Add(zgh);
-      }
-   }
-}
-
-void MyInitPosition2(int magic)
-{
-   // retrieve positions
-   for (int i = 0; i < POSITIONS; i++)
-   {
-      int hedgeIdx = i / 2;
-      int pairIdx  = i % 2;
-      ZiGuiHedge *hedge = hedgePairList.GetNodeAtIndex(hedgeIdx);
-
-      // pips adjustment marketinfo
-      int d = (int) MarketInfo(hedge.zgp[pairIdx].sym, MODE_DIGITS);
-      double slippage = 0; // customized slip-page
-      double pipPoint = MarketInfo(hedge.zgp[pairIdx].sym, MODE_POINT);
-
-      if (d == 3 || d == 5)
-      {
-         slippage *= 10;
-         pipPoint *= 10;
-      }
-
-      hedge.zgp[pairIdx].magic_b = magic+i;
-      hedge.zgp[pairIdx].slOrd = 0;
-      hedge.zgp[pairIdx].tpOrd = 0;
-      hedge.zgp[pairIdx].slippagePips = slippage;
-      hedge.zgp[pairIdx].pipPoint = pipPoint;
-      hedge.zgp[pairIdx].pos = 0;
-
-      for (int k = 0; k < OrdersTotal(); k++)
-      {
-         if (OrderSelect(k, SELECT_BY_POS) == false) break;
-
-         if (OrderSymbol() == hedge.zgp[pairIdx].sym &&
-             OrderMagicNumber() == hedge.zgp[pairIdx].magic_b)
-         {
-            hedge.zgp[pairIdx].pos = OrderTicket();
-            break;
-         }
-      }
-   }
-}
-
-// check MyPosition to be called in start()
-void MyCheckPosition2()
-{
-   for (int i = 0; i < POSITIONS; i++)
-   {
-      int hedgeIdx = i / 2;
-      int pairIdx  = i % 2;
-      ZiGuiHedge *hedge = hedgePairList.GetNodeAtIndex(hedgeIdx);
-
-      hedge.zgp[pairIdx].pos = 0;
-
-      for (int k = 0; k < OrdersTotal(); k++)
-      {
-         if (OrderSelect(k, SELECT_BY_POS) == false) break;
-
-         if (OrderSymbol() == hedge.zgp[pairIdx].sym &&
-             OrderMagicNumber() == hedge.zgp[pairIdx].magic_b)
-         {
-            hedge.zgp[pairIdx].pos = OrderTicket();
-            break;
-         }
-      }
-
-#ifdef sendslandtporders
-      int pos = 0;
-      for (int k = 0; k < OrdersTotal(); k++)
-      { 
-         if (OrderSelect(k, SELECT_BY_POS) == false) break;
-
-         if (OrderTicket() == hedge.zgp[pairIdx].pos)
-         {
-            pos = hedge.zgp[pairIdx].pos;
-            break;
-         }
-      }
-      if (pos > 0)
-      {
-         // send SL and TP orders
-         if ((hedge.zgp[pairIdx].slOrd > 0 || hedge.zgp[pairIdx].tpOrd > 0) &&
-             MyOrderModify(i, 0, hedge.zgp[pairIdx].slOrd, hedge.zgp[pairIdx].tpOrd))
-         {
-            hedge.zgp[pairIdx].slOrd = 0;
-            hedge.zgp[pairIdx].tpOrd = 0;
-         }
-      }
-      else hedge.zgp[pairIdx].pos = 0;
-#endif
-   }
-}
