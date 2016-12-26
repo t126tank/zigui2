@@ -189,7 +189,7 @@ int start()
 #endif
    return(0);
 }
-
+#ifdef abcde
 int make_request(datetime time, int ticket, string op, double price, string type, double lots,  double profits) {
 
    //Create the client request. This is in JSON format but you can send any string
@@ -223,7 +223,7 @@ int make_request(datetime time, int ticket, string op, double price, string type
    // Print(request);
    return(0);
 }
-
+#endif
 void printSummary(void)
 {
     ZiGuiHedge* h;
