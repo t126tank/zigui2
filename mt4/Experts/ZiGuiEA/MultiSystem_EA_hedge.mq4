@@ -6,7 +6,6 @@
 #define POSITIONS    (SYM_LAST*2)     // hedge pair positions * 2
 
 #include <ZiGuiLib\MyPosition.mqh>
-#include <ZiGuiLib\ZiGuiHedge.mqh>
 
 #include <Arrays\List.mqh>
 
@@ -14,10 +13,8 @@
 #include <ZiGuiLib\http\hash.mqh>
 #include <ZiGuiLib\http\json.mqh>
 
-extern string hostIp = "katokunou.com";
-extern int hostPort = 80;
+#include <ZiGuiLib\ZiGuiHedge.mqh>
 
-MqlNet INet;
 
 int Magic = 20161223;
 
@@ -269,6 +266,19 @@ void initHedgePairList() {
          // Set hedge pair Lots
          // TODO: lots balance ...
          zgh.setLots(0.1);
+
+/*
+         Trailing Stop Details(TSFlag):
+         # Init
+           Assume all hedge pairs are NOT on trailing-stop -> TSFlog = false
+
+         # Trade
+           * Both hedge pairs are closed -> TSFlag = false (Set in MyCheckPosition2())
+           * Half hedge pair  is  closed -> TSFlag = true
+           * sig < 0 means to close hege pairs -> TSFlag = true
+           * Trailing-Stop started -> TSFlag = true (Continue CLOSE by TS until Both closed)
+*/
+         zgh.setTSStarted(false); // Assume hedge pairs are NOT on trailing-stop
 
          hedgePairList.Add(zgh);
       }
