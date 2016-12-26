@@ -105,7 +105,8 @@ private:
    double            MyOrderOpenLots2(int pos_id);
    bool              MyOrderTS(int pos_id);  // Trailing-Stop
    bool              orderModifyReliable(int aTicket, double aPrice, double aStoploss, double aTakeprofit, datetime aExpiration, color aArrow_color = CLR_NONE);
-   int               make_request(datetime time, int ticket, string op, double price, string type, double lots,  double profits);
+//   int               make_request(datetime time, int ticket, string op, double price, string type, double lots,  double profits);
+   int               make_request(int pos_id, string op);
 protected:
    //--- method others
    int               Compare(const CObject *node,const int mode=0) const;
@@ -335,16 +336,10 @@ bool ZiGuiHedge::MyOrderSend2(int pos_id, int type,
    zgp[pos_id].pos = ret;
 
    // Post Order info
-   OrderSelect(zgp[pos_id].pos, SELECT_BY_TICKET));
-            ticket = MyPos[i];
-
    string opStr = "sell";
    if (type == OP_BUY)
       opStr = "buy";
-
-   make_request(OrderOpenTime(), zgp[pos_id].pos,
-                opStr, OrderOpenPrice(), "open",
-                MyOrderOpenLots2(pos_id), OrderProfit());
+   make_request(pos_id, opStr);
 
    // send SL and TP orders
    if (sl > 0) zgp[pos_id].slOrd = sl;
@@ -638,31 +633,33 @@ bool ZiGuiHedge::orderModifyReliable(int aTicket, double aPrice, double aStoplos
 //+------------------------------------------------------------------+
 //| trailing-stop                                                    |
 //+------------------------------------------------------------------+
-int ZiGuiHedge::make_request(datetime time, int ticket, string op, double price, string type, double lots,  double profits) {
+int ZiGuiHedge::make_request(int pos_id, string op) {
+   OrderSelect(zgp[pos_id].pos, SELECT_BY_TICKET);
 
+   int d = (int) MarketInfo(zgp[pos_id].sym, MODE_DIGITS);
    //Create the client request. This is in JSON format but you can send any string
    string request =  "{\"time\":  \""
-            + TimeToStr(time) + "\","
+            + TimeToStr(OrderOpenTime()) + "\","
             + " \"ticket\": \""
-            + IntegerToString(ticket) + "\","
+            + IntegerToString(zgp[pos_id].pos) + "\","
             + " \"op\": \""
             + op + "\","
             + " \"price\": \""
-            + DoubleToStr(price, Digits) + "\","
+            + DoubleToStr(OrderOpenPrice(), d) + "\","
             + " \"symbol\": \""
             + Symbol() + "\","
             + " \"type\": \""
-            + type + "\","
+            + "open" + "\","
             + " \"lots\": \""
-            + DoubleToStr(lots, Digits) + "\","
+            + DoubleToStr(MyOrderOpenLots2(pos_id), d) + "\","
             + " \"profits\": \""
-            + DoubleToStr(profits, Digits) + "\"}";
+            + DoubleToStr(OrderProfit(), d) + "\"}";
 
    //Create the response string
    string response = "";
 
    //Make the connection
-   if (!INet.Open(hostIp, hostPort)) return(-1);
+   if (!INet.Open(HOST_IP, HOST_PORT)) return(-1);
 
    if (!INet.RequestJson("POST", "/ifis/mt4/hedge-post.php", response, false, true, request, false)) {
       // printDebug("-Err download ");
