@@ -4,10 +4,6 @@ import sys
 import pandas as pd
 import os, glob
 
-from itertools import groupby 
-from collections import OrderedDict
-import json
-
 def main(argv):
    srcDir = "."
    if len(argv) != 0:
@@ -43,6 +39,8 @@ def main(argv):
 
    # Concat
    frame = pd.concat(list_)
+
+   # Sort "sort_values(by='dateTime', ascending=1)" from 0.17
 
    # Convert all data
    frame.to_json('data.json', orient='records')
