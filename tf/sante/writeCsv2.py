@@ -86,10 +86,10 @@ def main(argv):
    if len(argv) != 0:
       srcDir = argv[0]
 
-   dim = 9
-   ma  = 5
-   p   = 4
-   q   = 6
+   dim = 10
+   ma  = 6
+   p   = 5
+   q   = 7
 
    # Specify datasets saved location/path
    os.chdir(srcDir)
