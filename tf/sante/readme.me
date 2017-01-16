@@ -1,8 +1,16 @@
 
 $ python readCsv2.py [csv files path] (default: ".")
 Ex:
-  python readCsv2.py ./sante
+  $ python readCsv2.py ./sante
   
 http://k-db.com/stocks/4536-T/1d/2011?download=csv
 http://k-db.com/stocks/4536-T/1d/2012?download=csv
 ...
+
+>>> import pandas
+>>> import random
+>>> df=pandas.read_csv('data.csv')
+>>> rows = random.sample(df.index, 10)
+>>> df_10 = df.ix[rows]
+>>> df_other = df.drop(rows)
+
