@@ -1,19 +1,59 @@
 #!/usr/bin/python
 
+from __future__ import division
+
 import sys
 import pandas as pd
 import os, glob
 import numpy as np
 
+# Classification [0] < bad < [1] < bdraw < [2] < gdraw < [3] < good < [4]
+bdraw = -0.01  # bad  draw
+gdraw =  0.01  # good draw
+bad   = -0.04
+good  =  0.04
+
 def ma_f(row, d, m, l):
-   r = 0 
+   r = 0
    s = row.name
    e = s + m - 1
+   # print "call: ", s
 
    if (s < l - m + 1):
-      dividend = d.loc[s:e, ['tradeValue']].sum()
-      divider  = d.loc[s:e, ['volume']].sum()
-      r        = dividend / divider
+      mid = d.loc[s:e, :].sum()
+      r = mid.get_value('tradeValue') / mid.get_value('volume')
+
+   return r
+
+def comp_f(row, d, p, q, dm, l):
+   r = -1
+   s = row.name
+
+   if ((s < q) or (s > l - dm - p)):  # q < dim
+      return r
+
+   # predict: p->q
+   qSum = d.loc[s-q:s-1, :].sum().get_value('c')
+   qAvg = qSum / q
+
+   # history
+   pSum = d.loc[s:s+p-1, :].sum().get_value('c')
+   pAvg = pSum / p
+
+   result = qAvg / pAvg - 1
+
+   # print s,": ",pAvg, " -> ", qAvg
+
+   if (result > good):
+      r = 4
+   elif (result > gdraw):
+      r = 3
+   elif (result > bdraw):
+      r = 2
+   elif (result > bad):
+      r = 1
+   else:
+      r = 0
 
    return r
 
@@ -22,31 +62,32 @@ def main(argv):
    if len(argv) != 0:
       srcDir = argv[0]
 
-   dim = 8
-   ma  = 4
-   p   = 3
-   q   = 5
-
-   # Classification [0] < bad < [1] < bdraw < [2] < gdraw < [3] < good < [4]
-   bdraw = -0.01  # bad  draw
-   gdraw =  0.01  # good draw
-   bad   = -0.03
-   good  =  0.03
+   dim = 9
+   ma  = 5
+   p   = 4
+   q   = 6
 
    # Specify datasets saved location/path
    os.chdir(srcDir)
 
    df = pd.read_json('data.json', encoding="UTF-8")
 
+   sz = len(df['c'])
    # Add NEW dimension column of "dim"
    # dataLen = len(df['tradeTime'])
    # df['dim'] = np.random.randn(dataLen)
    # df['dim'] = df['c'].map(lambda x: np.random.random())
-   df['dim'] = df.apply(ma_f, args = (df, ma, len(df['c']),), axis=1)
+   df['dim'] = df.apply(ma_f, args = (df, ma, sz,), axis=1)
 
-   print df.head(10)
+   # Add NEW column of "classification"
+   df['result'] = df.apply(comp_f, args = (df, p, q, dim, sz,), axis=1)
+
+   print df.head(20)
    print "..."
-   print df.tail(10)
+   print df.tail(20)
+
+   # from(q) - to(len - ma - [dim - 1])
+
 
    # start(idx) = q
    # if p < dim then
