@@ -9,11 +9,6 @@ def main(argv):
    if len(argv) != 0:
       srcDir = argv[0]
 
-   dim = 8
-   ma  = 4
-   p   = 3
-   q   = 5
-
    frame = pd.DataFrame()
    list_ = []
 
