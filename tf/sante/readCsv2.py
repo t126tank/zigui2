@@ -9,6 +9,11 @@ def main(argv):
    if len(argv) != 0:
       srcDir = argv[0]
 
+   dim = 8
+   ma  = 4
+   p   = 3
+   q   = 5
+
    frame = pd.DataFrame()
    list_ = []
 
@@ -40,6 +45,9 @@ def main(argv):
    # Concat
    frame = pd.concat(list_)
 
+   # Remove odd rows
+   frame = frame[frame.volume != 0]
+
    # Sort
    col_name = frame.columns[0]
    # print col_name
@@ -48,7 +56,7 @@ def main(argv):
 
    frame[col_name] = pd.to_datetime(frame.tradeTime)
    # frame.sort('tradeTime') This now sorts in date order (deprecated)
-   frame.sort_values(by=[col_name], ascending=[True], inplace=True) # from ver 0.17
+   frame.sort_values(by=[col_name], ascending=[False], inplace=True) # from ver 0.17
    frame[col_name] = frame[col_name].dt.strftime('%Y-%m-%d')
 
    # Convert all data
