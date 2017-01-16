@@ -70,14 +70,13 @@ def csv_f(row, d, ma, q, dm, l):
          r.append(d.get_value(idx, 'dim'))
 
       r.append(d.get_value(i, 'result'))
-
       csv = csv.append([r])
 
    # Reset idx
    csv = csv.reset_index(drop=True)
 
    # titles
-   csv.columns.values[0] = l
+   csv.columns.values[0] = e+1-s
    csv.columns.values[1] = dm
 
    csv.to_csv('data.csv', index=False)
