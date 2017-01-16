@@ -5,8 +5,15 @@ import pandas as pd
 import os, glob
 import numpy as np
 
-def ma(row):
-   return row['tradeValue'] / row['volume']
+def ma_f(row, ma, len, dim):
+   rnt = 0
+   start = row.name
+   end = start + ma
+
+   if (end < len - ma - (dim - 1)):
+      rnt = row.loc[start:end, ['tradeValue']].sum() / row.loc[start:end, ['volume']].sum()
+
+   return rnt
 
 def main(argv):
    srcDir = "."
@@ -14,11 +21,11 @@ def main(argv):
       srcDir = argv[0]
 
    dim = 8
-   ma0 = 4
+   ma  = 4
    p   = 3
    q   = 5
 
-   # Classification [-2] < bad < [-1] < bdraw < [0] < gdraw < [1] < good < [2]
+   # Classification [0] < bad < [1] < bdraw < [2] < gdraw < [3] < good < [4]
    bdraw = -0.01  # bad  draw
    gdraw =  0.01  # good draw
    bad   = -0.03
@@ -33,14 +40,16 @@ def main(argv):
    # dataLen = len(df['tradeTime'])
    # df['dim'] = np.random.randn(dataLen)
    # df['dim'] = df['c'].map(lambda x: np.random.random())
-   df['dim'] = df.apply(ma, axis=1)
+   df['dim'] = df.apply(ma_f, args = (ma, len, dim, ), axis=1)
 
+   print df.head(10)
+   print "..."
    print df.tail(10)
 
    # start(idx) = q
    # if p < dim then
-   # end1 (idx) = len - ma0 - (dim - 1)
-   # end2 (idx) = len - ma0
+   # end1 (idx) = len - ma - (dim - 1)
+   # end2 (idx) = len - ma
 
 if __name__ == "__main__":
    main(sys.argv[1:])
