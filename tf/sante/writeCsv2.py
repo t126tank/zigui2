@@ -5,15 +5,17 @@ import pandas as pd
 import os, glob
 import numpy as np
 
-def ma_f(row, ma, len, dim):
-   rnt = 0
-   start = row.name
-   end = start + ma
+def ma_f(row, d, m, l):
+   r = 0 
+   s = row.name
+   e = s + m - 1
 
-   if (end < len - ma - (dim - 1)):
-      rnt = row.loc[start:end, ['tradeValue']].sum() / row.loc[start:end, ['volume']].sum()
+   if (s < l - m + 1):
+      dividend = d.loc[s:e, ['tradeValue']].sum()
+      divider  = d.loc[s:e, ['volume']].sum()
+      r        = dividend / divider
 
-   return rnt
+   return r
 
 def main(argv):
    srcDir = "."
@@ -40,7 +42,7 @@ def main(argv):
    # dataLen = len(df['tradeTime'])
    # df['dim'] = np.random.randn(dataLen)
    # df['dim'] = df['c'].map(lambda x: np.random.random())
-   df['dim'] = df.apply(ma_f, args = (ma, len, dim, ), axis=1)
+   df['dim'] = df.apply(ma_f, args = (df, ma, len(df['c']),), axis=1)
 
    print df.head(10)
    print "..."
