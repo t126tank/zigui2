@@ -57,6 +57,31 @@ def comp_f(row, d, p, q, dm, l):
 
    return r
 
+
+def csv_f(row, d, ma, q, dm, l):
+   csv = pd.DataFrame()
+   s = q
+   e = l - ma - dm + 1
+
+   for i in range(s, e+1):
+      r = []
+      for j in range(dm):
+         idx = i + dm - j - 1
+         r.append(d.get_value(idx, 'dim'))
+
+      r.append(d.get_value(i, 'result'))
+
+      csv = csv.append([r])
+
+   # Reset idx
+   csv = csv.reset_index(drop=True)
+
+   # titles
+   csv.columns.values[0] = l
+   csv.columns.values[1] = dm
+
+   csv.to_csv('data.csv', index=False)
+
 def main(argv):
    srcDir = "."
    if len(argv) != 0:
@@ -87,7 +112,8 @@ def main(argv):
    print df.tail(20)
 
    # from(q) - to(len - ma - [dim - 1])
-
+   # Add NEW column of "classification"
+   df.apply(csv_f, args = (df, ma, q, dim, sz,), axis=1)
 
    # start(idx) = q
    # if p < dim then
