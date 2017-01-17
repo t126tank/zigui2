@@ -44,7 +44,7 @@ def main(argv):
    frame = frame[frame.volume > 0] # [frame.volume != 0]
 
    col_name = frame.columns[0]
-   # print col_name
+   print "[0]: ", col_name
    # frame = frame.rename(columns = {col_name: 'tradeTime'})
    # print frame.tradeTime
 
