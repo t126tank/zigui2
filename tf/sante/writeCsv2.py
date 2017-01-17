@@ -21,7 +21,7 @@ def ma_f(row, d, m, l):
 
    if (s < l - m + 1):
       mid = d.loc[s:e, :].sum()
-      r = mid.get_value('tradeValue') / mid.get_value('volume')
+      r = round(mid.get_value('tradeValue') / mid.get_value('volume'), 1)
 
    return r
 
@@ -29,7 +29,12 @@ def comp_f(row, d, p, q, dm, l):
    r = -1
    s = row.name
 
-   if ((s < q) or (s > l - dm - p)):  # q < dim
+   if (s < q):
+      pSum = d.loc[s:s+p-1, :].sum().get_value('c')
+      r = pSum / p
+      return r
+
+   if (s > l - dm - p):  # q < dim
       return r
 
    # predict: p->q
@@ -88,8 +93,8 @@ def main(argv):
 
    dim = 10
    ma  = 6
-   p   = 5
-   q   = 7
+   p   = 3
+   q   = 5
 
    # Specify datasets saved location/path
    os.chdir(srcDir)

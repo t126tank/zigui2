@@ -41,14 +41,17 @@ def main(argv):
    frame = pd.concat(list_)
 
    # Remove odd rows
-   frame = frame[frame.volume != 0]
+   frame = frame[frame.volume > 0] # [frame.volume != 0]
 
-   # Sort
    col_name = frame.columns[0]
    # print col_name
    # frame = frame.rename(columns = {col_name: 'tradeTime'})
    # print frame.tradeTime
 
+   # Drop duplicated
+   frame.drop_duplicates(subset=[col_name], inplace=True)
+
+   # Sort
    frame[col_name] = pd.to_datetime(frame.tradeTime)
    # frame.sort('tradeTime') This now sorts in date order (deprecated)
    frame.sort_values(by=[col_name], ascending=[False], inplace=True) # from ver 0.17
