@@ -7,10 +7,18 @@ http://k-db.com/stocks/4536-T/1d/2011?download=csv
 http://k-db.com/stocks/4536-T/1d/2012?download=csv
 ...
 
+
+Records: 2100
+iris_test.csv - 420 (2100 * 0.2)
+iris_training.csv - 1680+ (2100 * 0.8)
+
+
 >>> import pandas
 >>> import random
 >>> df=pandas.read_csv('data.csv')
->>> rows = random.sample(df.index, 10)
->>> df_10 = df.ix[rows]
+>>> rows = random.sample(df.index, 420)
+len
+>>> df_20 = df.ix[rows]
+[0] = 420
 >>> df_other = df.drop(rows)
-
+[0] = len - 420
