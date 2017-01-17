@@ -25,7 +25,7 @@ def ma_f(row, d, m, l):
 
    return r
 
-def comp_f(row, d, p, q, dm, l):
+def comp_f(row, d, p, q, dm, ma, l):
    r = -1
    s = row.name
 
@@ -34,7 +34,7 @@ def comp_f(row, d, p, q, dm, l):
       r = pSum / p
       return int(r)
 
-   if (s > l - dm - p):  # q < dim
+   if (s > l - dm - ma + 1):  # q < dim
       return int(r)
 
    # predict: p->q
@@ -63,7 +63,8 @@ def comp_f(row, d, p, q, dm, l):
    return int(r)
 
 
-def csv_f(row, d, ma, q, dm, l):
+# apply: def csv_f(row, d, ma, q, dm, l):
+def csv_f(d, ma, q, dm, l):
    csv = pd.DataFrame()
    s = q
    e = l - ma - dm + 1
@@ -86,14 +87,24 @@ def csv_f(row, d, ma, q, dm, l):
 
    csv.to_csv('data.csv', index=False)
 
+def print_new_f(d, q, dm):
+   for i in range(q):
+      r = []
+      for j in range(dm):
+         idx = i + dm - j - 1
+         r.append(round(d.get_value(idx, 'dim'), 1))
+
+      print r,","
+
+
 def main(argv):
    srcDir = "."
    if len(argv) != 0:
       srcDir = argv[0]
 
-   dim = 10
+   dim = 40
    ma  = 6
-   p   = 3
+   p   = 10
    q   = 5
 
    # Specify datasets saved location/path
@@ -109,20 +120,23 @@ def main(argv):
    df['dim'] = df.apply(ma_f, args = (df, ma, sz,), axis=1)
 
    # Add NEW column of "classification"
-   df['result'] = df.apply(comp_f, args = (df, p, q, dim, sz,), axis=1)
+   df['result'] = df.apply(comp_f, args = (df, p, q, dim, ma, sz,), axis=1)
 
-   print df.head(20)
+   print df.head(40)
    print "..."
-   print df.tail(20)
+   print df.tail(40)
 
    # from(q) - to(len - ma - [dim - 1])
    # Add NEW column of "classification"
-   df.apply(csv_f, args = (df, ma, q, dim, sz,), axis=1)
+   # df.apply(csv_f, args = (df, ma, q, dim, sz,), axis=1)
+   csv_f(df, ma, q, dim, sz)
 
    # start(idx) = q
    # if p < dim then
    # end1 (idx) = len - ma - (dim - 1)
    # end2 (idx) = len - ma
+
+   print_new_f(df, q, dim)
 
 if __name__ == "__main__":
    main(sys.argv[1:])

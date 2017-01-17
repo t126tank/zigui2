@@ -1,7 +1,7 @@
 #!/bin/bash
 
 sym="1570"
-if [ $1 != "" ] ; then
+if [[ ! -z "$1" ]] ; then
    sym=$1
 fi
 
