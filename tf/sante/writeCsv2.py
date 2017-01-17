@@ -32,10 +32,10 @@ def comp_f(row, d, p, q, dm, l):
    if (s < q):
       pSum = d.loc[s:s+p-1, :].sum().get_value('c')
       r = pSum / p
-      return r
+      return int(r)
 
    if (s > l - dm - p):  # q < dim
-      return r
+      return int(r)
 
    # predict: p->q
    qSum = d.loc[s-q:s-1, :].sum().get_value('c')
@@ -60,7 +60,7 @@ def comp_f(row, d, p, q, dm, l):
    else:
       r = 0
 
-   return r
+   return int(r)
 
 
 def csv_f(row, d, ma, q, dm, l):
