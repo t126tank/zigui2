@@ -15,7 +15,7 @@
 - ① Python
 - ② Bash Script
 
-###  [目录结构](https://raw.githubusercontent.com/t126tank/zigui2/master/tf/sante/readme.md)
+### CLICK ☞ [目录结构](https://raw.githubusercontent.com/t126tank/zigui2/master/tf/sante/readme.md)
 
 ```
 .
@@ -139,7 +139,7 @@
   Example conversion:
     est = Estimator(...) -> est = SKCompat(Estimator(...))
   WARNING:tensorflow:float64 is not supported by many models, consider casting to float32.
-  Predictions: [1, 1, 1]
+  Predictions: [1, 1, 1]　⇒ [(2017/01/18-01/20), (2017/01/17-01/19), (2017/01/16-01/18)] Refer to base CLOSE prices:[1442, 1459, 1468]
   ```
 
 ## TODO
