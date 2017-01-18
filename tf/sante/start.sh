@@ -7,6 +7,10 @@ fi
 
 
 pushd ..
+
+# python writeCsv2.py $sym > new.txt
+# rm -rf /tmp/iris_model/
+
 python tfCsv2.py $sym
 
 pushd $sym

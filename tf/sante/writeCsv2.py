@@ -49,11 +49,20 @@ def comp_f(row, d, p, q, dm, ma, l):
 
    # print s,": ",pAvg, " -> ", qAvg
 
+   '''
    if (result > good):
       r = 4
    elif (result > gdraw):
       r = 3
    elif (result > bdraw):
+      r = 2
+   elif (result > bad):
+      r = 1
+   else:
+      r = 0
+   '''
+
+   if (result > good):
       r = 2
    elif (result > bad):
       r = 1
@@ -103,9 +112,9 @@ def main(argv):
       srcDir = argv[0]
 
    dim = 40
-   ma  = 6
-   p   = 10
-   q   = 5
+   ma  = 5
+   p   = 3
+   q   = 3
 
    # Specify datasets saved location/path
    os.chdir(srcDir)
@@ -124,7 +133,7 @@ def main(argv):
 
    print df.head(40)
    print "..."
-   print df.tail(40)
+   print df.tail(60)
 
    # from(q) - to(len - ma - [dim - 1])
    # Add NEW column of "classification"
