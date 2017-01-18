@@ -54,14 +54,14 @@
      └── tflearn.py                  ◆①
 ```
 
-**readCsv2.py**: 读入**原始数据◎**，生成**加工数据■Ⅰ**
+### **readCsv2.py**: 读入**原始数据◎**，生成**加工数据■Ⅰ**
   * E.g.
 
   ```
   $ python readCsc2.py 1570
   ```
 
-**writeCsv2.py**: 读入**加工数据■Ⅰ**，生成**加工数据■Ⅱ**
+### **writeCsv2.py**: 读入**加工数据■Ⅰ**，生成**加工数据■Ⅱ**
   * E.g.
 
   ```
@@ -74,7 +74,7 @@
 - p   = 3 ：前 3 天（用于计算 Close 均价）
 - q   = 3 ：后 3 天（用于计算 Close 均价）
 
-**tfCsv2.py**: 读入**加工数据■Ⅱ**，按**20%** - **80%**比例生成**检证用目标数据★❶** - **训练用目标数据★❷**
+### **tfCsv2.py**: 读入**加工数据■Ⅱ**，按**20%** - **80%**比例生成**检证用目标数据★❶** - **训练用目标数据★❷**
   * E.g.
 
   ```
@@ -84,7 +84,7 @@
   * 内部参数
 - dim = 40：输入数据维数
 
-**tflearn.py**: 读入**检证用目标数据★❶**及**训练用目标数据★❷**
+### **tflearn.py**: 读入**检证用目标数据★❶**及**训练用目标数据★❷**
   * 参考： [Deep Neural Network Classifier](https://www.tensorflow.org/tutorials/tflearn/).
   * E.g.
 
@@ -97,7 +97,7 @@
 - dimension=40：输入数据维数
 - classes=3 ：预测区间数 _[0] < -4% < [1] < +4% < [2]_
 
-**start.sh**:自动执行脚本
+### **start.sh**:自动执行脚本
   * E.g.
 
   ```
@@ -109,7 +109,7 @@
 
 - http://k-db.com/stocks/4536-T/1d/2011?download=csv
 - http://k-db.com/stocks/4536-T/1d/2012?download=csv
-...
+- ...
 - http://k-db.com/stocks/1570-T/1d/2013?download=csv
 - http://k-db.com/stocks/1570-T/1d/2014?download=csv
 - http://k-db.com/stocks/1570-T/1d/2015?download=csv
