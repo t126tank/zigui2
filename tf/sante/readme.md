@@ -124,8 +124,8 @@
   * 4536 (40 维输入):
 
   ```
-  $ cd iris　4536
-  $ ./start.sh 
+  $ cd iris
+  $ ./start.sh  4536
   ...
   Instructions for updating:
   Estimator is decoupled from Scikit Learn interface by moving into
