@@ -139,4 +139,7 @@
   WARNING:tensorflow:float64 is not supported by many models, consider casting to float32.
   Predictions: [1, 1, 1]
   ```
-
+## TODO
+1. 网络重建
+2. 参数调整
+3. 增加评估
