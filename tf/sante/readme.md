@@ -15,43 +15,45 @@
 - ① Python
 - ② Bash Script
 
+###  [目录结构](https://raw.githubusercontent.com/t126tank/zigui2/master/tf/sante/readme.md)
+
 ```
 .
 ├── readCsv2.py                      ◆①
 ├── tfCsv2.py                        ◆①
 ├── writeCsv2.py                     ◆①
 ├── 1570
-│   ├── data.json                   ■Ⅰ
-│   ├── data.csv                    ■Ⅱ
-│   ├── iris_test.csv               ★❶  ─┐
-│   ├── iris_training.csv           ★❷  ─┼┐
-│   ├── stocks_1570-T_1d_2013.csv   ◎      ││
-│   ├── stocks_1570-T_1d_2014.csv   ◎      ││
-│   ├── stocks_1570-T_1d_2015.csv   ◎      ││
-│   ├── stocks_1570-T_1d_2016.csv   ◎      ││
-│   ├── stocks_1570-T_1d_2017.csv   ◎      ││
-│   └── stocks_1570-T.csv           ◎      ││
+│   ├── data.json                   ■Ⅰ
+│   ├── data.csv                    ■Ⅱ
+│   ├── iris_test.csv               ★❶  ─┐
+│   ├── iris_training.csv           ★❷  ─┼┐
+│   ├── stocks_1570-T_1d_2013.csv   ◎      ││
+│   ├── stocks_1570-T_1d_2014.csv   ◎      ││
+│   ├── stocks_1570-T_1d_2015.csv   ◎      ││
+│   ├── stocks_1570-T_1d_2016.csv   ◎      ││
+│   ├── stocks_1570-T_1d_2017.csv   ◎      ││
+│   └── stocks_1570-T.csv           ◎      ││
 ├── 4536                                     ││
-│   ├── data.json                   ■Ⅰ    ││
-│   ├── data.csv                    ■Ⅱ    ││
-│   ├── iris_test.csv               ★❶  ─┤│
-│   ├── iris_training.csv           ★❷  ─┼┤
-│   ├── stocks_4536-T_1d_2008.csv   ◎      ││
-│   ├── stocks_4536-T_1d_2009.csv   ◎      ││
-│   ├── stocks_4536-T_1d_2010.csv   ◎      ││
-│   ├── stocks_4536-T_1d_2011.csv   ◎      ││
-│   ├── stocks_4536-T_1d_2012.csv   ◎      ││
-│   ├── stocks_4536-T_1d_2013.csv   ◎      ││
-│   ├── stocks_4536-T_1d_2014.csv   ◎      ││
-│   ├── stocks_4536-T_1d_2015.csv   ◎      ││
-│   ├── stocks_4536-T_1d_2016.csv   ◎      ││
-│   ├── stocks_4536-T_1d_2017.csv   ◎      ││
-│   └── stocks_4536-T.csv           ◎      ││
+│   ├── data.json                   ■Ⅰ    ││
+│   ├── data.csv                    ■Ⅱ    ││
+│   ├── iris_test.csv               ★❶  ─┤│
+│   ├── iris_training.csv           ★❷  ─┼┤
+│   ├── stocks_4536-T_1d_2008.csv   ◎      ││
+│   ├── stocks_4536-T_1d_2009.csv   ◎      ││
+│   ├── stocks_4536-T_1d_2010.csv   ◎      ││
+│   ├── stocks_4536-T_1d_2011.csv   ◎      ││
+│   ├── stocks_4536-T_1d_2012.csv   ◎      ││
+│   ├── stocks_4536-T_1d_2013.csv   ◎      ││
+│   ├── stocks_4536-T_1d_2014.csv   ◎      ││
+│   ├── stocks_4536-T_1d_2015.csv   ◎      ││
+│   ├── stocks_4536-T_1d_2016.csv   ◎      ││
+│   ├── stocks_4536-T_1d_2017.csv   ◎      ││
+│   └── stocks_4536-T.csv           ◎      ││
 └── iris                                     ││
-     ├── iris_test.csv       ←───────┘│
-     ├── iris_training.csv   ←────────┘
-     ├── start.sh                    ◆②
-     └── tflearn.py                  ◆①
+     ├── iris_test.csv       ←───────┘│
+     ├── iris_training.csv   ←────────┘
+     ├── start.sh                    ◆②
+     └── tflearn.py                  ◆①
 ```
 
 ### **readCsv2.py**: 读入**原始数据◎**，生成**加工数据■Ⅰ**
