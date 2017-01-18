@@ -121,10 +121,10 @@
 
 
 ## 执行结果
-  * 4536:
+  * 4536 (40 维输入):
 
   ```
-  $ cd iris
+  $ cd iris　4536
   $ ./start.sh 
   ...
   Instructions for updating:
