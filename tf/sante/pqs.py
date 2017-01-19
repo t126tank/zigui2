@@ -1,27 +1,13 @@
-# -*- coding: utf-8 -*-
+#! /usr/bin/python
+# -*- coding: utf8 -*-
 
-""" Convolutional Neural Network for MNIST dataset classification task.
+# https://raw.githubusercontent.com/zsdonghao/tensorlayer/master/example/tutorial_mnist_simple.py
 
-References:
-    Y. LeCun, L. Bottou, Y. Bengio, and P. Haffner. "Gradient-based
-    learning applied to document recognition." Proceedings of the IEEE,
-    86(11):2278-2324, November 1998.
-
-Links:
-    [MNIST Dataset] http://yann.lecun.com/exdb/mnist/
-
-"""
-
-from __future__ import division, print_function, absolute_import
-
-import tflearn
-from tflearn.layers.core import input_data, dropout, fully_connected
-from tflearn.layers.conv import conv_2d, max_pool_2d
-from tflearn.layers.normalization import local_response_normalization
-from tflearn.layers.estimator import regression
-
-import numpy as np
 import tensorflow as tf
+import tensorlayer as tl
+import numpy as np
+
+sess = tf.InteractiveSession()
 
 IRIS_TRAINING = "iris_training.csv"
 IRIS_TEST = "iris_test.csv"
@@ -29,47 +15,81 @@ IRIS_TEST = "iris_test.csv"
 # Data loading and preprocessing
 # Read in train and test csv's where there are 49 features and a target
 csvTrain = np.genfromtxt(IRIS_TRAINING, delimiter=",", skip_header=1)
-X = np.array(csvTrain[:, :49])
-Y = csvTrain[:,49]
+X_train = np.array(csvTrain[:, :49])
+y_train = csvTrain[:,49]
 
 csvTest = np.genfromtxt(IRIS_TEST, delimiter=",", skip_header=1)
-testX = np.array(csvTest[:, :49])
-testY = csvTest[:,49]
+X_test = np.array(csvTest[:, :49])
+y_test = csvTest[:,49]
 
-X = X.reshape([-1,7,7,1])
-testX = testX.reshape([-1,7,7,1])
+X_train = X_train.reshape([-1,7,7,1])
+X_test = X_test.reshape([-1,7,7,1])
 
 # reshape Y and Y_test to have shape (batch_size, 1).
-# Y = Y.reshape([-1, 28, 28, 1])
-# testY = testY.reshape([-1, 28, 28, 1])
+# y_train = y_train.reshape([-1, 28, 28, 1])
+# y_test = y_test.reshape([-1, 28, 28, 1])
 
-## Building convolutional network
-network = input_data(shape=[None, 7, 7, 1], name='input')
-network = conv_2d(network, 32, 3, activation='relu', regularizer="L2")
-network = max_pool_2d(network, 2)
-network = local_response_normalization(network)
-network = conv_2d(network, 64, 3, activation='relu', regularizer="L2")
-network = max_pool_2d(network, 2)
-network = local_response_normalization(network)
-network = fully_connected(network, 128, activation='tanh')
-network = dropout(network, 0.8)
-network = fully_connected(network, 256, activation='tanh')
-network = dropout(network, 0.8)
-# network = fully_connected(network, 10, activation='softmax')       # output size
-# network = fully_connected(network, 1, activation='linear')
-network = regression(network, optimizer='adam', learning_rate=0.01,
-                     loss='categorical_crossentropy', name='target') # loss='mean_square'
+X_val=[]
+X_val=np.array(X_val)
 
-### add this "fix":
-col = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES)
-for x in col:
-    tf.add_to_collection(tf.GraphKeys.VARIABLES, x )    
-## then continue:
+y_val=[]
+y_val=np.array(y_val)
 
-# Training
-model = tflearn.DNN(network, tensorboard_verbose=0)
-model.fit({'input': X}, {'target': Y}, n_epoch=20,
-           validation_set=({'input': testX}, {'target': testY}),
-           snapshot_step=100, show_metric=True)                      # run_id='convnet_mnist'
 
-# Ref: http://stackoverflow.com/questions/37433321/tensorflow-tflearn-valueerror-cannot-feed-value-of-shape-64-for-tensor-uta
+### Ori ###
+# prepare data
+# X_train, y_train, X_val, y_val, X_test, y_test = \
+#                                tl.files.load_mnist_dataset(shape=(-1,784))
+###########
+
+# define placeholder
+x = tf.placeholder(tf.float32, shape=[None, 49], name='x')
+y_ = tf.placeholder(tf.int64, shape=[None, ], name='y_')
+
+# define the network
+network = tl.layers.InputLayer(x, name='input_layer')
+network = tl.layers.DropoutLayer(network, keep=0.8, name='drop1')
+network = tl.layers.DenseLayer(network, n_units=800,
+                                act = tf.nn.relu, name='relu1')
+network = tl.layers.DropoutLayer(network, keep=0.5, name='drop2')
+network = tl.layers.DenseLayer(network, n_units=800,
+                                act = tf.nn.relu, name='relu2')
+network = tl.layers.DropoutLayer(network, keep=0.5, name='drop3')
+# the softmax is implemented internally in tl.cost.cross_entropy(y, y_) to
+# speed up computation, so we use identity here.
+# see tf.nn.sparse_softmax_cross_entropy_with_logits()
+network = tl.layers.DenseLayer(network, n_units=3,
+                                act = tf.identity,
+                                name='output_layer')
+
+# define cost function and metric.
+y = network.outputs
+cost = tl.cost.cross_entropy(y, y_)
+correct_prediction = tf.equal(tf.argmax(y, 1), y_)
+acc = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+y_op = tf.argmax(tf.nn.softmax(y), 1)
+
+# define the optimizer
+train_params = network.all_params
+train_op = tf.train.AdamOptimizer(learning_rate=0.0001, beta1=0.9, beta2=0.999,
+                            epsilon=1e-08, use_locking=False).minimize(cost, var_list=train_params)
+
+# initialize all variables in the session
+tl.layers.initialize_global_variables(sess)
+
+# print network information
+# network.print_params()
+# network.print_layers()
+
+# train the network
+# http://tensorlayer.readthedocs.io/en/latest/modules/utils.html
+tl.utils.fit(sess, network, train_op, cost, X_train, y_train, x, y_,
+            acc=acc, batch_size=49, n_epoch=500, print_freq=5,
+            X_val=X_val, y_val=y_val, eval_train=False)
+
+# evaluation
+tl.utils.test(sess, network, acc, X_test, y_test, x, y_, batch_size=None, cost=cost)
+
+# save the network to .npz file
+tl.files.save_npz(network.all_params , name='model.npz')
+sess.close()
