@@ -4,6 +4,13 @@ import sys
 import pandas as pd
 import os, glob
 
+def o_f():
+   outpath = "out"
+   if not os.path.exists(outpath):
+      os.makedirs(outpath)
+
+   os.chdir(outpath)
+
 def main(argv):
    srcDir = "."
    if len(argv) != 0:
@@ -56,6 +63,9 @@ def main(argv):
    # frame.sort('tradeTime') This now sorts in date order (deprecated)
    frame.sort_values(by=[col_name], ascending=[False], inplace=True) # from ver 0.17
    frame[col_name] = frame[col_name].dt.strftime('%Y-%m-%d')
+
+   # Output datasets
+   o_f()
 
    # Convert all data
    frame.to_json('data.json', orient='records')

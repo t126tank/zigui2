@@ -8,13 +8,13 @@ fi
 
 pushd ..
 
-# python writeCsv2.py $sym > new.txt
-# rm -rf /tmp/iris_model/
+python writeCsv2.py $sym > $sym/out/new.txt
+rm -rf /tmp/iris_model/
 
 python tfCsv2.py $sym
 
-pushd $sym
-cp -f iris_test.csv iris_training.csv  ../iris/
+pushd $sym/out
+cp -f iris_test.csv iris_training.csv  ../../iris/
 popd
 
 popd

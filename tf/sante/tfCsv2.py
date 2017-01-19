@@ -7,6 +7,13 @@ import pandas as pd
 import os, glob
 import random as rd
 
+def o_f():
+   outpath = "out"
+   if not os.path.exists(outpath):
+      os.makedirs(outpath)
+
+   os.chdir(outpath)
+
 def main(argv):
    srcDir = "."
    if len(argv) != 0:
@@ -15,12 +22,14 @@ def main(argv):
    # Specify datasets saved location/path
    os.chdir(srcDir)
 
+   o_f()
+
    df = pd.read_csv('data.csv')
 
    sz = len(df.index)
    tstsz = int(round(sz * 0.2))
    trnsz = sz - tstsz
-   dim = 40
+   dim = 49
 
    rows = rd.sample(df.index, tstsz)
    df_20 = df.ix[rows]
