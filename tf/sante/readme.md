@@ -55,7 +55,7 @@
      ├── iris_test.csv       ←───────┘│
      ├── iris_training.csv   ←────────┘
      ├── start.sh                    ◆②
-     └── tflearn.py                  ◆①
+     └── pqs.py                      ◆①
 ```
 
 ### readCsv2.py: 读入 原始数据(◎)，生成 加工数据(■Ⅰ)
@@ -101,13 +101,15 @@
   * 内部参数
 - dim = 40：输入数据维数
 
-### tflearn.py: 读入 检证用目标数据(★❶) + 训练用目标数据(★❷)
-  * 参考： [Deep Neural Network Classifier](https://www.tensorflow.org/tutorials/tflearn/).
+### pqs.py: 读入 检证用目标数据(★❶) + 训练用目标数据(★❷)
+  * 参考：
+- [Deep Neural Network Classifier](https://www.tensorflow.org/tutorials/tflearn/).
+- [Convolutional Network (MNIST)](http://tflearn.org/examples/).
   * E.g.
 
   ```
   $ cd iris
-  $ python tflearn.py
+  $ python pqs.py
   ```
 
   * 内部参数
