@@ -19,5 +19,5 @@ popd
 
 popd
 
-python tflearn.py
+python pqs.py
 
