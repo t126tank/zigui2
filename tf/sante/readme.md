@@ -23,10 +23,11 @@
 ├── tfCsv2.py                        ◆①
 ├── writeCsv2.py                     ◆①
 ├── 1570
-│   ├── data.json                   ■Ⅰ
-│   ├── data.csv                    ■Ⅱ
-│   ├── iris_test.csv               ★❶  ─┐
-│   ├── iris_training.csv           ★❷  ─┼┐
+│   ├── out
+│   │   ├── data.json              ■Ⅰ
+│   │   ├── data.csv               ■Ⅱ
+│   │   ├── iris_test.csv          ★❶  ─┐
+│   │   └── iris_training.csv      ★❷  ─┼┐
 │   ├── stocks_1570-T_1d_2013.csv   ◎      ││
 │   ├── stocks_1570-T_1d_2014.csv   ◎      ││
 │   ├── stocks_1570-T_1d_2015.csv   ◎      ││
@@ -34,10 +35,11 @@
 │   ├── stocks_1570-T_1d_2017.csv   ◎      ││
 │   └── stocks_1570-T.csv           ◎      ││
 ├── 4536                                     ││
-│   ├── data.json                   ■Ⅰ    ││
-│   ├── data.csv                    ■Ⅱ    ││
-│   ├── iris_test.csv               ★❶  ─┤│
-│   ├── iris_training.csv           ★❷  ─┼┤
+│   ├── out                                 ││
+│   │   ├── data.json              ■Ⅰ    ││
+│   │   ├── data.csv               ■Ⅱ    ││
+│   │   ├── iris_test.csv          ★❶  ─┤│
+│   │   └── iris_training.csv      ★❷  ─┼┤
 │   ├── stocks_4536-T_1d_2008.csv   ◎      ││
 │   ├── stocks_4536-T_1d_2009.csv   ◎      ││
 │   ├── stocks_4536-T_1d_2010.csv   ◎      ││
@@ -134,7 +136,7 @@
 
 
 ## 执行结果
-  * 4536 (40 维输入):
+  * 4536 (49 维输入):
 
   ```
   $ cd iris
@@ -146,7 +148,7 @@
   available in the SKCompat class, Estimator will only accept input_fn.
   Example conversion:
     est = Estimator(...) -> est = SKCompat(Estimator(...))
-  Accuracy: 0.790123
+  Accuracy: 0.865429
   WARNING:tensorflow:From /usr/local/lib/python2.7/dist-packages/tensorflow/contrib/learn/python/learn/estimators/dnn.py:348 in predict.: calling predict (from tensorflow.contrib.learn.python.learn.estimators.estimator) with x is deprecated  and will be removed after 2016-12-01.
   ...
   Example conversion:
