@@ -38,8 +38,9 @@ def comp_f(row, d, p, q, o, dm, ma, l):
 
    if (s < q + o):
       pSum = d.loc[s:s+p-1, :].sum().get_value('c')
-      r = pSum / p
-      return int(r)
+      r = int(pSum / p)
+      r = str(int(r*(1+bad))) + " " + str(r) + " " + str(int(r*(1+good)))
+      return r
 
    if (s > l - dm - ma + 1):  # q < dim
       return int(r)
