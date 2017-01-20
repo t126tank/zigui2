@@ -29,7 +29,7 @@ def main(argv):
    sz = len(df.index)
    tstsz = int(round(sz * 0.2))
    trnsz = sz - tstsz
-   dim = 49
+   dim = 81
 
    rows = rd.sample(df.index, tstsz)
    df_20 = df.ix[rows]

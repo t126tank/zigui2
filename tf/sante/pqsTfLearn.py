@@ -71,6 +71,6 @@ for x in col:
 model = tflearn.DNN(network, tensorboard_verbose=0)
 model.fit({'input': X}, {'target': Y}, n_epoch=20,
            validation_set=({'input': testX}, {'target': testY}),
-           snapshot_step=100, show_metric=True)                      # run_id='convnet_mnist'
+           snapshot_step=100, show_metric=True, run_id='convnet_mnist')
 
 # Ref: http://stackoverflow.com/questions/37433321/tensorflow-tflearn-valueerror-cannot-feed-value-of-shape-64-for-tensor-uta

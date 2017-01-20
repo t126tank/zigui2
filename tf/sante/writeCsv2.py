@@ -10,7 +10,7 @@ import numpy as np
 # Classification [0] < bad < [1] < bdraw < [2] < gdraw < [3] < good < [4]
 bdraw = -0.01  # bad  draw
 gdraw =  0.01  # good draw
-bad   = -0.035
+bad   = -0.03
 good  =  0.035
 
 def o_f():
@@ -119,11 +119,11 @@ def main(argv):
    if len(argv) != 0:
       srcDir = argv[0]
 
-   dim = 49
+   dim = 81
    ma  = 5
    p   = 3
    q   = 3
-   offset = 1
+   offset = 0
 
    # Specify datasets saved location/path
    os.chdir(srcDir)
