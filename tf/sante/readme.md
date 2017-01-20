@@ -52,9 +52,11 @@
 │   ├── stocks_4536-T_1d_2017.csv   ◎      ││
 │   └── stocks_4536-T.csv           ◎      ││
 └── iris                                     ││
-     ├── iris_test.csv       ←───────┘│
-     ├── iris_training.csv   ←────────┘
+     ├── iris_test.csv       ⇦=───────┘│
+     ├── iris_training.csv   ⇦=────────┘
      ├── start.sh                    ◆②
+     ├── pqsDNN.py                   ◆①
+     ├── pqsTfLearn.py               ◆①
      └── pqs.py                      ◆①
 ```
 
@@ -105,6 +107,7 @@
   * 参考：
 - [Deep Neural Network Classifier](https://www.tensorflow.org/tutorials/tflearn/).
 - [Convolutional Network (MNIST)](http://tflearn.org/examples/).
+- [Multi-layer perceptron (MNIST)](http://tensorlayer.readthedocs.io/en/latest/user/example.html#basics).
   * E.g.
 
   ```
@@ -114,7 +117,7 @@
 
   * 内部参数
 - dimension=40：输入数据维数
-- classes=3 ：预测区间数 _[0] < -4% < [1] < +4% < [2]_
+- classes=3 ：预测区间数 _[0] < -3.0% < [1] < +3.5% < [2]_
 
 ### **start.sh**:自动执行脚本
   * E.g.
@@ -138,7 +141,7 @@
 
 
 ## 执行结果
-  * 4536 (49 维输入):
+  * 4536 (81 维输入):
 
   ```
   $ cd iris
@@ -150,13 +153,14 @@
   available in the SKCompat class, Estimator will only accept input_fn.
   Example conversion:
     est = Estimator(...) -> est = SKCompat(Estimator(...))
-  Accuracy: 0.865429
+  Accuracy: 0.847059
   WARNING:tensorflow:From /usr/local/lib/python2.7/dist-packages/tensorflow/contrib/learn/python/learn/estimators/dnn.py:348 in predict.: calling predict (from tensorflow.contrib.learn.python.learn.estimators.estimator) with x is deprecated  and will be removed after 2016-12-01.
   ...
   Example conversion:
     est = Estimator(...) -> est = SKCompat(Estimator(...))
   WARNING:tensorflow:float64 is not supported by many models, consider casting to float32.
-  Predictions: [1, 1, 1]　⇒ [(2017/01/18-01/20), (2017/01/17-01/19), (2017/01/16-01/18)] Refer to base CLOSE prices:[1442, 1459, 1468]
+  Predictions: [1, 1, 1] ⇒ [(2017/01/18-01/20), (2017/01/17-01/19), (2017/01/16-01/18)]
+  Refer to base CLOSE prices: [([0]1363 [1] 1406 [1] 1455[2]), ([0]1390 [1] 1433 [1] 1483[2]), ([0]1398 [1] 1442 [1] 1492[2])]
   ```
 
 ## TODO
