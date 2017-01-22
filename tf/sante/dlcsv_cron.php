@@ -18,22 +18,32 @@ define('NEW3',  '.csv');
 $symbols = array();
 loadsymbols($symbols);
 print_r($symbols);
-// $symbols = array(1301); debug
+// $symbols = array(1332, 1333);
 
 $from = 2007;
 $to   = 2017;
 
 foreach ($symbols as $value) {
+/*
    for ($year = $from; $year < $to; $year++) {
       $csv = BASEURL . $value . PERIOD . $year . FILETYPE;
       dlcsv($csv, $value, $year);
-      sleep(10);
+      sleep(1);
    }
+*/
    $csv = BASEURL . $value . FILETYPE2; // Latest 250 items
-   dlcsv($csv, $value, $year);
+   dlcsv($csv, $value, $to);
+   sleep(3);
 }
 
-echo "done! <br>";
+echo "download done! <br>";
+
+// Make sure the script can handle large folders/files
+ini_set('max_execution_time', 600);
+ini_set('memory_limit','1024M');
+
+zipData(ROOTPATH . "/stocks", ROOTPATH . "/backup.zip");
+echo 'zip finished.';
 
 function dlcsv($url, $sym, $year) {
    $opts = array('http' =>
@@ -43,7 +53,7 @@ function dlcsv($url, $sym, $year) {
            'header' => array(
                'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*\/*;q=0.8',
                'User-Agent:MyAgent/1.0\r\n'
-           ),
+           ), 
        )
    );
    $context = stream_context_create($opts);
@@ -85,7 +95,7 @@ function loadsymbols(&$syms) {
 
            $utf8_type = mb_convert_encoding($data[3], "UTF-8", "SJIS");
            /* Contains in column 市場・商品区分 */
-           if (strpos($utf8_type, '市場第一部（内国株）') !== false)
+           if (strpos($utf8_type, '市場第一部（内国株）') !== false) // target is utf-8 encode
                $syms[] = $data[1]; // コード column
 
 /*
@@ -96,6 +106,33 @@ function loadsymbols(&$syms) {
        }
        fclose($handle);
    }
+}
+
+function zipData($source, $destination) {
+	if (extension_loaded('zip')) {
+		if (file_exists($source)) {
+			$zip = new ZipArchive();
+			if ($zip->open($destination, ZIPARCHIVE::CREATE)) {
+				$source = realpath($source);
+				if (is_dir($source)) {
+					$files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($source),
+					            RecursiveIteratorIterator::SELF_FIRST);
+					foreach ($files as $file) {
+						$file = realpath($file);
+						if (is_dir($file)) {
+							$zip->addEmptyDir(str_replace($source . '/', '', $file . '/'));
+						} else if (is_file($file)) {
+							$zip->addFromString(str_replace($source . '/', '', $file), file_get_contents($file));
+						}
+					}
+				} else if (is_file($source)) {
+					$zip->addFromString(basename($source), file_get_contents($source));
+				}
+			}
+			return $zip->close();
+		}
+	}
+	return false;
 }
 
 /*
