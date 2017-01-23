@@ -19,45 +19,46 @@
 
 ```
 .
-├── readCsv2.py                      ◆①
-├── tfCsv2.py                        ◆①
-├── writeCsv2.py                     ◆①
-├── 1570
-│   ├── out
-│   │   ├── data.json              ■Ⅰ
-│   │   ├── data.csv               ■Ⅱ
-│   │   ├── iris_test.csv          ★❶  ─┐
-│   │   └── iris_training.csv      ★❷  ─┼┐
-│   ├── stocks_1570-T_1d_2013.csv   ◎      ││
-│   ├── stocks_1570-T_1d_2014.csv   ◎      ││
-│   ├── stocks_1570-T_1d_2015.csv   ◎      ││
-│   ├── stocks_1570-T_1d_2016.csv   ◎      ││
-│   ├── stocks_1570-T_1d_2017.csv   ◎      ││
-│   └── stocks_1570-T.csv           ◎      ││
-├── 4536                                     ││
-│   ├── out                                 ││
-│   │   ├── data.json              ■Ⅰ    ││
-│   │   ├── data.csv               ■Ⅱ    ││
-│   │   ├── iris_test.csv          ★❶  ─┤│
-│   │   └── iris_training.csv      ★❷  ─┼┤
-│   ├── stocks_4536-T_1d_2008.csv   ◎      ││
-│   ├── stocks_4536-T_1d_2009.csv   ◎      ││
-│   ├── stocks_4536-T_1d_2010.csv   ◎      ││
-│   ├── stocks_4536-T_1d_2011.csv   ◎      ││
-│   ├── stocks_4536-T_1d_2012.csv   ◎      ││
-│   ├── stocks_4536-T_1d_2013.csv   ◎      ││
-│   ├── stocks_4536-T_1d_2014.csv   ◎      ││
-│   ├── stocks_4536-T_1d_2015.csv   ◎      ││
-│   ├── stocks_4536-T_1d_2016.csv   ◎      ││
-│   ├── stocks_4536-T_1d_2017.csv   ◎      ││
-│   └── stocks_4536-T.csv           ◎      ││
-└── iris                                     ││
-     ├── iris_test.csv       ⇦=───────┘│
-     ├── iris_training.csv   ⇦=────────┘
-     ├── start.sh                    ◆②
-     ├── pqsDNN.py                   ◆①
-     ├── pqsTfLearn.py               ◆①
-     └── pqs.py                      ◆①
+├── readCsv2.py                           ◆①
+├── writeCsv2.py                          ◆①
+├── tfCsv2.py                             ◆①
+├── start.sh                              ◆②
+├── stocks
+│   ├── 1570
+│   │   ├── out
+│   │   │   ├── data.json              ■Ⅰ
+│   │   │   ├── data.csv               ■Ⅱ
+│   │   │   ├── iris_test.csv          ★❶  ─┐
+│   │   │   └── iris_training.csv      ★❷  ─┼┐
+│   │   ├── stocks_1570-T_1d_2013.csv   ◎      ││
+│   │   ├── stocks_1570-T_1d_2014.csv   ◎      ││
+│   │   ├── stocks_1570-T_1d_2015.csv   ◎      ││
+│   │   ├── stocks_1570-T_1d_2016.csv   ◎      ││
+│   │   ├── stocks_1570-T_1d_2017.csv   ◎      ││
+│   │   └── stocks_1570-T.csv           ◎      ││
+│   └── 4536                                     ││
+│        ├── out                                 ││
+│        │   ├── data.json              ■Ⅰ    ││
+│        │   ├── data.csv               ■Ⅱ    ││
+│        │   ├── iris_test.csv          ★❶  ─┤│
+│        │   └── iris_training.csv      ★❷  ─┼┤
+│        ├── stocks_4536-T_1d_2008.csv   ◎      ││
+│        ├── stocks_4536-T_1d_2009.csv   ◎      ││
+│        ├── stocks_4536-T_1d_2010.csv   ◎      ││
+│        ├── stocks_4536-T_1d_2011.csv   ◎      ││
+│        ├── stocks_4536-T_1d_2012.csv   ◎      ││
+│        ├── stocks_4536-T_1d_2013.csv   ◎      ││
+│        ├── stocks_4536-T_1d_2014.csv   ◎      ││
+│        ├── stocks_4536-T_1d_2015.csv   ◎      ││
+│        ├── stocks_4536-T_1d_2016.csv   ◎      ││
+│        ├── stocks_4536-T_1d_2017.csv   ◎      ││
+│        └── stocks_4536-T.csv           ◎      ││
+└── iris                                          ││
+     ├── iris_test.csv        ⇦=─────────┘│
+     ├── iris_training.csv    ⇦=──────────┘
+     ├── pqsDNN.py                        ◆①
+     ├── pqsTfLearn.py                    ◆①
+     └── pqs.py                           ◆①
 ```
 
 ### readCsv2.py: 读入 原始数据(◎)，生成 加工数据(■Ⅰ)
@@ -123,7 +124,6 @@
   * E.g.
 
   ```
-  $ cd iris
   $ ./start.sh 1570
   ```
 
@@ -144,7 +144,6 @@
   * 4536 (81 维输入):
 
   ```
-  $ cd iris
   $ ./start.sh  4536
   ...
   Instructions for updating:
