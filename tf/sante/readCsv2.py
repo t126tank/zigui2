@@ -51,7 +51,8 @@ def main(argv):
    frame = frame[frame.volume > 0] # [frame.volume != 0]
 
    col_name = frame.columns[0]
-   print "[0]: ", col_name
+   # print "[0]: ", col_name
+   # print "Dir: ", srcDir
    # frame = frame.rename(columns = {col_name: 'tradeTime'})
    # print frame.tradeTime
 
@@ -69,6 +70,13 @@ def main(argv):
 
    # Convert all data
    frame.to_json('data.json', orient='records')
+
+   # For report
+   ldate = frame.get_value(0, 'tradeTime')[0]
+   f = open('item.json', 'a')
+   print >> f, '"code": "%s", "fromDate": "%s",' % (srcDir[7:11], ldate)
+   f.close()
+
 
 if __name__ == "__main__":
    main(sys.argv[1:])

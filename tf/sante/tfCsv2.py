@@ -42,6 +42,12 @@ def main(argv):
    df_other.columns.values[1] = dim
    df_other.to_csv('iris_training.csv', index=False)
 
+   # For report
+   f = open('item.json', 'a')
+   print >> f, '"training": %d, "test": %d,' % (trnsz, tstsz)
+   f.close()
+
+
 if __name__ == "__main__":
    main(sys.argv[1:])
 

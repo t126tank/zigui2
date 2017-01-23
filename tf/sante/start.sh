@@ -18,4 +18,3 @@ cp -f ../$sym/out/iris_test.csv ../$sym/out/iris_training.csv  .
 python pqs.py
 popd
 
-

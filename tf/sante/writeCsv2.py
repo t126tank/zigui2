@@ -10,8 +10,8 @@ import numpy as np
 # Classification [0] < bad < [1] < bdraw < [2] < gdraw < [3] < good < [4]
 bdraw = -0.01  # bad  draw
 gdraw =  0.01  # good draw
-bad   = -0.03
-good  =  0.035
+bad   = -0.028
+good  =  0.032
 
 def o_f():
    outpath = "out"
@@ -39,7 +39,18 @@ def comp_f(row, d, p, q, o, dm, ma, l):
    if (s < q + o):
       pSum = d.loc[s:s+p-1, :].sum().get_value('c')
       r = int(pSum / p)
-      r = str(int(r*(1+bad))) + " " + str(r) + " " + str(int(r*(1+good)))
+      p1 = r
+      p0 = int(p1*(1+bad))
+      p2 = int(p1*(1+good))
+
+      r = str(p0) + " " + str(p1) + " " + str(p2)
+
+      # For report
+      if s == 0:
+         f = open('item.json', 'a')
+         print >> f, '"refPrice": %d, "price0": %d, "price1": %d, "price2": %d,' % (p1, p0, p1, p2)
+         f.close()
+
       return r
 
    if (s > l - dm - ma + 1):  # q < dim
@@ -110,6 +121,11 @@ def print_new_f(d, q, o, dm):
       for j in range(dm):
          idx = i + dm - j - 1
          r.append(round(d.get_value(idx, 'dim'), 1))
+
+      # For NEW data predicting
+      if i == 0:
+         a = np.asarray([ r ]) # [ [1,2,3], [4,5,6], [7,8,9] ]
+         np.savetxt("input.csv", a, delimiter=",", fmt='%10.2f')
 
       print r,","
 
