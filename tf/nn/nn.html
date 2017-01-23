@@ -1,0 +1,104 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<!-- JS -->
+<script type="text/javascript" src="../js/jquery-3.1.1.min.js"></script>
+<script type="text/javascript">
+<!--
+$(function() {
+    $('#send').click(function() {
+        var url = "./nn.php";
+        var formData = {
+            "code" : $('#code').val()
+        };
+        var postData = JSON.stringify(formData);    // Json 2 String
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            // dataType: "html",
+            data: {'nnData': postData},             // payload has KEY and Value
+            success: function (msg) {
+               var backdata = msg;
+               $("#backdata").html(backdata);
+               $("#backdata").css({color: "green"});
+
+               // alert('success!');
+               // $('.hoge tr').addClass('hv');
+
+               $('.hoge tr').hover(
+                  function() {
+                     // hover event cover
+                     $(this).addClass('hv');
+                  },
+                  function() {
+                     //hover event leave
+                     $(this).removeClass('hv');
+                  }
+               );
+            },
+            error: function(e) {
+                console.log(e.message);
+            }
+        });
+        // alert('Hi');
+    });
+});
+-->
+</script>
+
+<!-- CSS -->
+<style type="text/css">
+    table.hoge tr.hv-0 td {
+        background-color: #99ffff;
+    }
+    table.hoge tr.hv-1 td {
+        background-color: #99ff99;
+    }
+    table.hoge tr.hv-2 td {
+        background-color: #ff99ff;
+    }
+    table.hoge tr.hv td {
+        background-color: #ffff33;
+    }
+</style>
+
+
+</head>
+
+<body>
+<p align="center">
+"Have a colorful day ^_^ ";
+</p>
+<br>
+
+<table width="300" border="0" align="center" cellpadding="0" cellspacing="1" bgcolor="#CCCCCC">
+<tr>
+    <form>
+    <td>
+    <table width="100%" border="0" cellpadding="3" cellspacing="1" bgcolor="#FFFFFF">
+    <tr>
+        <td colspan="3"><strong>Query Form </strong></td>
+    </tr>
+    <tr>
+        <td>Code</td>
+        <td>:</td>
+        <td><input type="text" id="code" required /></td>
+    </tr>
+    <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><input type="button" id="send" value="Query"></td>
+    </tr>
+    </table>
+    </td>
+    </form>
+</tr>
+</table>
+
+<span id="backdata"></span>
+
+</body>
+</html>
+
+

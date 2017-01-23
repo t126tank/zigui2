@@ -1,0 +1,39 @@
+[
+    {
+        "code": "1301",
+        "training": 2000,
+        "test": 400,
+        "possibility": 0.88,
+        "refPrice": 500,
+        "fromDate": "2017-01-23",
+        "result": 1,
+        "price0": 454,
+        "price1": 466,
+        "price2": 488
+    },
+    {
+        "code": "1302",
+        "training": 2300,
+        "test": 500,
+        "possibility": 0.77,
+        "refPrice": 1200,
+        "fromDate": "2017-01-23",
+        "result": 0,
+        "price0": 1454,
+        "price1": 1466,
+        "price2": 1488
+    },
+    {
+        "code": "2683",
+        "training": 1000,
+        "test": 200,
+        "possibility": 0.66,
+        "refPrice": 200,
+        "fromDate": "2017-01-23",
+        "result": 2,
+        "price0": 154,
+        "price1": 222,
+        "price2": 383
+    }
+]
+
