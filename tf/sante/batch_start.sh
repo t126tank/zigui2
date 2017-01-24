@@ -2,6 +2,10 @@
 
 folder="stocks/"
 item="item.json"
+nn="nn.json"
+
+touch $nn
+echo "[]" > $nn
 
 pushd ${folder}
 elementes=($(ls -d *))
@@ -15,8 +19,13 @@ do
    code=${elementes[$i]}
    sym=${folder}${code}
 
+   # Secure new output folder
+   OUT_DIR=$sym/out
+   NEW_DIR=`dirname $OUT_DIR`
+   [ ! -d $NEW_DIR ] && mkdir -p $NEW_DIR
+
    touch $sym/out/${item}
-   echo "{" > $sym/out/${item}
+   echo "[{" > $sym/out/${item}
 
    python readCsv2.py $sym
 
@@ -29,14 +38,14 @@ do
    cp -f ../$sym/out/iris_test.csv ../$sym/out/iris_training.csv ../$sym/out/input.csv  .
    python pqs.py $code
 
-   echo "}" >> ../$sym/out/${item}
+   echo "}]" >> ../$sym/out/${item}
    popd
 
-   touch "nn.json"
-   echo "[]" > "nn.json"
    python nn.py $sym
-
 done
+
+pre=($(date "+%Y%m%d-%H%M%S-"))
+cp $nn  $pre$nn
 
 
 

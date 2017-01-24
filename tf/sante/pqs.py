@@ -16,7 +16,7 @@ def main(argv):
 
    sess = tf.InteractiveSession()
 
-   n_classes = 3
+   n_cls = 3
    IRIS_TRAINING = "iris_training.csv"
    IRIS_TEST = "iris_test.csv"
    INPUT_RECORD  = "input.csv"
@@ -67,7 +67,7 @@ def main(argv):
    # the softmax is implemented internally in tl.cost.cross_entropy(y, y_) to
    # speed up computation, so we use identity here.
    # see tf.nn.sparse_softmax_cross_entropy_with_logits()
-   network = tl.layers.DenseLayer(network, n_units=n_classes,
+   network = tl.layers.DenseLayer(network, n_units=n_cls,
                                    act = tf.identity,
                                    name='output_layer')
 
@@ -93,13 +93,16 @@ def main(argv):
    # train the network
    # http://tensorlayer.readthedocs.io/en/latest/modules/utils.html
    tl.utils.fit(sess, network, train_op, cost, X_train, y_train, x, y_,
-               acc=acc, batch_size=100, n_epoch=50, print_freq=1,
+               acc=acc, batch_size=100, n_epoch=5, print_freq=10,
                eval_train=True)
    #           X_val=X_val, y_val=y_val, eval_train=False)
 
    # evaluation
-   tl.utils.test(sess, network, acc, X_test, y_test, x, y_, batch_size=None, cost=cost)
-   # c_mat, f1, acc, f1_macro = tl.utils.evaluation(y_test, y_, n_classes)
+   test_acc = tl.utils.test(sess, network, acc, X_test, y_test, x, y_, batch_size=None, cost=cost)
+
+   #### /usr/local/lib/python2.7/dist-packages/tensorlayer/utils.py
+
+   # c_mat, f1, test_acc, f1_macro = tl.utils.evaluation(y_test=y_test, y_predict=None, n_classes=n_cls)
 
    # save the network to .npz file
    tl.files.save_npz(network.all_params , name='model.npz')
@@ -113,7 +116,7 @@ def main(argv):
 
    # For report
    f = open('../stocks/' + code + '/out/item.json', 'a')
-   print >> f, '"possibility": %f, "result": %d' % (0.8, result[0])
+   print >> f, '"possibility": %f, "result": %d' % (test_acc, int(result[0]))
    f.close()
 
    sess.close()
@@ -121,4 +124,7 @@ def main(argv):
 
 if __name__ == "__main__":
    main(sys.argv[1:])
+
+
+# Ref: http://qiita.com/akasakas/items/fad4ca279c9a726998e0
 

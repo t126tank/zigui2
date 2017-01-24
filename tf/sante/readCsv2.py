@@ -65,6 +65,9 @@ def main(argv):
    frame.sort_values(by=[col_name], ascending=[False], inplace=True) # from ver 0.17
    frame[col_name] = frame[col_name].dt.strftime('%Y-%m-%d')
 
+   # Reset idx : severl files have index 0
+   frame = frame.reset_index(drop=True)
+
    # Output datasets
    o_f()
 
@@ -72,7 +75,7 @@ def main(argv):
    frame.to_json('data.json', orient='records')
 
    # For report
-   ldate = frame.get_value(0, 'tradeTime')[0]
+   ldate = frame.get_value(0, 'tradeTime')
    f = open('item.json', 'a')
    print >> f, '"code": "%s", "fromDate": "%s",' % (srcDir[7:11], ldate)
    f.close()
