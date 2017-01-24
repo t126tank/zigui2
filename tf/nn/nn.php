@@ -1,5 +1,5 @@
 <?php
-// require_once ("../dbg/dbg.php");
+// require_once ("../pqs/dbg/dbg.php");
 header("Content-type: text/plain; charset=UTF-8");
 
 define("FILELOC", __DIR__ . '/');
@@ -65,7 +65,8 @@ EOF;
 }
 
 function output($item) {
-   echo '<td>' .$item['code'].'</td>';
+   // http://stocks.finance.yahoo.co.jp/stocks/detail/?code=1570.t
+   echo '<td><a href="http://stocks.finance.yahoo.co.jp/stocks/detail/?code=' .$item['code']. '".t target="_blank">' .$item['code'].'</a></td>';
    echo '<td>' .$item['training'].'</td>';
    echo '<td>' .$item['test'].'</td>';
    echo '<td>' .$item['possibility'].'</td>';
