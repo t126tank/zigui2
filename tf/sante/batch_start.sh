@@ -3,6 +3,7 @@
 folder="stocks/"
 item="item.json"
 nn="nn.json"
+csv="nn.csv"
 
 touch $nn
 echo "[]" > $nn
@@ -47,13 +48,4 @@ done
 pre=($(date "+%Y%m%d-%H%M%S-"))
 cp $nn  $pre$nn
 
-
-
-
-
-
-
-
-
-
-
+cp $nn  $csv /var/www/html/nn/
