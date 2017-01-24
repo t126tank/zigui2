@@ -20,6 +20,7 @@ def main(argv):
    frame = frame.reset_index(drop=True)
 
    frame.to_json('nn.json', orient='records')
+   frame.to_csv('nn.csv', index=False)
 
 if __name__ == "__main__":
    main(sys.argv[1:])
