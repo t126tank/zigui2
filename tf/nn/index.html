@@ -8,8 +8,11 @@
 $(function() {
     $('#send').click(function() {
         var url = "./nn.php";
+        var filter = $('input[name="filter"]:checked').val();
+
         var formData = {
-            "code" : $('#code').val()
+            "code"   : $('#code').val(),
+            "filter" : filter
         };
         var postData = JSON.stringify(formData);    // Json 2 String
 
@@ -74,7 +77,7 @@ $(function() {
 </p>
 <br>
 
-<table width="300" border="0" align="center" cellpadding="0" cellspacing="1" bgcolor="#CCCCCC">
+<table width="500" border="0" align="center" cellpadding="0" cellspacing="1" bgcolor="#CCCCCC">
 <tr>
     <form>
     <td>
@@ -87,6 +90,17 @@ $(function() {
         <td>:</td>
         <td><input type="text" id="code" required /></td>
     </tr>
+    <tr>
+        <td>Result Filter</td>
+        <td>:</td>
+        <td>
+            <input id="all" type="radio" name="filter" value="3" checked><label>all</label>
+            <input id="dn" type="radio" name="filter" value="0"><label>down</label>
+            <input id="unstable" type="radio" name="filter" value="1"><label>unstable</label>
+            <input id="up" type="radio" name="filter" value="2"><label>up</label>
+        </td>
+    </tr>
+
     <tr>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
@@ -102,5 +116,4 @@ $(function() {
 
 </body>
 </html>
-
 
