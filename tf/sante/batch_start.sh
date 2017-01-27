@@ -8,11 +8,12 @@ csv="nn.csv"
 touch $nn
 echo "[]" > $nn
 
-pushd ${folder}
-elementes=($(ls -d *))
-nmbr_of_elements=${#elementes[@]}
-popd
+elementes=($(/usr/bin/php  select_sym.php))
+# pushd ${folder}
+# elementes=($(ls -d *))
+# popd
 
+nmbr_of_elements=${#elementes[@]}
 # echo ${nmbr_of_elements}
 # perform every element
 for (( i = 0 ; i < nmbr_of_elements ; i++ ))
@@ -24,6 +25,7 @@ do
    OUT_DIR=$sym/out
    NEW_DIR=`dirname $OUT_DIR`
    [ ! -d $NEW_DIR ] && mkdir -p $NEW_DIR
+   mkdir -p $OUT_DIR
 
    touch $sym/out/${item}
    echo "[{" > $sym/out/${item}
