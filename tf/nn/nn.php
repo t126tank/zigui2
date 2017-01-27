@@ -4,11 +4,15 @@ header("Content-type: text/plain; charset=UTF-8");
 
 define("FILELOC", __DIR__ . '/');
 define("TOTAL", "0");
+define("ALL", "3");
 
-$codeStr = TOTAL;
+$codeStr    = TOTAL;
+$filterStr  = ALL;
+
 if (isset($_POST['nnData'])) {
-    $postJson = json_decode($_POST['nnData'], true); // decode to array
-    $codeStr  = strtolower($postJson['code']);
+    $postJson  = json_decode($_POST['nnData'], true); // decode to array
+    $codeStr   = strtolower($postJson['code']);
+    $filterStr = strtolower($postJson['filter']);
 
     if (empty(trim($postJson['code'])))
         $codeStr = TOTAL;
@@ -21,7 +25,7 @@ $codeStr = strval($code);
 // Read-in json datasets
 $allItems = getJsonObj("nn.json");
 
-generateTbl($allItems, $codeStr);
+generateTbl($allItems, $codeStr, $filterStr);
 
 function getJsonObj($jsonfile) {
    $fileLocation = FILELOC . $jsonfile;
@@ -32,8 +36,9 @@ function getJsonObj($jsonfile) {
    return json_decode($jsonObj, true);
 }
 
-function generateTbl($arr, $cdStr) {
+function generateTbl($arr, $cdStr, $ftStr) {
 echo <<<EOF
+   <br>
    <table class="hoge">
    <tr>
       <th>Code</th>
@@ -51,8 +56,10 @@ EOF;
 
     $color = rand(1, 30);
     foreach ($arr as $item) {
-        if (strcmp($cdStr, TOTAL) == 0 ||
-            strcmp($item['code'], $cdStr) == 0) {
+        if ((strcmp($cdStr, TOTAL) == 0 ||
+             strcmp($item['code'], $cdStr) == 0) &&
+            (strcmp($item['result'], $ftStr) == 0 ||
+             strcmp($ftStr, ALL) == 0)) {
             echo '<tr class="hv-'.fmod($color, 3).'">';
             output($item);
             echo '</tr>';
@@ -79,4 +86,3 @@ function output($item) {
 }
 
 ?>
-
