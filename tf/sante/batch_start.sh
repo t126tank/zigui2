@@ -5,6 +5,8 @@ item="item.json"
 nn="nn.json"
 csv="nn.csv"
 
+pre=($(date "+%Y%m%d-%H%M%S-"))
+
 touch $nn
 echo "[]" > $nn
 
@@ -45,9 +47,14 @@ do
    popd
 
    python nn.py $sym
+
+   # real-time update, for 1st time
+   cp $nn  $pre$nn
+   sudo cp $nn  $csv /var/www/html/nn/
 done
 
-pre=($(date "+%Y%m%d-%H%M%S-"))
-cp $nn  $pre$nn
+# pre=($(date "+%Y%m%d-%H%M%S-"))
 
-cp $nn  $csv /var/www/html/nn/
+cp $nn  $pre$nn
+sudo cp $nn  $csv /var/www/html/nn/
+
