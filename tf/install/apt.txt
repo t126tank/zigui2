@@ -1,0 +1,20 @@
+    7  sudo apt-get update
+    8  sudo apt-get install apache2
+   94  sudo apt-get install mysql-server libapache2-mod-auth-mysql php5-mysql
+   95  sudo apt-get install php5 libapache2-mod-php5 php5-mcrypt curl libcurl3 libcurl3-dev php5-curl
+  108  sudo apt-get install git
+  137  sudo apt-get -y install vsftpd
+  222  sudo apt-get install unzip zip
+  381  sudo apt-get install cython3
+  438  sudo apt-get update
+  440  sudo apt-get -y install python-pip
+  441  sudo apt-get -y install python-dev
+  462  sudo apt-get install libfreetype6-dev libxft-dev
+  481  sudo apt-get install libjpeg-dev
+  507  sudo apt-get install python-scipy
+  511  sudo apt-get remove scipy
+  512  sudo apt-get remove python-scipy
+  516  sudo apt-get install libfreetype6-dev libxft-dev
+  517  sudo apt-get autoremove
+  521  sudo apt-get install libfreetype6-dev libxft-dev
+  528  history | grep apt > apt.txt

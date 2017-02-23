@@ -1,0 +1,38 @@
+  359  sudo pip install pandas
+  440  sudo apt-get -y install python-pip
+  445  sudo pip install --upgrade $TF_BINARY_URL
+  447  sudo pip install pandas
+  455  pip install matplotlib numpy scipy scikit-image
+  457  sudo pip install matplotlib numpy scipy scikit-image
+  458  sudo pip install numpy scipy scikit-image
+  459  sudo pip tensorflow
+  460  sudo pip install tensorflow
+  461  sudo pip install tensorlayer
+  463  sudo pip install matplotlib 
+  464  sudo pip install tensorlayer
+  465  sudo pip install req
+  469  sudo pip install tensorlayer
+  470  sudo pip install oldfile
+  471  sudo pip install olefile
+  472  sudo pip -U install tensorlayer
+  473  sudo pip upgrade tensorlayer
+  474  sudo pip install --upgrade tensorlayer
+  480  sudo pip install pillow
+  482  sudo pip install pillow scikit-image
+  483  sudo pip install pillow
+  484  sudo pip install scikit-image
+  494  sudo pip install scikit-image
+  495  sudo pip install tensorlayer
+  496  sudo pip install -U tensorlayer
+  497  sudo pip install cython
+  498  sudo pip install scikit-image
+  506  sudo pip install scipy
+  508  sudo pip install scikit-image
+  509  sudo pip install -U scipy
+  510  sudo pip uninstall scipy
+  514  sudo pip install -U scipy
+  515  sudo pip install -U scikit-image
+  520  sudo pip install -U scikit-image
+  523  history | grep pip
+  524  history | grep pipclear
+  527  history | grep pip > pip.txt
