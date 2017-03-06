@@ -7,10 +7,12 @@ csv="nn.csv"
 
 pre=($(date "+%Y%m%d-%H%M%S-"))
 
+pushd ~/workspace/projects/nn/
+
 touch $nn
 echo "[]" > $nn
 
-elementes=($(/usr/bin/php  select_sym.php))
+elementes=($(/usr/bin/php  select_sym_nikkei225.php))
 # pushd ${folder}
 # elementes=($(ls -d *))
 # popd
@@ -49,12 +51,18 @@ do
    python nn.py $sym
 
    # real-time update, for 1st time
-   cp $nn  $pre$nn
-   sudo cp $nn  $csv /var/www/html/nn/
+   # cp $nn  $pre$nn
+   # sudo cp $nn  $csv /var/www/html/nn/
 done
 
 # pre=($(date "+%Y%m%d-%H%M%S-"))
 
 cp $nn  $pre$nn
-sudo cp $nn  $csv /var/www/html/nn/
+sudo cp $nn  $csv  /var/www/html/nn/
+
+rm  backup.zip
+zip backup.zip stocks -r
+sudo cp -f backup.zip /var/www/html/nn/
+
+popd
 
