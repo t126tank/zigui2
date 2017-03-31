@@ -5,6 +5,8 @@ item="item.json"
 sigma="sigma.json"
 csv="sigma.csv"
 
+pre=($(date "+%Y%m%d-%H%M%S-"))
+pushd ~/workspace/projects/sigma/
 touch $sigma
 echo "[]" > $sigma
 
@@ -25,8 +27,8 @@ do
 
    # Secure new output folder
    OUT_DIR=$sym/out
-   NEW_DIR=`dirname $OUT_DIR`
-   [ ! -d $NEW_DIR ] && mkdir -p $NEW_DIR
+   # NEW_DIR=`dirname $OUT_DIR`
+   # [ ! -d $NEW_DIR ] && mkdir -p $NEW_DIR
    mkdir -p $OUT_DIR
 
    touch $sym/out/${item}
@@ -40,10 +42,19 @@ do
 
    python sigma.py $sym
 
-   # cp $sigma  $csv /var/www/html/sigma/
+   # update realtime
+   # cp $sigma  $pre$sigma
+   # sudo cp $sigma  $csv /var/www/html/sigma/
 done
 
-pre=($(date "+%Y%m%d-%H%M%S-"))
+# pre=($(date "+%Y%m%d-%H%M%S-"))
 cp $sigma  $pre$sigma
-# cp $sigma  $csv /var/www/html/sigma/
+sudo cp $sigma  $csv /var/www/html/sigma/
 
+rm  backup.zip
+find stocks/ -type d -name "out" -exec rm -rf {} \;
+
+zip backup.zip stocks -r
+sudo cp -f backup.zip /var/www/html/sigma/
+
+popd
