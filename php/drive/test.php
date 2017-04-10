@@ -9,7 +9,7 @@ use Goutte\Client;
 
 $client = new Client();
 
-$crawler = $client->request('GET', 'http://srv/drv/final3NG_files/result.htm');
+$crawler = $client->request('GET', 'http://jptolx20305/drv/final3NG_files/result.htm');
 
 $crawler->filter('title')->each(function($node)
 {
@@ -25,13 +25,18 @@ $crawler->filter('span.saitenkekka')->each(function($node)
 // <td valign="top" width="570">
 
 $cnt = 0;
-$crawler->filterXPath('//td[contains(@valign, "top")]')->each(function($node) use(&$cnt)
-{
+$subcnt = 0;
+$illus = false;
+
+$crawler->filterXPath('//td[contains(@valign, "top")]')->each(function($node) use(&$cnt, &$illus, &$subcnt) {
     $ctx  = "";
     $hrkn = "";
+    $type = "";
 
     $node->filter('pre.font14pt')->each(function($txt) use (&$ctx)
     {
+        // utf8: ？ (EFBC9F) to ?
+        // $tmp = str_replace("\xef\xbc\x9f", "?", mb_convert_kana($txt->text(), "s", "UTF-8"));
         // utf8: whitespace from "&nbsp;" to C2A0
         $tmp = str_replace("\xc2\xa0", " ", mb_convert_kana($txt->text(), "s", "UTF-8"));
         $ctx .= trim($tmp);
@@ -44,12 +49,32 @@ $crawler->filterXPath('//td[contains(@valign, "top")]')->each(function($node) us
 
     // echo "hirakana" . $hrkn . "<br>";
     if (!empty($ctx)) {
-        $cnt++;
-        if ($cnt < 180) {
+        if (strpos($ctx, "\xef\xbc\x9f") !== false) {
+            $illus = true;
+            $subcnt = 0;
+        } else {
             $type = $cnt % 2? "Answer: ": "Question: ";
-            echo $type.$cnt . $ctx . "<br>";
         }
+
+        // illustration
+        if ($illus) {
+            if ($subcnt == 0) {
+                $type = "Question: ";
+            } else if ($subcnt % 2 == 0) {
+                $type = "Sub-Question: ";
+            } else if ($subcnt == 7) {
+                    $type = "Answer: ";
+                    $illus = false;
+            }
+            $subcnt++; // +1
+        }
+        $cnt++;
+        // Not illustration
+        if ($subcnt % 2 || $subcnt == 0 || $subcnt == 8)
+            echo $type. $ctx . "<br>";
     }
+
+  
     /*
     static $cnt = 0;
     $ctx =trim($node->text());
