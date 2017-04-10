@@ -9,26 +9,40 @@ use Goutte\Client;
 
 $client = new Client();
 
-$crawler = $client->request('GET', 'http://jptolx20305/drv/final3NG_files/result.htm');
+$idx = 1;
+$rslt = array("OK", "NG");
+$lnk1 = 'http://srv/drv/final';
+$lnk2 = '_files';
+$lnk3 = '/result.htm';
 
-$crawler->filter('title')->each(function($node)
-{
-    echo trim($node->text()) . "<br>";
-    echo "<hr>";
-});
+for ($idx = 1; $idx < 16; $idx++) {
+foreach ($rslt as $value) {
 
-$crawler->filter('span.saitenkekka')->each(function($node)
-{
-    echo trim($node->text()) . "<br>";
-    echo "<hr>";
-});
-// <td valign="top" width="570">
+$lnk = $lnk1 . $idx . $value . $lnk2;
+$crawlertr = $client->request('GET', $lnk . $lnk3);
+
+
 
 $cnt = 0;
 $subcnt = 0;
 $illus = false;
 
-$crawler->filterXPath('//td[contains(@valign, "top")]')->each(function($node) use(&$cnt, &$illus, &$subcnt) {
+$crawlertr->filter('tbody tr')->each(function($crawler) use(&$cnt, &$illus, &$subcnt, $lnk) {
+    $crawler->filter('title')->each(function($node) {
+        echo trim($node->text()) . "<br>";
+        echo "<hr>";
+    });
+
+    $crawler->filter('span.saitenkekka')->each(function($node)
+    {
+        echo trim($node->text()) . "<br>";
+        echo "<hr>";
+    });
+    // <td valign="top" width="570">
+
+
+// tr start
+$crawler->filterXPath('//td[contains(@valign, "top")]')->each(function($node) use(&$cnt, &$illus, &$subcnt, $lnk) {
     $ctx  = "";
     $hrkn = "";
     $type = "";
@@ -40,6 +54,11 @@ $crawler->filterXPath('//td[contains(@valign, "top")]')->each(function($node) us
         // utf8: whitespace from "&nbsp;" to C2A0
         $tmp = str_replace("\xc2\xa0", " ", mb_convert_kana($txt->text(), "s", "UTF-8"));
         $ctx .= trim($tmp);
+    });
+
+    $node->filter('pre.font8pt')->each(function($txt) use (&$hrkn)
+    {
+        $hrkn = trim($txt->text());
     });
 
     $node->filter('pre.font8pt')->each(function($txt) use (&$hrkn)
@@ -69,9 +88,21 @@ $crawler->filterXPath('//td[contains(@valign, "top")]')->each(function($node) us
             $subcnt++; // +1
         }
         $cnt++;
+
         // Not illustration
         if ($subcnt % 2 || $subcnt == 0 || $subcnt == 8)
             echo $type. $ctx . "<br>";
+    }
+
+    if (count($node->filter('img'))) {
+        $node->filter('img')->each(function($pic) {
+            $img = $pic->attr('src');
+
+            if (strpos($img, "false_on.gif") !== false)
+                echo "正解は batsu <br>";
+            if (strpos($img, "true_on.gif") !== false)
+                echo "正解は maru <br>";
+        });
     }
 
   
@@ -94,3 +125,21 @@ $crawler->filterXPath('//td[contains(@valign, "top")]')->each(function($node) us
     }
     */
 });
+
+if (count($crawler->filter('td img'))) {
+    $crawler->filter('img')->each(function($pic) use($lnk) {
+        $img = $pic->attr('src');
+
+        if (strpos($img, "jpg") !== false)
+            echo "Picture is: " . $lnk .'/'. $img . "<br>";
+    });
+}
+// tr end
+
+});
+
+}
+}
+
+
+
