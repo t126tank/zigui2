@@ -3,6 +3,12 @@ require_once ("../pqs/dbg/dbg.php");
 require_once './vendor/autoload.php';
 require_once './Client.php';
 
+define('ROOTPATH', __DIR__);
+define('LNK0', 'http://srv/drv');
+define('LNK1', '/final');
+define('LNK2', '_files/');
+define('LNK3', 'result.htm');
+
 // require_once './profiler.php';
 
 use Goutte\Client;
@@ -11,16 +17,14 @@ $client = new Client();
 
 $idx = 1;
 $rslt = array("OK", "NG");
-$lnk1 = 'http://srv/drv/final';
-$lnk2 = '_files';
-$lnk3 = '/result.htm';
 
-for ($idx = 1; $idx < 16; $idx++) {
+$GLOBALS['id'] = 0;
+
+for ($idx = 1; $idx < 3; $idx++) {
 foreach ($rslt as $value) {
 
-$lnk = $lnk1 . $idx . $value . $lnk2;
-$crawlertr = $client->request('GET', $lnk . $lnk3);
-
+$lnk = LNK1 . $idx . $value . LNK2;
+$crawlertr = $client->request('GET', LNK0 . LNK1 . $idx . $value . LNK2 . LNK3);
 
 
 $cnt = 0;
@@ -98,10 +102,14 @@ $crawler->filterXPath('//td[contains(@valign, "top")]')->each(function($node) us
         $node->filter('img')->each(function($pic) {
             $img = $pic->attr('src');
 
-            if (strpos($img, "false_on.gif") !== false)
-                echo "正解は batsu <br>";
-            if (strpos($img, "true_on.gif") !== false)
-                echo "正解は maru <br>";
+            if (strpos($img, "false_on.gif") !== false) {
+                $GLOBALS['id'] = insert_common("answer", false);
+                echo "正解は batsu ".$GLOBALS['id']."<br>";
+            }
+            if (strpos($img, "true_on.gif") !== false) {
+                $GLOBALS['id'] = insert_common("answer", true);
+                echo "正解は maru ".$GLOBALS['id']."<br>";
+            }
         });
     }
 
@@ -130,8 +138,12 @@ if (count($crawler->filter('td img'))) {
     $crawler->filter('img')->each(function($pic) use($lnk) {
         $img = $pic->attr('src');
 
-        if (strpos($img, "jpg") !== false)
-            echo "Picture is: " . $lnk .'/'. $img . "<br>";
+        if (strpos($img, "jpg") !== false) {
+            $loc = ROOTPATH . $lnk . $img;
+            echo "Picture is: " . $loc . "<br>";
+            $img_file = access_image($loc);
+            update_common("image", $img_file);
+        }
     });
 }
 // tr end
@@ -141,5 +153,56 @@ if (count($crawler->filter('td img'))) {
 }
 }
 
+function update_common($col, $val) {
+    include 'lib/config.php';
+    include 'lib/opendb.php';
+
+    $query = "UPDATE drv_main ".
+             "SET " . $col ." = '$val' ".
+             "WHERE id=" . $GLOBALS['id'];
+echo $query . "<br>";
+    mysql_query("SET NAMES UTF8");
+    mysql_query($query) or die('Error, query failed');
+
+    include 'lib/closedb.php';
+}
+
+function insert_common($col, $val) {
+    include 'lib/config.php';
+    include 'lib/opendb.php';
+
+    /*
+    $fp      = fopen($tmpName, 'r');
+    $content = fread($fp, filesize($tmpName));
+    $content = addslashes($content);
+    fclose($fp);
+
+    date_default_timezone_set('Asia/Tokyo');
+    $date = date('Y-m-d H:i:s', time());
+    echo $date."<br>";
+    */
+    $query = "INSERT INTO drv_main (".$col.") ".
+             "VALUES ('$val');";
+echo $query . "<br>";
+    mysql_query("SET NAMES UTF8");
+    mysql_query($query) or die('Error, query failed');
+
+    $GLOBALS['id'] = mysql_insert_id();
+echo "id = " . $GLOBALS['id'] . "<br>";
+    include 'lib/closedb.php';
+}
+
+function access_image($img_loc) {
+    // Read image content
+    $fp = fopen($img_loc, 'r');
+    $stream = fread($fp, filesize($img_loc));
+    $stream = addslashes($stream);
+    fclose($fp);
+
+    // Delete image file
+    // unlink($img_loc);
+
+    return $stream;
+}
 
 
