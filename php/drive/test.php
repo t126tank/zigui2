@@ -18,7 +18,7 @@ $client = new Client();
 $idx = 1;
 $rslt = array("OK", "NG");
 
-for ($idx = 1; $idx < 3; $idx++) {
+for ($idx = 1; $idx < 16; $idx++) {
 foreach ($rslt as $value) {
 
 $lnk = LNK1 . $idx . $value . LNK2;
@@ -29,8 +29,9 @@ $cnt = 0;
 $subcnt = 0;
 $illus = false;
 $id = 0;
+$pid = 0;
 
-$crawlertr->filter('tbody tr')->each(function($crawler) use(&$cnt, &$illus, &$subcnt, $lnk, &$id) {
+$crawlertr->filter('tbody tr')->each(function($crawler) use(&$cnt, &$illus, &$subcnt, $lnk, &$id, &$pid) {
     $crawler->filter('title')->each(function($node) {
         echo trim($node->text()) . "<br>";
         echo "<hr>";
@@ -45,7 +46,7 @@ $crawlertr->filter('tbody tr')->each(function($crawler) use(&$cnt, &$illus, &$su
 
 
 // tr start
-$crawler->filterXPath('//td[contains(@valign, "top")]')->each(function($node) use(&$cnt, &$illus, &$subcnt, $lnk, &$id) {
+$crawler->filterXPath('//td[contains(@valign, "top")]')->each(function($node) use(&$cnt, &$illus, &$subcnt, $lnk, &$id, &$pid) {
     $ctx  = "";
     $hrkn = "";
     $type = "";
@@ -70,25 +71,30 @@ $crawler->filterXPath('//td[contains(@valign, "top")]')->each(function($node) us
     });
 
     // echo "hirakana" . $hrkn . "<br>";
-    global $id;
     if (!empty($ctx)) {
         if (strpos($ctx, "\xef\xbc\x9f") !== false) {
             $illus = true;
             $subcnt = 0;
         } else {
             $type = $cnt % 2? "explanation": "question";
-            update_common($id, $type, $ctx);
+            if (!$illus)
+                update_common($id, $type, $ctx);
         }
 
         // illustration
         if ($illus) {
             if ($subcnt == 0) {
-                $type = "Question: ";
+                $type = "question";
+                $id = insert_common($type, $ctx);
+                $pid = $id;
             } else if ($subcnt % 2 == 0) {
-                $type = "Sub-Question: ";
+                $type = "question";
+                update_common($id, $type, $ctx);
+                update_common($id, "parent", $pid);
             } else if ($subcnt == 7) {
-                    $type = "Answer: ";
-                    $illus = false;
+                $type = "explanation";
+                $illus = false;
+                update_common($pid, $type, $ctx);
             }
             $subcnt++; // +1
         }
@@ -100,7 +106,7 @@ $crawler->filterXPath('//td[contains(@valign, "top")]')->each(function($node) us
     }
 
     if (count($node->filter('img'))) {
-        $node->filter('img')->each(function($pic) use(&$id) {
+        $node->filter('img')->each(function($pic) use(&$id, $illus) {
             $img = $pic->attr('src');
 
             if (strpos($img, "false_on.gif") !== false) {
@@ -160,7 +166,7 @@ function update_common($id, $col, $val) {
     $query = "UPDATE drv_main ".
              "SET " . $col ." = '$val' ".
              "WHERE id='$id'";
-echo $query . "<br>";
+
     mysql_query("SET NAMES UTF8");
     mysql_query($query) or die('Error, query failed');
 
