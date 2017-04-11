@@ -42,5 +42,5 @@ CREATE TABLE IF NOT EXISTS `drv_main` (
 
 mysqldump --default-character-set=utf8 -u root -p 'drv_db' > drv_db.sql
 
-mysql -u root -p < drv_db.sql
+mysql -u root -p 'drv_db' < drv_db.sql
 
