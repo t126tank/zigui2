@@ -4,7 +4,7 @@ require_once './vendor/autoload.php';
 require_once './Client.php';
 
 define('ROOTPATH', __DIR__);
-define('LNK0', 'http://srv/drv');
+define('LNK0', 'http://jptolx20305/drv');
 define('LNK1', '/final');
 define('LNK2', '_files/');
 define('LNK3', 'result.htm');
@@ -18,7 +18,7 @@ $client = new Client();
 $idx = 1;
 $rslt = array("OK", "NG");
 
-$GLOBALS['id'] = 0;
+$id = 0;
 
 for ($idx = 1; $idx < 3; $idx++) {
 foreach ($rslt as $value) {
@@ -31,7 +31,7 @@ $cnt = 0;
 $subcnt = 0;
 $illus = false;
 
-$crawlertr->filter('tbody tr')->each(function($crawler) use(&$cnt, &$illus, &$subcnt, $lnk) {
+$crawlertr->filter('tbody tr')->each(function($crawler) use(&$cnt, &$illus, &$subcnt, $lnk, &$id) {
     $crawler->filter('title')->each(function($node) {
         echo trim($node->text()) . "<br>";
         echo "<hr>";
@@ -46,7 +46,7 @@ $crawlertr->filter('tbody tr')->each(function($crawler) use(&$cnt, &$illus, &$su
 
 
 // tr start
-$crawler->filterXPath('//td[contains(@valign, "top")]')->each(function($node) use(&$cnt, &$illus, &$subcnt, $lnk) {
+$crawler->filterXPath('//td[contains(@valign, "top")]')->each(function($node) use(&$cnt, &$illus, &$subcnt, $lnk, &$id) {
     $ctx  = "";
     $hrkn = "";
     $type = "";
@@ -76,7 +76,8 @@ $crawler->filterXPath('//td[contains(@valign, "top")]')->each(function($node) us
             $illus = true;
             $subcnt = 0;
         } else {
-            $type = $cnt % 2? "Answer: ": "Question: ";
+            $type = $cnt % 2? "explanation": "question";
+            update_common($id, $type, $ctx);
         }
 
         // illustration
@@ -103,12 +104,12 @@ $crawler->filterXPath('//td[contains(@valign, "top")]')->each(function($node) us
             $img = $pic->attr('src');
 
             if (strpos($img, "false_on.gif") !== false) {
-                $GLOBALS['id'] = insert_common("answer", false);
-                echo "正解は batsu ".$GLOBALS['id']."<br>";
+                $id = insert_common("answer", 0);
+                echo "正解は batsu ".$id."<br>";
             }
             if (strpos($img, "true_on.gif") !== false) {
-                $GLOBALS['id'] = insert_common("answer", true);
-                echo "正解は maru ".$GLOBALS['id']."<br>";
+                $id = insert_common("answer", 1);
+                echo "正解は maru ".$id."<br>";
             }
         });
     }
@@ -135,14 +136,14 @@ $crawler->filterXPath('//td[contains(@valign, "top")]')->each(function($node) us
 });
 
 if (count($crawler->filter('td img'))) {
-    $crawler->filter('img')->each(function($pic) use($lnk) {
+    $crawler->filter('img')->each(function($pic) use($lnk, $id) {
         $img = $pic->attr('src');
 
         if (strpos($img, "jpg") !== false) {
             $loc = ROOTPATH . $lnk . $img;
             echo "Picture is: " . $loc . "<br>";
             $img_file = access_image($loc);
-            update_common("image", $img_file);
+            // update_common(1, "image", $img_file);
         }
     });
 }
@@ -153,13 +154,13 @@ if (count($crawler->filter('td img'))) {
 }
 }
 
-function update_common($col, $val) {
+function update_common($_id, $col, $val) {
     include 'lib/config.php';
     include 'lib/opendb.php';
 
     $query = "UPDATE drv_main ".
              "SET " . $col ." = '$val' ".
-             "WHERE id=" . $GLOBALS['id'];
+             "WHERE id='$_id'";
 echo $query . "<br>";
     mysql_query("SET NAMES UTF8");
     mysql_query($query) or die('Error, query failed');
@@ -171,6 +172,7 @@ function insert_common($col, $val) {
     include 'lib/config.php';
     include 'lib/opendb.php';
 
+    $rtn = 0;
     /*
     $fp      = fopen($tmpName, 'r');
     $content = fread($fp, filesize($tmpName));
@@ -187,9 +189,10 @@ echo $query . "<br>";
     mysql_query("SET NAMES UTF8");
     mysql_query($query) or die('Error, query failed');
 
-    $GLOBALS['id'] = mysql_insert_id();
-echo "id = " . $GLOBALS['id'] . "<br>";
+    $rtn = mysql_insert_id();
+
     include 'lib/closedb.php';
+    return $rtn;
 }
 
 function access_image($img_loc) {
