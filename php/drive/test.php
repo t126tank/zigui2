@@ -18,18 +18,17 @@ $client = new Client();
 $idx = 1;
 $rslt = array("OK", "NG");
 
-$id = 0;
-
 for ($idx = 1; $idx < 3; $idx++) {
 foreach ($rslt as $value) {
 
 $lnk = LNK1 . $idx . $value . LNK2;
-$crawlertr = $client->request('GET', LNK0 . LNK1 . $idx . $value . LNK2 . LNK3);
+$crawlertr = $client->request('GET', LNK0 . $lnk . LNK3);
 
 
 $cnt = 0;
 $subcnt = 0;
 $illus = false;
+$id = 0;
 
 $crawlertr->filter('tbody tr')->each(function($crawler) use(&$cnt, &$illus, &$subcnt, $lnk, &$id) {
     $crawler->filter('title')->each(function($node) {
@@ -71,6 +70,7 @@ $crawler->filterXPath('//td[contains(@valign, "top")]')->each(function($node) us
     });
 
     // echo "hirakana" . $hrkn . "<br>";
+    global $id;
     if (!empty($ctx)) {
         if (strpos($ctx, "\xef\xbc\x9f") !== false) {
             $illus = true;
@@ -100,7 +100,7 @@ $crawler->filterXPath('//td[contains(@valign, "top")]')->each(function($node) us
     }
 
     if (count($node->filter('img'))) {
-        $node->filter('img')->each(function($pic) {
+        $node->filter('img')->each(function($pic) use(&$id) {
             $img = $pic->attr('src');
 
             if (strpos($img, "false_on.gif") !== false) {
@@ -113,7 +113,6 @@ $crawler->filterXPath('//td[contains(@valign, "top")]')->each(function($node) us
             }
         });
     }
-
   
     /*
     static $cnt = 0;
@@ -143,7 +142,7 @@ if (count($crawler->filter('td img'))) {
             $loc = ROOTPATH . $lnk . $img;
             echo "Picture is: " . $loc . "<br>";
             $img_file = access_image($loc);
-            // update_common(1, "image", $img_file);
+            update_common($id, "image", $img_file);
         }
     });
 }
@@ -154,13 +153,13 @@ if (count($crawler->filter('td img'))) {
 }
 }
 
-function update_common($_id, $col, $val) {
+function update_common($id, $col, $val) {
     include 'lib/config.php';
     include 'lib/opendb.php';
 
     $query = "UPDATE drv_main ".
              "SET " . $col ." = '$val' ".
-             "WHERE id='$_id'";
+             "WHERE id='$id'";
 echo $query . "<br>";
     mysql_query("SET NAMES UTF8");
     mysql_query($query) or die('Error, query failed');
