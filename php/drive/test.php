@@ -4,8 +4,8 @@ require_once './vendor/autoload.php';
 require_once './Client.php';
 
 define('ROOTPATH', __DIR__);
-define('LNK0', 'http://jptolx20305/drv');
-define('LNK1', '/final');
+define('LNK0', 'http://srv/drv');
+define('LNK1', '/semi'); // final
 define('LNK2', '_files/');
 define('LNK3', 'result.htm');
 
@@ -163,7 +163,7 @@ function update_common($id, $col, $val) {
     include 'lib/config.php';
     include 'lib/opendb.php';
 
-    $query = "UPDATE drv_main ".
+    $query = "UPDATE drv_semi ".
              "SET " . $col ." = '$val' ".
              "WHERE id='$id'";
 
@@ -188,7 +188,7 @@ function insert_common($col, $val) {
     $date = date('Y-m-d H:i:s', time());
     echo $date."<br>";
     */
-    $query = "INSERT INTO drv_main (".$col.") ".
+    $query = "INSERT INTO drv_semi (".$col.") ".
              "VALUES ('$val');";
 echo $query . "<br>";
     mysql_query("SET NAMES UTF8");
@@ -212,5 +212,6 @@ function access_image($img_loc) {
 
     return $stream;
 }
+
 
 
