@@ -40,6 +40,18 @@ CREATE TABLE IF NOT EXISTS `drv_main` (
 # DROP TABLE drv_main;
 
 
+CREATE TABLE IF NOT EXISTS `drv_semi` (
+  `id` int(32) NOT NULL AUTO_INCREMENT,
+  `question` varchar(767),
+  `answer` tinyint(1),
+  `explanation` varchar(767),
+  `image` mediumblob,
+  `type` varchar(767),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+# DROP TABLE drv_semi;
+
 mysqldump --default-character-set=utf8 -u root -p 'drv_db' > drv_db.sql
 
 mysql -u root -p 'drv_db' < drv_db.sql
