@@ -106,7 +106,7 @@ $crawler->filterXPath('//td[contains(@valign, "top")]')->each(function($node) us
     }
 
     if (count($node->filter('img'))) {
-        $node->filter('img')->each(function($pic) use(&$id, $illus) {
+        $node->filter('img')->each(function($pic) use(&$id) {
             $img = $pic->attr('src');
 
             if (strpos($img, "false_on.gif") !== false) {
