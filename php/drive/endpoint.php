@@ -1,126 +1,70 @@
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<!-- JS -->
-<script type="text/javascript" src="../pqs/js/jquery-3.1.1.min.js"></script>
-<script type="text/javascript">
-<!--
-$(function() {
-    $('#send').click(function() {
-        var url = "./endpoint.php";
-        var type = $('input[name="type"]:checked').val();
+<?php
+require ("../pqs/mysql_pdo/Db.class.php"); // setting.ini.php
+require_once ("../pqs/dbg/dbg.php");
 
-        var tbl = "drv_main";
-        if (type == 1)
-            tbl = "drv_semi";
+$jsonObj = file_get_contents('php://input');
+$req = json_decode($jsonObj, true);
 
-        var formData = {
-            "id"    : $('#id').val(),
-            "table" : tbl
-        };
-        var postData = JSON.stringify(formData);    // Json 2 String
+if (!isset($_POST['myusername']) || !isset($_POST['mypassword'])) {
+    // header("location:login.html");
+}
+// username and password sent from form
+// Never sent unchecked data to mysql server
+// Creating md5 hashed to prevent from mysql injections
+// $myusername=strtolower($_POST['myusername']);
+// $mypassword=md5($_POST['mypassword']);
 
-        $.ajax({
-            type: "POST",
-            url: url,
-            // dataType: "html",
-            data: postData, // raw json
-            success: function (msg) {
-               var backdata = msg;
-               $("#backdata").html(backdata);
-               $("#backdata").css({color: "green"});
+// To protect MySQL injection (more detail about MySQL injection)
+// $myusername = stripslashes($myusername);
+// $mypassword = stripslashes($mypassword);
 
-               // alert('success!');
-               // $('.hoge tr').addClass('hv');
+$db = new Db();
 
-               $('.hoge tr').hover(
-                  function() {
-                     // hover event cover
-                     $(this).addClass('hv');
-                  },
-                  function() {
-                     //hover event leave
-                     $(this).removeClass('hv');
-                  }
-               );
-            },
-            error: function(e) {
-                console.log(e.message);
-            }
-        });
-        // alert('Hi');
-    });
-});
--->
-</script>
+// $myusername = mysql_real_escape_string($myusername); PDO::quote()
+// $mypassword = mysql_real_escape_string($mypassword); PDO::quote()
 
-<!-- CSS -->
-<style type="text/css">
-    table.hoge tr.hv-0 td {
-        background-color: #ffccff;
-    }
-    table.hoge tr.hv-1 td {
-        background-color: #ffcc99;
-    }
-    table.hoge tr.hv-2 td {
-        background-color: #ccffcc;
-    }
-    table.hoge tr.hv-3 td {
-        background-color: #ccffff;
-    }
-    table.hoge tr.hv-4 td {
-        background-color: #ccccff;
-    }
-    table.hoge tr.hv-5 td {
-        background-color: #ffcccc;
-    }
-    table.hoge tr.hv td {
-        background-color: #ffff33;
-    }
-</style>
+// $db->bindMore(array("tbl"=>$req['table'], "id"=>intval($req['id'])));
+// $result = $db->query("SELECT * FROM :tbl WHERE id = :id");
+$result = $db->row("SELECT * FROM ".$req['table']." WHERE id='".$req['id']."'");
+// $result = $db->single("SELECT Email FROM ifis_users WHERE Email = :email AND Password = :password");
 
+// $user_count = array_values($user_count);
 
-</head>
+// If result matched $myusername and $mypassword, table row must be 1 row
+if (!empty($result)) {
+    session_start();
+    // Register $myusername, $mypassword and redirect to file "login_success.php"
+    $_SESSION['myusername'] = $result;
+    $_SESSION['mypassword'] = true;
+    $_SESSION['is_logged_in'] = true;
+    $_SESSION['expires'] = time() + 3600;   // 3600 seconds session lifetime
+    // header("location:login_success.php");
 
-<body>
-<p align="center">
-"Have a good test ^_^ ";
+echo <<<EOF
+   <table class="hoge" border=2>
+   <tr>
+      <th>Question</th>
+      <th>Answer</th>
+      <th>Explanation</th>
+      <th>Image</th>
+   </tr>
+EOF;
+    $img = "-";
+    if (!empty($result['image']))
+        $img = '<img src="data:image/jpeg;base64,'.base64_encode($result['image']).'"/>';
 
-<table width="500" border="0" align="center" cellpadding="0" cellspacing="1" bgcolor="#CCCCCC">
-<tr>
-    <form>
-    <td>
-    <table width="100%" border="0" cellpadding="3" cellspacing="1" bgcolor="#FFFFFF">
-    <tr>
-        <td colspan="3"><strong>Check Form </strong></td>
-    </tr>
-    <tr>
-        <td>Question id</td>
-        <td>:</td>
-        <td><input type="text" id="id" required /></td>
-    </tr>
-    <tr>
-        <td>Test type</td>
-        <td>:</td>
-        <td>
-            <input id="semi" type="radio" name="type" value="1"><label>仮免許</label>
-            <input id="final" type="radio" name="type" value="0" checked><label>本免許</label>
-        </td>
-    </tr>
+    // print_r($result);
+    // echo json_encode($result);
+    $color = rand(1, 60);
+    echo '<tr class="hv-'.fmod($color, 6).'">';
+    echo '<td>' .$result['question'].'</td>';
+    echo '<td>' .$result['answer'].'</td>';
+    echo '<td>' .$result['explanation'].'</td>';
+    echo '<td>' .$img.'</td>';
+    echo '</tr>';
 
-    <tr>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
-        <td><input type="button" id="send" value="Query"></td>
-    </tr>
-    </table>
-    </td>
-    </form>
-</tr>
-</table>
-
-<span id="backdata"></span>
-
-</body>
-</html>
-
+} else {
+    echo "Wrong Username or Password !";
+    // Redirect to re-login
+}
+?>
