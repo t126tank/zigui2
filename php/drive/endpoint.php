@@ -1,13 +1,20 @@
 <?php
+ob_start();
+
 require ("../pqs/mysql_pdo/Db.class.php"); // setting.ini.php
 require_once ("../pqs/dbg/dbg.php");
 
-$jsonObj = file_get_contents('php://input');
-$req = json_decode($jsonObj, true);
+// $jsonObj = file_get_contents('php://input');
+// $req = json_decode($jsonObj, true);
 
-if (!isset($_POST['myusername']) || !isset($_POST['mypassword'])) {
-    // header("location:login.html");
+$req = array('table'=>'drv_main', 'id'=>1);
+
+if (!isset($_GET['table']) || !isset($_GET['id'])) {
+    echo "_POST problem";
 }
+$req['table'] = $_GET['table'];
+$req['id']    = intval($_GET['id']);
+
 // username and password sent from form
 // Never sent unchecked data to mysql server
 // Creating md5 hashed to prevent from mysql injections
@@ -33,35 +40,25 @@ $result = $db->row("SELECT * FROM ".$req['table']." WHERE id='".$req['id']."'");
 // If result matched $myusername and $mypassword, table row must be 1 row
 if (!empty($result)) {
     session_start();
-    // Register $myusername, $mypassword and redirect to file "login_success.php"
-    $_SESSION['myusername'] = $result;
-    $_SESSION['mypassword'] = true;
-    $_SESSION['is_logged_in'] = true;
-    $_SESSION['expires'] = time() + 3600;   // 3600 seconds session lifetime
-    // header("location:login_success.php");
+    $rnt = array(
+        'kind'=>'Listing',
+        'data'=>array(
+            'modhash'=>'',
+            'children'=>array(),
+            'after'=>'t3_660ns7',
+            'before'=>null
+        )
+    );
+    $result['image'] = base64_encode($result['image']);
+    $rnt['data']['children'][] = $result;
+    echo json_encode($rnt);
 
-echo <<<EOF
-   <table class="hoge" border=2>
-   <tr>
-      <th>Question</th>
-      <th>Answer</th>
-      <th>Explanation</th>
-      <th>Image</th>
-   </tr>
-EOF;
-    $img = "-";
-    if (!empty($result['image']))
-        $img = '<img src="data:image/jpeg;base64,'.base64_encode($result['image']).'"/>';
+    $length = ob_get_length();
+    header("Content-Type: application/json; charset=UTF-8");
+    header("Content-Length:".$length."\r\n");
+    header("Accept-Ranges: bytes"."\r\n");
 
-    // print_r($result);
-    // echo json_encode($result);
-    $color = rand(1, 60);
-    echo '<tr class="hv-'.fmod($color, 6).'">';
-    echo '<td>' .$result['question'].'</td>';
-    echo '<td>' .$result['answer'].'</td>';
-    echo '<td>' .$result['explanation'].'</td>';
-    echo '<td>' .$img.'</td>';
-    echo '</tr>';
+    ob_end_flush();
 
 } else {
     echo "Wrong Username or Password !";
