@@ -73,6 +73,7 @@ def main(argv):
 
    # Convert all data
    frame.to_json('data.json', orient='records')
+   frame.to_csv('history.csv', index=False)
 
    # For report
    ldate = frame.get_value(0, 'tradeTime')
