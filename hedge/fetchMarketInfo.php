@@ -27,6 +27,10 @@ print_r($redis->lGet($key,  0));
 print_r($redis->lGet($key, -1));
 */
 
+$key = "last";
+$redis->hSet($key, $key, $timestamp);
+print("<br> Last timestamp: " . $redis->hGet($key, $key));
+
 $redis->close();
 
 // https://redis.io/commands
