@@ -10,6 +10,12 @@ $redis->connect("127.0.0.1", 6379);
 $redis->select(1);
 
 $key = "history";
+
+$timestamp = strtotime($marketObj['timestamp']);
+$redis->hSet($key, $timestamp, $marketStr);
+print_r($redis->hGet($key, $timestamp));
+
+/*
 $redis->rpush($key, $marketStr);
 
 // debug
@@ -19,11 +25,12 @@ $redis->rpush($key, $marketStr);
 print_r($redis->lRange($key, 0, -1));
 print_r($redis->lGet($key,  0));
 print_r($redis->lGet($key, -1));
+*/
 
 $redis->close();
 
 // https://redis.io/commands
-
 // https://github.com/phpredis/phpredis
 // http://www.runoob.com/redis/redis-tutorial.html
+
 ?>
