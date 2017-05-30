@@ -22,4 +22,8 @@ print_r($redis->lGet($key, -1));
 
 $redis->close();
 
+// https://redis.io/commands
+
+// https://github.com/phpredis/phpredis
+// http://www.runoob.com/redis/redis-tutorial.html
 ?>
