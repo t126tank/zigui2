@@ -9,8 +9,9 @@ $options = array();
 $hit = mt_rand(0, $cnt-1);
 
 for ($i=0; $i<$cnt; $i++) {
-    $atm = $i == $hit?true: false;
+    $atm = $i == $hit? true: false;
     $delta = round(mt_rand()/mt_getrandmax(), 4);
+    $delta = $i == $hit? 0.5003: $delta;
 
     $cp = array("call", "put");
     foreach ($cp as $value) {
@@ -73,4 +74,3 @@ header("Accept-Ranges: bytes"."\r\n");
 ob_end_flush();
 
 ?>
-
