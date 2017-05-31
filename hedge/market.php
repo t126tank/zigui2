@@ -7,6 +7,7 @@ $step = 125;
 $cnt  = 9;
 $options = array();
 $hit = mt_rand(0, $cnt-1);
+$datetime = date('Y/m/d H:i:s');
 
 for ($i=0; $i<$cnt; $i++) {
     $atm = $i == $hit? true: false;
@@ -16,6 +17,7 @@ for ($i=0; $i<$cnt; $i++) {
     $cp = array("call", "put");
     foreach ($cp as $value) {
         $new = array(
+                'update'=>$datetime,
                 'k'=>$base+$i*$step,
                 'expire'=>'20170608',
                 'type'=>$value,
@@ -45,10 +47,12 @@ foreach ($type as $value) {
 
     $new = array(
             'bull'=>array(
+                'update'=>$datetime,
                 'code'=>$bullCd,
                 'price'=>$bullPrice
             ),
             'bear'=>array(
+                'update'=>$datetime,
                 'code'=>$bearCd,
                 'price'=>$bearPrice
             ),
@@ -58,7 +62,7 @@ foreach ($type as $value) {
 }
 
 $market = array(
-    'timestamp'=>date('Y/m/d H:i:s'),
+    'timestamp'=>$datetime,
     'options'=>$options,
     'hedges'=>$hedges
 );
