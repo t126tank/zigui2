@@ -55,10 +55,9 @@ foreach ($type as $value) {
                 'update'=>$datetime,
                 'code'=>$bearCd,
                 'price'=>$bearPrice
-            ),
-            'hedgesType'=>$value
+            )
     );
-    $hedges[] = $new;
+    $hedges[$value] = $new;
 }
 
 $market = array(
@@ -78,3 +77,4 @@ header("Accept-Ranges: bytes"."\r\n");
 ob_end_flush();
 
 ?>
+

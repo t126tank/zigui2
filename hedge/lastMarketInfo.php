@@ -22,5 +22,6 @@ $redis->close();
 print($last['timestamp'] . "<br>");
 $atms = array_filter($last['options'], "atm");
 print_r($atms);
+print_r($last['hedges']['SC_BP']);
 
 ?>
