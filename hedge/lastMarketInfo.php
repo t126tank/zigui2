@@ -19,7 +19,7 @@ $key = "history";
 $last = json_decode($redis->hGet($key, $timestamp), true);
 $redis->close();
 
-print($last['timestamp'] . "<br>");
+print($last['timestamp'] . " ::: " . $timestamp . "<br>");
 $atms = array_filter($last['options'], "atm");
 print_r($atms);
 print_r($last['hedges']['SC_BP']);
