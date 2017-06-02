@@ -66,6 +66,15 @@ function atm($var) {
     return ($var['atm'] && true);
 }
 
+function array_find_opttype($needle, $haystack) {
+   foreach ($haystack as $item) {
+      if (strcmp($item['type'], $needle) == 0) {
+         return $item;
+         break;
+      }
+   }
+}
+
   writeln('BEGIN TESTING OBSERVER PATTERN');
   writeln('');
 
@@ -84,30 +93,17 @@ function atm($var) {
     exit();
   }
 
-  $tradeDelta = 0.1234;
-  $unit = 1200000;
-  $hedgeType = "SC_BP";
-  $visible = true;
-
-  /* 2.2 - startup */
-  $startupNode = array(
-    'tradeDelta'=> abs($tradeDelta),
-    'unit'=> $unit,
-    'hedgeType'=> $hedgeType,
-    'visible'=>$visible
-  );
-  $dao->setTradeStartup($key, $startupNode);
-
   /* 2.1 - trade list */
   $historyNode = $dao->getMarketHistoryOne($marketLastTimestamp);
 
-  $atmOption = array_filter($historyNode['options'], "atm");
-  $hedgePair = $historyNode['hedges'][$hedgeType];
-  $bullPrice = $hedgePair['bull']['price'];
-  $bearPrice = $hedgePair['bear']['price'];
+  $atmOptions = array_filter($historyNode['options'], "atm");
+
+  $unit = 1200000;
+  $bullPrice = $historyNode['hedges']['bull']['price'];
+  $bearPrice = $historyNode['hedges']['bear']['price'];
   $bullQty   = round($unit / $bullPrice, 0);
-  $bearQty   = round($bullPrice/$bearPrice*$bullQty, 0);
-  
+  $bearQty   = round($unit / $bearPrice, 0);
+
   $tradeNode = array(
     'state'=> "OPEN", // define as CONST or Enum
     'timestamp'=> $marketLastTimestamp,
@@ -120,6 +116,23 @@ function atm($var) {
     'cash'=>0
   );
   $dao->setTradeOne($key, $tradeNode);
+
+  /* 2.2 - startup */
+  $tradeDelta = 0.1234;
+  $visible = true;
+
+  $call = array_find_opttype("call", $atmOptions);
+  $put  = array_find_opttype("put",  $atmOptions);
+
+  $startupNode = array(
+    'tradeDelta'=> abs($tradeDelta),
+    'unit'=> $unit,
+    'volBullRatio' => $unit / $bullPrice / abs($call['delta']),
+    'volBearRatio' => $unit / $bearPrice / abs($put['delta']),
+    'visible'=>$visible
+  );
+  $dao->setTradeStartup($key, $startupNode);
+
 
   $patternGossiper = new PatternSubject();
   $patternGossipFan = new PatternObserver();
