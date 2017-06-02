@@ -2,18 +2,16 @@
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
 
+require_once __DIR__ . '/RedisDao.php';
+
 $marketStr = file_get_contents("http://localhost/hedge/market.php");
 $marketObj = json_decode($marketStr, true); // array
 
-$redis = new Redis();
-$redis->connect("127.0.0.1", 6379);
-$redis->select(1);
-
-$key = "history";
+$dao = new RedisDAO();
 
 $timestamp = strtotime($marketObj['timestamp']);
-$redis->hSet($key, $timestamp, $marketStr);
-print_r($redis->hGet($key, $timestamp));
+$dao->setMarketHistoryOne($timestamp, $marketObj);
+print_r($dao->getMarketHistoryOne($timestamp));
 
 /*
 $redis->rpush($key, $marketStr);
@@ -27,11 +25,9 @@ print_r($redis->lGet($key,  0));
 print_r($redis->lGet($key, -1));
 */
 
-$key = "last";
-$redis->hSet($key, $key, $timestamp);
-print("<br> Last timestamp: " . $redis->hGet($key, $key));
+$dao->setMarketLastTimestamp($timestamp);
+print("<br> Last timestamp: " . $dao->getMarketLastTimestamp());
 
-$redis->close();
 
 // https://redis.io/commands
 // https://github.com/phpredis/phpredis

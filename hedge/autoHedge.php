@@ -33,6 +33,9 @@ class PatternObserver extends AbstractObserver {
     private $_startupAtmOption = NULL;
     private $_lastTradeNode  = NULL;
     private $_firstTradeNode = NULL;
+    private $_volBullRatio = 0.0;
+    private $_volBearRatio = 0.0;
+    const REFOPT = "SC";
 
     public function __construct($id, $conf, $dao) {
         $this->_startupId = $id;
@@ -44,44 +47,65 @@ class PatternObserver extends AbstractObserver {
         $this->_startupTimestamp = intval($v[1]);
         /* 1.1 */
         $startupHistoryNode = $this->_dao->getMarketHistoryOne($this->_startupTimestamp);
-        $this->_startupAtmOption = array_filter($startupHistoryNode['options'], "atm");
+        $startupAtmOptions = array_filter($startupHistoryNode['options'], "atm");
+        $this->_startupAtmOption = $this->array_find_opttype($startupAtmOptions);
         /* 2.1 */
         $this->_firstTradeNode = $this->_dao->getTradeOne($this->_startupId,  0);
         $this->_lastTradeNode  = $this->_dao->getTradeOne($this->_startupId, -1);
+
+        /* ratio for delta mapping on vol based on unit during startup */
+        $this->_volBullRatio = ($this->_startupConf['unit']) /
+                                $startupHistoryNode['hedges'][$this->_startupConf['hedgeType']]['bull']['price'] /
+                                $this->_startupAtmOption['delta'];
+        $this->_volBearRatio = ($this->_startupConf['unit']) /
+                                $startupHistoryNode['hedges'][$this->_startupConf['hedgeType']]['bear']['price'] /
+                                $this->_startupAtmOption['delta'];
     }
 
     public function update(AbstractSubject $subject) {
         $newTimestamp = $subject->getFavorites();
+
         writeln('*** IN PATTERN OBSERVER - NEW PATTERN GOSSIP ALERT*');
         writeln(' userId(int): '. $this->_userId);
-        writeln(' new timestamp(int): '. $newTimestamp);
+        writeln(' last timestamp(int): '. $newTimestamp);
+        writeln(' trade option delta: '. $this->_startupConf['tradeDelta']);
+        writeln(' startup trade timestamp(int): '. $this->_firstTradeNode['timestamp']);
 
-        /* 1.1 */
-        $newHistoryNode = $this->_dao->getMarketHistoryOne($newTimestamp);
-        foreach ($newHistoryNode['options'] as $obj) {
-            print_r($obj);
-        }
+        $this->onTradingDiffDelta($newTimestamp);
+        
+        //foreach ($newHistoryNode['options'] as $obj) {
+            // print_r($obj);
+        //}
 
         writeln('*** IN PATTERN OBSERVER - PATTERN GOSSIP ALERT OVER*');
     }
 
-    /*
-    private function get() {
-    }
-    private function onTrading() {
-        // 1.1
-        $historyNode = $dao->getMarketHistoryOne($marketLastTimestamp);
+    private function onTradingDiffDelta($nts) {
+        /* 1.1 */
+        $newHistoryNode = $this->_dao->getMarketHistoryOne($nts);
+        $newHistoryOpt = $this->array_find_opt($newHistoryNode['options']);
 
-        $atmOption = array_filter($historyNode['options'], "atm");
-        $hedgePair = $historyNode['hedges'][$hedgeType];
+        $lastTradeHistoryNode = $this->_dao->getMarketHistoryOne($this->_lastTradeNode['timestamp']);
+        $lastTradeOpt = $this->array_find_opt($lastTradeHistoryNode['options']);
+
+        $diffDelta = abs($newHistoryOpt['delta'] - $lastTradeOpt['delta']);
+        writeln(' diff option delta: '. $diffDelta);
+        if ($diffDelta < $this->_startupConf['tradeDelta']) {
+            writeln(' XXX NOT TRADING XXX ');
+            return;
+        }
+        writeln(' OOO NOT TRADING OOO ');
+
+        $hedgePair = $newHistoryNode['hedges'][$this->_startupConf['hedgeType']];
         $bullPrice = $hedgePair['bull']['price'];
         $bearPrice = $hedgePair['bear']['price'];
-        $bullQty   = round($unit / $bullPrice, 0);
-        $bearQty   = round($bullPrice/$bearPrice*$bullQty, 0);
+        $bullVol   = round($unit / $bullPrice, 0);
+        $bearVol   = round($bullPrice/$bearPrice*$bullQty, 0);
+        $cash      = ;
 
         $tradeNode = array(
-        'state'=> "OPEN", // define as CONST or Enum
-        'timestamp'=> $marketLastTimestamp,
+        'state'=> "TRADING", // define as CONST or Enum
+        'timestamp'=> $nts,
         'bullQty'=> $bullQty,
         'bullPrice'=> $bullPrice,
         'bullVol'=> 0,
@@ -92,6 +116,46 @@ class PatternObserver extends AbstractObserver {
         );
 
         // $dao->setTradeOne($this->_startId, $tradeNode);
+    }
+
+    private function getOptType($refopt) {
+        $rtn = "call";
+        if (strcmp("BP", $refopt) == 0 ||
+            strcmp("SP", $refopt) == 0) {
+            $rtn = "put";
+        }        
+        return $rtn;
+    }
+
+    private function array_find_opttype($haystack) {
+       foreach ($haystack as $item) {
+          if (strpos($item['type'], $this->getOptType(self::REFOPT)) !== FALSE) {
+             return $item;
+             break;
+          }
+       }
+    }
+
+    private function array_find_opt($haystack) {
+       foreach ($haystack as $item) {
+          if (strcmp($item['expire'], $this->_startupAtmOption['expire']) == 0 &&
+              $item['k'] == $this->_startupAtmOption['k'] &&
+              strcmp($item['type'], $this->getOptType(self::REFOPT)) == 0) {
+              return $item;
+              break;
+          }
+       }
+    }
+
+    /*
+    private function get() {
+    }
+    private function onTrading() {
+        // 1.1
+        $historyNode = $dao->getMarketHistoryOne($marketLastTimestamp);
+
+        $atmOption = array_filter($historyNode['options'], "atm");
+        
     }
     */
 }

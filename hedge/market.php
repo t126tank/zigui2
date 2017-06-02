@@ -32,6 +32,21 @@ for ($i=0; $i<$cnt; $i++) {
 
 //
 $hedges = array();
+
+$bull = array(
+        'update'=>$datetime,
+        'code'=>"1357",
+        'price'=>mt_rand(1750, 1820)
+);
+$bear = array(
+        'update'=>$datetime,
+        'code'=>"1570",
+        'price'=>mt_rand(14820, 15230)
+);
+$hedges['bull'] = $bull;
+$hedges['bear'] = $bear;
+
+/*
 $type = array("SC_BP", "BC_SP");
 
 foreach ($type as $value) {
@@ -59,6 +74,7 @@ foreach ($type as $value) {
     );
     $hedges[$value] = $new;
 }
+*/
 
 $market = array(
     'timestamp'=>$datetime,

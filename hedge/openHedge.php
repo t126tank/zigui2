@@ -91,7 +91,7 @@ function atm($var) {
 
   /* 2.2 - startup */
   $startupNode = array(
-    'tradeDelta'=> $tradeDelta,
+    'tradeDelta'=> abs($tradeDelta),
     'unit'=> $unit,
     'hedgeType'=> $hedgeType,
     'visible'=>$visible

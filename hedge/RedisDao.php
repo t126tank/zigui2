@@ -34,12 +34,21 @@ class RedisDAO {
         $jsonStr = $this->_redis->hGet(self::HISTORY, $timestamp);
         return json_decode($jsonStr, true);
     }
+    function setMarketHistoryOne($field, $value) {
+        $this->_redis->select(1);
 
+        $this->_redis->hSet(self::HISTORY, $field, json_encode($value));
+    }
     /* 1.2 */
     function getMarketLastTimestamp() {
         $this->_redis->select(1);
 
         return $this->_redis->hGet(self::LAST, self::LAST);
+    }
+    function setMarketLastTimestamp($value) {
+        $this->_redis->select(1);
+        
+        $this->_redis->hSet(self::LAST, self::LAST, json_encode($value));
     }
 
     /* 2.1 */
