@@ -64,6 +64,11 @@ class RedisDAO {
         $jsonStr = $this->_redis->lIndex($key, $idx);
         return json_decode($jsonStr, true);
     }
+    function getTradeAll($key) {
+        $this->_redis->select(2);
+
+        return $this->_redis->lRange($key, 0, -1);
+    }
 
     /* 2.2 */
     function setTradeStartup($field, $value) {

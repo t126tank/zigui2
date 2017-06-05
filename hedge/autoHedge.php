@@ -251,6 +251,7 @@ foreach ($patternGossipFanArr as $fan) {
     $patternGossiper->detach($fan);
 }
 
+unset($dao);
 writeln('END TESTING OBSERVER PATTERN');
 
 ?>
