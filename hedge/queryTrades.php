@@ -3,16 +3,22 @@ error_reporting(E_ALL);
 ini_set("display_errors", 1);
 
 require_once __DIR__ . '/RedisDao.php';
-require_once __DIR__ . '/HistoryTradeUtil.php';
+// require_once __DIR__ . '/HistoryTradeUtil.php';
 
 ob_start();
 
 $dao = new RedisDAO();
 
+$req = array();
+
+if (!isset($_GET['startupId'])) {
+    echo "_POST problem";
+    exit();
+}
+$req['startupId'] = $_GET['startupId'];
 
 /* Get all trade history from list */
-$tradeKey = "aaa:1496390109";
-$tradeObj = (object) $dao->getTradeAll($tradeKey);  
+$tradeObj = (object) $dao->getTradeAll($req['startupId']);  
 
 /* Create util */
 // $htu = new HistoryTradeUtil($tradeKey, $dao);
@@ -34,7 +40,8 @@ foreach ($tradeObj as $key => $value) {
     $v['pl'] = $v['total'] / $init - 1;
     $tradeArr[$key] = $v; // debug
 }
-echo json_encode($tradeArr);
+$rtn['result'] = $tradeArr;
+echo json_encode($rtn);
 
 $length = ob_get_length();
 
