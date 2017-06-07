@@ -28,7 +28,7 @@ print_r($redis->lGet($key, -1));
 $dao->setMarketLastTimestamp($timestamp);
 print("<br> Last timestamp: " . $dao->getMarketLastTimestamp());
 
-
+unset($dao);
 // https://redis.io/commands
 // https://github.com/phpredis/phpredis
 // http://www.runoob.com/redis/redis-tutorial.html

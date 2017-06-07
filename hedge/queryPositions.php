@@ -39,6 +39,9 @@ foreach ($startupObj as $key => $value) {
 
         $v['total'] = calPosition($lastTradeNode);
         $v['pl']    = $v['total'] / calPosition($firstTradeNode) - 1;
+        $v['first'] = $firstTradeNode['timestamp'];
+        $v['last']  = $lastTradeNode['timestamp'];
+        $v['times'] = $dao->getTradeTimes($key);
         $rtn['result'][] = array (
             $key => $v
         );

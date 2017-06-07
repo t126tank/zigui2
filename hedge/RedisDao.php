@@ -69,6 +69,11 @@ class RedisDAO {
 
         return $this->_redis->lRange($key, 0, -1);
     }
+    function getTradeTimes($key) {
+        $this->_redis->select(2);
+
+        return $this->_redis->lLen($key);
+    }
 
     /* 2.2 */
     function setTradeStartup($field, $value) {
