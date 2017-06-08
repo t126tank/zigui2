@@ -58,7 +58,19 @@ function converPara($str) {
 
 // init
 $dao = new RedisDao();
+
+$config = [
+    'proxy' => [
+        'http' => 'http://proxy.global.sonyericsson.net:8080'
+    ]
+];
+
+/*
+$client = new Client($config);
+$client->setAuth('xp020563', 'xxxx', 'basic');
+*/
 $client = new Client();
+
 // Init market info object to be set in Redis finally
 $marketObj = array();
 
@@ -67,6 +79,11 @@ $lnk = OPTLNK;
 $lnk = 'http://127.0.0.1/hedge/jpx/http_svc.qri.jp_jpx_nkopm_1304.htm';
 $client->setHeader(RER, REFV);
 $crawlerAll = $client->request('GET', $lnk);
+
+/*
+$status = $client->getResponse()->getStatus();
+echo $status;
+*/
 
 // last updated time: <dl><dd> ...
 $historyDatetime = date('Y/m/d H:i:s');
@@ -180,9 +197,11 @@ $codes = array('1357.t', '1570.t');
 
 $hedges = array();
 $bull = true;
+$client->resetHeaders();
+
 foreach ($codes as $value) {
     $lnk = HEDGELNK . $value; // hedge
-    // $lnk = 'http://127.0.0.1/hedge/jpx/yahoo.html'; // OPTLNK
+    $lnk = 'http://127.0.0.1/hedge/jpx/yahoo.html'; // OPTLNK
     $crawler = $client->request('GET', $lnk);
 
     // echo $lnk . '<br>';
