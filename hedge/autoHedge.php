@@ -75,13 +75,18 @@ class PatternObserver extends AbstractObserver {
 
     private function onTradingDiffDelta($nts) {
         /* 1.1 */
-        $newHistoryNode = $this->_dao->getMarketHistoryOne($nts);
-        $newHistoryCall = $this->array_find_opt(self::CALL, $newHistoryNode['options']);
-        $newHistoryPut  = $this->array_find_opt(self::PUT,  $newHistoryNode['options']);
-
         $lastTradeHistoryNode = $this->_dao->getMarketHistoryOne($this->_lastTradeNode['timestamp']);
         $lastTradeCall = $this->array_find_opt(self::CALL, $lastTradeHistoryNode['options']);
         $lastTradePut  = $this->array_find_opt(self::PUT,  $lastTradeHistoryNode['options']);
+
+        $newHistoryNode = $this->_dao->getMarketHistoryOne($nts);
+        $newHistoryCall = $this->array_find_opt(self::CALL, $newHistoryNode['options']);
+        // prevent invalid delta
+        $newHistoryCall = is_null($newHistoryCall)? $lastTradeCall: $newHistoryCall;
+
+        $newHistoryPut  = $this->array_find_opt(self::PUT,  $newHistoryNode['options']);
+        // prevent invalid delta
+        $newHistoryPut = is_null($newHistoryPut)? $lastTradePut: $newHistoryPut;
 
         $diffDeltaCall = $newHistoryCall['delta'] - $lastTradeCall['delta'];
         $diffDeltaPut  = $newHistoryPut['delta']  - $lastTradePut['delta'];
@@ -136,6 +141,7 @@ class PatternObserver extends AbstractObserver {
     }
 
     private function array_find_opt($needle, $haystack) {
+        $rtn = NULL;
         $option = strcmp($needle, self::CALL) == 0?
                     $this->_startupAtmCall:
                     $this->_startupAtmPut;
@@ -144,10 +150,11 @@ class PatternObserver extends AbstractObserver {
             if (strcmp($item['expire'], $option['expire']) == 0 &&
                 $item['k'] == $option['k'] &&
                 strcmp($item['type'], $needle) == 0) {
-                return $item;
+                $rtn = $item;
                 break;
             }
         }
+        return $rtn;
     }
 
     /*
