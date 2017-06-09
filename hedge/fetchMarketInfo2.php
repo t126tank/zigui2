@@ -61,7 +61,7 @@ $dao = new RedisDao();
 
 $config = [
     'proxy' => [
-        'http' => 'http://proxy.global.sonyericsson.net:8080'
+        'http' => 'http://proxy.global.net:8080'
     ]
 ];
 
@@ -76,7 +76,7 @@ $marketObj = array();
 
 // Fetch options
 $lnk = OPTLNK;
-$lnk = 'http://127.0.0.1/hedge/jpx/http_svc.qri.jp_jpx_nkopm_1304.htm';
+// $lnk = 'http://127.0.0.1/hedge/jpx/http_svc.qri.jp_jpx_nkopm_1304.htm';
 $client->setHeader(RER, REFV);
 $crawlerAll = $client->request('GET', $lnk);
 
@@ -142,7 +142,8 @@ $crawlerAll->filter('table.price-table tbody.price-info-scroll')->each(function(
     // Delta, Gamma, Theta, Vega
     // <table class="greek-value-table"><tbody><tr><td class="a-right" ...
     $idx = 0;
-    $crawler->filter('table.greek-value-table tbody tr td.a-right')->each(function($node) use (&$options, &$idx) {
+    // $crawler->filter('table.greek-value-table tbody tr td.a-right')->each(function($node) use (&$options, &$idx) {
+    $crawler->filter('table.greek-value-table tr td.a-right')->each(function($node) use (&$options, &$idx) {
          $para_cnt = 4;
          $optidx = (int)floor($idx / $para_cnt);
          $txt = trim($node->text());
@@ -201,7 +202,7 @@ $client->resetHeaders();
 
 foreach ($codes as $value) {
     $lnk = HEDGELNK . $value; // hedge
-    $lnk = 'http://127.0.0.1/hedge/jpx/yahoo.html'; // OPTLNK
+    // $lnk = 'http://127.0.0.1/hedge/jpx/yahoo.html'; // OPTLNK
     $crawler = $client->request('GET', $lnk);
 
     // echo $lnk . '<br>';
@@ -213,7 +214,8 @@ foreach ($codes as $value) {
          $update = $onTradeDate . ' ' .trim($node->text()) . ':0';
     });
     // <table class="stocksTable" <tbody><tr><td class="stoksPrice">
-    $crawler->filter('table.stocksTable tbody tr td.stoksPrice')->each(function($node) use (&$price) {
+    // $crawler->filter('table.stocksTable tbody tr td.stoksPrice')->each(function($node) use (&$price) {
+    $crawler->filter('table.stocksTable tr td.stoksPrice')->each(function($node) use (&$price) {
          $price = doubleval(getKStr(trim($node->text())));
     });
 
