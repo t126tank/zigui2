@@ -7,6 +7,10 @@ LoadModule rewrite_module modules/mod_rewrite.so
 https://www.digitalocean.com/community/tutorials/how-to-set-up-mod_rewrite-for-apache-on-ubuntu-14-04
 
 sudo a2enmod rewrite
+sudo a2enmod headers <Directory /var/www/html/hedge> ... </Directory>
+http://d.hatena.ne.jp/rin1024/20080929/1222693346
+sudo a2enmod deflate
+
 sudo service apache2 restart
 
 nohup ionic serve --nobrowser --nolivereload $> ionic.log &
