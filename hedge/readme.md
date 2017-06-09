@@ -11,3 +11,6 @@ sudo service apache2 restart
 
 nohup ionic serve --nobrowser --nolivereload $> ionic.log &
 screen -d -m -L ionic serve --nolivereload --nobrowser
+
+【何ぞ？】Access-Control-Allow-Origin, クロスドメイン制約, 同一生成元ポリシーって何ぞ【XMLHttpRequest】【JavaScript】【Apache】
+http://otiai10.hatenablog.com/entry/2013/04/04/233057
