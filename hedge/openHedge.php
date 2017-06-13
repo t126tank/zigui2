@@ -4,6 +4,21 @@ ini_set("display_errors", 1);
 
 require_once __DIR__ . '/RedisDao.php';
 
+$req = array(
+         'tradeDelta' =>0.05678,
+         'investAmnt' =>24
+);
+if (!isset($_GET['tradeDelta']) || !isset($_GET['investAmnt'])) {
+    echo "_POST problem";
+}
+$req['tradeDelta'] = abs(doubleval($_GET['tradeDelta']));
+$req['investAmnt'] = abs(intval($_GET['investAmnt'])*5000); // 10 thousand for hedge pair
+
+if (!is_numeric($req['tradeDelta']) || !is_numeric($req['investAmnt'])) {
+    echo "numeric problem";
+    exit();
+}
+
 abstract class AbstractObserver {
     abstract function update(AbstractSubject $subject_in);
 }
@@ -15,7 +30,7 @@ abstract class AbstractSubject {
 }
 
 function writeln($line_in) {
-    echo $line_in."<br/>";
+    // echo $line_in."<br/>";
 }
 
 class PatternObserver extends AbstractObserver {
@@ -84,7 +99,7 @@ function array_find_opttype($needle, $haystack) {
   $userId = "aaa";
   /* Create Key for trading OPEN */
   $key = $userId . ":" . $marketLastTimestamp; // Or AS filed in HashMap
-  writeln($key);
+  echo "My NEW positon: " . $key;
 
   /* IF FILED Exists, EXIT */
   if ($dao->hExistsTradeStartup($key)) {
@@ -98,7 +113,7 @@ function array_find_opttype($needle, $haystack) {
 
   $atmOptions = array_filter($historyNode['options'], "atm");
 
-  $unit = 1200000;
+  $unit = $req['investAmnt'];
   $bullPrice = $historyNode['hedges']['bull']['price'];
   $bearPrice = $historyNode['hedges']['bear']['price'];
   $bullQty   = round($unit / $bullPrice, 0);
@@ -118,7 +133,7 @@ function array_find_opttype($needle, $haystack) {
   $dao->setTradeOne($key, $tradeNode);
 
   /* 2.2 - startup */
-  $tradeDelta = 0.1234;
+  $tradeDelta = $req['tradeDelta'];
   $visible = true;
 
   $call = array_find_opttype("call", $atmOptions);

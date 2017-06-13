@@ -14,10 +14,17 @@ if (!isset($_GET['userId'])) {
 $req['userId'] = $_GET['userId'];
 
 function calPosition($v) {
-    return $v['bullVol']*$v['bullPrice'] +
-           $v['bearVol']*$v['bearPrice'] +
+    return $v['bullVol'] * $v['bullPrice'] +
+           $v['bearVol'] * $v['bearPrice'] +
            $v['cash'];
 }
+
+function calCurrPosition($v, $h) {
+    return $v['bullVol'] * $h['bull']['price'] +
+           $v['bearVol'] * $h['bear']['price'] +
+           $v['cash'];
+}
+
 
 $dao = new RedisDao();
 
@@ -26,6 +33,11 @@ $startupObj = (object) $dao->getTradeStartuphGetAll();
 
 /* Get userId responding startup trade */
 $rtn['result'] = array();
+
+
+/* Get Market last timestamp */
+$currTimestamp = $dao->getMarketLastTimestamp();
+$currMarketNode = $dao->getMarketHistoryOne($currTimestamp);
 
 foreach ($startupObj as $key => $value) {
     $v = json_decode($value, true); // $value is encoded in redis
@@ -37,7 +49,7 @@ foreach ($startupObj as $key => $value) {
 
         $firstTradeNode  = $dao->getTradeOne($key, 0);
 
-        $v['total'] = calPosition($lastTradeNode);
+        $v['total'] = calCurrPosition($lastTradeNode, $currMarketNode['hedges']);
         $v['pl']    = $v['total'] / calPosition($firstTradeNode) - 1;
         $v['first'] = $firstTradeNode['timestamp'];
         $v['last']  = $lastTradeNode['timestamp'];

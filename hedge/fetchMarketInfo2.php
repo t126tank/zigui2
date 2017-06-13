@@ -17,12 +17,12 @@ define('ATM',       'ATM');
 use Goutte\Client;
 
 function getTimeStr($str) {
-   $rtn = "0:0";
+   $rtn = "00:00";
    if (!(strpos($str, '-') !== false)) {
       $parts = explode('(', $str);
       $rtn = str_replace(')', '', $parts[1]);
    }
-   return " " . $rtn . ":0";  // H:i:s
+   return " " . $rtn . ":00";  // H:i:s
 }
 
 function getPriceStr($str) {
@@ -58,19 +58,7 @@ function converPara($str) {
 
 // init
 $dao = new RedisDao();
-
-$config = [
-    'proxy' => [
-        'http' => 'http://proxy.global.net:8080'
-    ]
-];
-
-/*
-$client = new Client($config);
-$client->setAuth('xp020563', 'xxxx', 'basic');
-*/
 $client = new Client();
-
 // Init market info object to be set in Redis finally
 $marketObj = array();
 
@@ -79,11 +67,6 @@ $lnk = OPTLNK;
 // $lnk = 'http://127.0.0.1/hedge/jpx/http_svc.qri.jp_jpx_nkopm_1304.htm';
 $client->setHeader(RER, REFV);
 $crawlerAll = $client->request('GET', $lnk);
-
-/*
-$status = $client->getResponse()->getStatus();
-echo $status;
-*/
 
 // last updated time: <dl><dd> ...
 $historyDatetime = date('Y/m/d H:i:s');
@@ -198,11 +181,10 @@ $codes = array('1357.t', '1570.t');
 
 $hedges = array();
 $bull = true;
-$client->resetHeaders();
-
 foreach ($codes as $value) {
     $lnk = HEDGELNK . $value; // hedge
     // $lnk = 'http://127.0.0.1/hedge/jpx/yahoo.html'; // OPTLNK
+    $client->resetHeaders();
     $crawler = $client->request('GET', $lnk);
 
     // echo $lnk . '<br>';
@@ -211,10 +193,10 @@ foreach ($codes as $value) {
 
     // <div class="forAddPortfolio"><dl class="stocksInfo clearFix"><dd class="yjSb real"><span>...
     $crawler->filter('div.forAddPortfolio dl.stocksInfo.clearFix dd.yjSb.real span')->each(function($node) use (&$update, $onTradeDate) {
-         $update = $onTradeDate . ' ' .trim($node->text()) . ':0';
+         // echo "!!!!!!" . $node->text() . "<br>";
+         $update = $onTradeDate . ' ' .trim($node->text()) . ':00';
     });
-    // <table class="stocksTable" <tbody><tr><td class="stoksPrice">
-    // $crawler->filter('table.stocksTable tbody tr td.stoksPrice')->each(function($node) use (&$price) {
+    // <table class="stocksTable" <tr><td class="stoksPrice">
     $crawler->filter('table.stocksTable tr td.stoksPrice')->each(function($node) use (&$price) {
          $price = doubleval(getKStr(trim($node->text())));
     });
