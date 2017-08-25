@@ -28,12 +28,14 @@ int init()
    utility = new Utility();
    pMgr = new PositionMgr(USDJPY, MidRate, TradeVol, ThresholdDelta);
 
+   // TODO: NEED rebuild LONG/SHORT trading stacks
    // MyInitPosition(Magic);
    return(0);
 }
 
 void deinit()
 {
+   // TODO: If we rebuilt stacks, should not close all orders
    closeAllOrders();
    delete pMgr;
    delete utility;
@@ -60,23 +62,33 @@ int start()
          double lots;
          double remaining;
 
+         bool closeFlg = false;
          // close LONG  / open SHORT for (tradeAmount[LONG] < 0)
          remaining = (tradeAmount[LONG] < 0)? -tradeAmount[LONG]: -tradeAmount[SHORT];
          while (remaining > 0) {
             orderId = (tradeAmount[LONG] < 0)? orderStack[LONG].peek(): orderStack[SHORT].peek();
             lots = MyOrderLots2(orderId);
-            if (lots <= remaining) {
-               MyOrderClose2(orderStack, orderId);
-               remaining -= lots;
-            } else {
-               MyOrderCloseParts2(orderStack, orderId, remaining);
-               remaining = 0;
+
+            double parts = remaining;
+            if (lots <= parts) {
+               parts = -1;
             }
+            closeFlg = MyOrderClose2(orderStack, orderId, parts);
+            if (closeFlg && parts < 0)
+               remaining -= lots;
+            else if (closeFlg && parts > 0)
+               remaining = 0;
+            else
+               break;
          }
-         if (tradeAmount[LONG] < 0) { // close LONG  / open SHORT
-            MyOrderSend2(orderStack, OP_SELL, tradeAmount[SHORT], 0, 0, 0, "SHORT");
-         } else {
-            MyOrderSend2(orderStack, OP_BUY,  tradeAmount[LONG],  0, 0, 0, "LONG");
+
+         // To avoid slipper
+         if (closeFlg) {
+            if (tradeAmount[LONG] < 0) { // close LONG  / open SHORT
+               MyOrderSend2(orderStack, OP_SELL, tradeAmount[SHORT], 0, 0, 0, "SHORT");
+            } else {
+               MyOrderSend2(orderStack, OP_BUY,  tradeAmount[LONG],  0, 0, 0, "LONG");
+            }
          }
       }
 
@@ -101,10 +113,10 @@ void closeAllOrders() {
       pMgr.getOrderStack(orderStack);
 
       while (orderStack[LONG].peek() > 0)
-         MyOrderClose2(orderStack, orderStack[LONG].peek());
+         MyOrderClose2(orderStack, orderStack[LONG].peek(),  -1); // whole
 
       while (orderStack[SHORT].peek() > 0)
-         MyOrderClose2(orderStack, orderStack[SHORT].peek());
+         MyOrderClose2(orderStack, orderStack[SHORT].peek(), -1); // whole
 }
 
 void restartEpoch() {
@@ -189,7 +201,9 @@ bool MyOrderSend2(OrderStack*& aOrderStack[], int type, double lots,
    RefreshRates();
    if (type == OP_BUY) price = Ask;
    if (type == OP_SELL) price = Bid;
-   
+
+   // We doesn't care about slipper during OPEN, but need to secure OPEN
+   // Maybe 10 is not enough
    int ret = OrderSend(Raspimt4SymStr[pMgr.getSym()], type, lots, price,
                 Slippage*10, 0, 0, comment,
                 Magic, 0, ArrowColor[type]); // TODO: handle magic
@@ -216,27 +230,35 @@ bool MyOrderSend2(OrderStack*& aOrderStack[], int type, double lots,
    return(rtn);
 }
 
-// send close order
-bool MyOrderClose2(OrderStack*& aOrderStack[], int orderId)
+bool MyOrderClose2(OrderStack*& aOrderStack[], int orderId, double aParts)
 {
-   bool rtn = true;
+   return (aParts < 0)?
+          MyOrderCloseWhole2(aOrderStack, orderId):
+          MyOrderCloseParts2(aOrderStack, orderId, aParts);
+}
+
+// send close order wholy
+bool MyOrderCloseWhole2(OrderStack*& aOrderStack[], int orderId)
+{
+   bool ret = false;
    if (MyOrderOpenLots2(orderId) == 0)
-      return(rtn);
+      return(ret);
 
    // for open position
    int type = MyOrderType2(orderId);
 
    RefreshRates();
-   bool ret = OrderClose(orderId, OrderLots(),
-                 OrderClosePrice(), Slippage*10,
-                 ArrowColor[type]);
+   if ((type == OP_BUY)  && (OrderClosePrice() > OrderOpenPrice()) ||
+       (type == OP_SELL) && (OrderClosePrice() < OrderOpenPrice()))
+      ret = OrderClose(orderId, OrderLots(),
+                    OrderClosePrice(), Slippage,
+                    ArrowColor[type]);
 
    if (!ret)
    {
       int err = GetLastError();
-      Print("MyOrderClose : ", err, " ",
+      Print("MyOrderCloseWhole2 : ", err, " ",
             ErrorDescription(err));
-      rtn = false;
    } else {
       // pop open orderId
       if (type == OP_BUY) {
@@ -245,7 +267,7 @@ bool MyOrderClose2(OrderStack*& aOrderStack[], int orderId)
          aOrderStack[SHORT].pop();
       }
    }
-   return(rtn);
+   return(ret);
 }
 
 // partial closed order id
@@ -267,24 +289,25 @@ int getNewTicketNumber(double aOpenPrice, datetime aOpenTime, int aType)
 // send close order for parts
 bool MyOrderCloseParts2(OrderStack*& aOrderStack[], int orderId, double parts)
 {
-   bool rtn = true;
+   bool ret = false;
    if (MyOrderOpenLots2(orderId) == 0)
-      return(rtn);
+      return(ret);
 
    // for open position
    int type = MyOrderType2(orderId);
 
 PrintFormat("MyOrderCloseParts2: [%d] (%f -- %f)", orderId, MyOrderLots2(orderId), parts);
    RefreshRates();
-   bool ret = OrderClose(orderId, parts,
-                 OrderClosePrice(), Slippage*10,
-                 ArrowColor[type]);
+   if ((type == OP_BUY)  && (OrderClosePrice() > OrderOpenPrice()) ||
+       (type == OP_SELL) && (OrderClosePrice() < OrderOpenPrice()))
+      ret = OrderClose(orderId, parts,
+                    OrderClosePrice(), Slippage,
+                    ArrowColor[type]);
    if (!ret)
    {
       int err = GetLastError();
-      Print("MyOrderCloseParts : ", err, " ",
+      Print("MyOrderCloseParts2 : ", err, " ",
             ErrorDescription(err));
-      rtn = false;
    } else {
       // pop and push new orderId
       int newTicket = getNewTicketNumber(OrderOpenPrice(), OrderOpenTime(), type);
@@ -301,7 +324,7 @@ PrintFormat("MyOrderCloseParts2: [%d] (%f -- %f)", orderId, MyOrderLots2(orderId
             aOrderStack[SHORT].push(newTicket);
       }
    }
-   return(rtn);
+   return(ret);
 }
 // get order lots
 double MyOrderLots2(int orderId)
