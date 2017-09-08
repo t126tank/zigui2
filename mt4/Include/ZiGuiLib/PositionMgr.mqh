@@ -8,7 +8,6 @@
 #property version   "1.00"
 #property strict
 
-#include <ZiGuiLib\Raspimt4Sym.mqh>
 #include <ZiGuiLib\OrderStack.mqh>
 
 //+------------------------------------------------------------------+
@@ -17,18 +16,19 @@
 class PositionMgr
   {
 private:
-    Raspimt4Sym      sym;
+    string           sym;
     double           midRate;
     double           tradeVol;
     double           thresholdDelta;
-    double           preTradedDelta[PositionType_ALL];
+    double           preTradedDelta;
+    double           backupPreDelta;
     OrderStack*      orderStack[PositionType_ALL];
 
 public:
-                     PositionMgr(Raspimt4Sym aSym, double aMidRate, double aVol, double aDelta);
+                     PositionMgr(string aSym, double aMidRate, double aVol, double aDelta);
                     ~PositionMgr();
     //
-    Raspimt4Sym      getSym();
+    string           getSym();
     //
     double           getMidRate();
     //
@@ -38,28 +38,28 @@ public:
     //
     double           getThresholdDelta();
     //
-    void             setPreLtradedDelta(double preDelta);
+    void             setPreTradedDelta(double preDelta);
     //
-    double           getPreLtradedDelta();
+    double           getPreTradedDelta();
     //
-    void             setPreStradedDelta(double preDelta);
+    void             setBackupPreStradedDelta(double aBk);
     //
-    double           getPreStradedDelta();
+    double           getBackupPreStradedDelta();
     //
     void             getOrderStack(OrderStack*& aOrderStack[]);
   };
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-PositionMgr::PositionMgr(Raspimt4Sym aSym, double aMidRate, double aVol, double aDelta)
+PositionMgr::PositionMgr(string aSym, double aMidRate, double aVol, double aDelta)
   {
     this.sym = aSym;
     this.midRate = aMidRate;
     this.tradeVol = aVol;
     this.thresholdDelta = aDelta;
 
-    this.preTradedDelta[LONG]  = -0.1;
-    this.preTradedDelta[SHORT] = -0.1;
+    this.preTradedDelta = -0.1;
+    this.backupPreDelta = -0.1;
 
     this.orderStack[LONG]  = new OrderStack(LONG);
     this.orderStack[SHORT] = new OrderStack(SHORT);
@@ -78,7 +78,7 @@ PositionMgr::~PositionMgr()
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-Raspimt4Sym PositionMgr::getSym()
+string PositionMgr::getSym()
   {
     return this.sym;
   }
@@ -113,32 +113,31 @@ double PositionMgr::getThresholdDelta()
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-double PositionMgr::getPreLtradedDelta()
+double PositionMgr::getPreTradedDelta()
   {
-    return this.preTradedDelta[LONG];
+    return this.preTradedDelta;
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-void PositionMgr::setPreLtradedDelta(double pre)
+void PositionMgr::setPreTradedDelta(double aPre)
   {
-    this.preTradedDelta[LONG] = pre;
+    this.preTradedDelta = aPre;
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-double PositionMgr::getPreStradedDelta()
+double PositionMgr::getBackupPreStradedDelta()
   {
-    return this.preTradedDelta[SHORT];
+    return this.backupPreDelta;
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-void PositionMgr::setPreStradedDelta(double pre)
+void PositionMgr::setBackupPreStradedDelta(double aBk)
   {
-    this.preTradedDelta[SHORT] = pre;
-  }
-//+------------------------------------------------------------------+
+    this.backupPreDelta = aBk;
+  }//+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
 void PositionMgr::getOrderStack(OrderStack*& aOrderStack[])
