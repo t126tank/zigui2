@@ -2,12 +2,15 @@
 #property copyright "Copyright 2017, Katokunou Corp."
 #property link      "http://katokunou.com/"
 
+#include <ZiGuiLib\Raspimt4Sym.mqh>
 #include <ZiGuiLib\PositionMgr.mqh>
 #include <ZiGuiLib\Utility.mqh>
 
-input double MidRate    = 109.483;
+// http://www.bk.mufg.jp/gdocs/kinri/list_j/kinri/kawase.html
+input double MidRate    = 109.381;
 input double TradeVol   = 3.33;
-input double ThresholdDelta = 0.003888;
+// 0.0015 = 0.01 lots * 0.5 delta / 3.33 TradeVol > spread?
+input double ThresholdDelta = 0.0018;
 input double ScaleCDF   = 0.03;
 
 #include <ZiGuiLib\PositionMgr.mqh>
@@ -15,7 +18,7 @@ input double ScaleCDF   = 0.03;
 #include <ZiGuiLib\MyPosition.mqh>
 #include <ZiGuiLib\HedgeRequest.mqh>
 
-#define REFRESH   (2 * 60 * 60) // 3H
+#define REFRESH   (3 * 60 * 60) // 3H
 int Magic = 20170822;
 
 PositionMgr* pMgr;
@@ -26,17 +29,21 @@ int init()
 {
    initTime = TimeCurrent();
    utility = new Utility();
-   pMgr = new PositionMgr(USDJPY, MidRate, TradeVol, ThresholdDelta);
+   pMgr = new PositionMgr(Raspimt4SymStr[USDJPY], MidRate, TradeVol, ThresholdDelta);
 
-   // TODO: NEED rebuild LONG/SHORT trading stacks
-   // MyInitPosition(Magic);
+   string sym = pMgr.getSym();
+   double currentMidRate = utility.calMidRate(MarketInfo(sym, MODE_BID), MarketInfo(sym, MODE_ASK));
+   pMgr.setMidRate(MidRate); // update MidRate for debug
+
+   // NEED to rebuild LONG/SHORT trading stacks
+   MyInitPosition2();
    return(0);
 }
 
 void deinit()
 {
-   // TODO: If we rebuilt stacks, should not close all orders
-   closeAllOrders();
+   // If we rebuilt stacks, unnecessary to close all opening orders
+
    delete pMgr;
    delete utility;
 }
@@ -56,24 +63,27 @@ int start()
 
       // Initial
       if (tradeAmount[LONG] > 0 && tradeAmount[SHORT] > 0) {
-         MyOrderSend2(orderStack, OP_BUY, tradeAmount[LONG], 0, 0, 0, "LONG");
-         MyOrderSend2(orderStack, OP_SELL, tradeAmount[SHORT], 0, 0, 0, "SHORT");
+         while (!MyOrderSend2(orderStack, OP_BUY,  tradeAmount[LONG], 0, 0, 0,  "LONG"))
+            ;
+         while (!MyOrderSend2(orderStack, OP_SELL, tradeAmount[SHORT], 0, 0, 0, "SHORT"))
+            ;
       } else { // On hedging
          double lots;
-         double remaining;
-
          bool closeFlg = false;
          // close LONG  / open SHORT for (tradeAmount[LONG] < 0)
-         remaining = (tradeAmount[LONG] < 0)? -tradeAmount[LONG]: -tradeAmount[SHORT];
+         bool closeLongFlg = tradeAmount[LONG] < 0;
+         double remaining = (closeLongFlg)? -tradeAmount[LONG]: -tradeAmount[SHORT];
+         double totalClz = remaining;
+
          while (remaining > 0) {
-            orderId = (tradeAmount[LONG] < 0)? orderStack[LONG].peek(): orderStack[SHORT].peek();
+            orderId = (closeLongFlg)? orderStack[LONG].peek(): orderStack[SHORT].peek();
             lots = MyOrderLots2(orderId);
 
             double parts = remaining;
-            if (lots <= parts) {
+            if (lots <= remaining) {
                parts = -1;
             }
-            closeFlg = MyOrderClose2(orderStack, orderId, parts);
+            closeFlg = MyOrderClose2(orderStack, orderId, parts, false);
             if (closeFlg && parts < 0)
                remaining -= lots;
             else if (closeFlg && parts > 0)
@@ -84,26 +94,42 @@ int start()
 
          // To avoid slipper
          if (closeFlg) {
-            if (tradeAmount[LONG] < 0) { // close LONG  / open SHORT
-               MyOrderSend2(orderStack, OP_SELL, tradeAmount[SHORT], 0, 0, 0, "SHORT");
+            if (closeLongFlg) { // close LONG  / open SHORT
+               while (!MyOrderSend2(orderStack, OP_SELL, tradeAmount[SHORT], 0, 0, 0, "SHORT"))
+                  ;
             } else {
-               MyOrderSend2(orderStack, OP_BUY,  tradeAmount[LONG],  0, 0, 0, "LONG");
+               while (!MyOrderSend2(orderStack, OP_BUY,  tradeAmount[LONG],  0, 0, 0, "LONG"))
+                  ;
             }
+         } else {
+            // Maybe just parts of close amount successful
+            double partsClz = totalClz - remaining;
+            if (partsClz > 0) {   // Parts close failed
+               if (closeLongFlg) { // close LONG  / open SHORT
+                  while (!MyOrderSend2(orderStack, OP_SELL, partsClz, 0, 0, 0, "SHORT"))
+                     ;
+               } else {
+                  while (!MyOrderSend2(orderStack, OP_BUY,  partsClz,  0, 0, 0, "LONG"))
+                     ;
+               }
+            }
+
+            // For closeOrder failing recover
+            pMgr.setPreTradedDelta(pMgr.getBackupPreStradedDelta());
          }
       }
 
       // TODO: debug
       orderStack[LONG].display();
       orderStack[SHORT].display();
+
+      // Restart NEW Epoch
+      if (orderStack[LONG].empty() || orderStack[SHORT].empty()) {
+         restartEpoch();
+      }
    }
 
    delete tmp;
-
-   // REFRESH
-   if ((TimeCurrent() - initTime) > REFRESH) {
-      initTime = TimeCurrent();
-      restartEpoch();
-   }
 
    return(0);
 }
@@ -112,29 +138,31 @@ void closeAllOrders() {
       OrderStack* orderStack[PositionType_ALL];
       pMgr.getOrderStack(orderStack);
 
-      while (orderStack[LONG].peek() > 0)
-         MyOrderClose2(orderStack, orderStack[LONG].peek(),  -1); // whole
+      while (!orderStack[LONG].empty())
+         MyOrderClose2(orderStack, orderStack[LONG].peek(),  -1, true); // whole
 
-      while (orderStack[SHORT].peek() > 0)
-         MyOrderClose2(orderStack, orderStack[SHORT].peek(), -1); // whole
+      while (!orderStack[SHORT].empty())
+         MyOrderClose2(orderStack, orderStack[SHORT].peek(), -1, true); // whole
 }
 
 void restartEpoch() {
-   // closeAllOrders();
-   // delete pMgr;
+   closeAllOrders();
+
+   string sym = pMgr.getSym();
+   double currentMidRate = utility.calMidRate(MarketInfo(sym, MODE_BID), MarketInfo(sym, MODE_ASK));
+
+   delete pMgr;
 
    // TODO: use offical mid rate
-   // pMgr = new PositionMgr(USDJPY, MidRate, TradeVol, ThresholdDelta);
-   string sym = Raspimt4SymStr[pMgr.getSym()];
-   double currentMidRate = utility.calMidRate(MarketInfo(sym, MODE_BID), MarketInfo(sym, MODE_ASK));
-   // pMgr.setMidRate(currentMidRate);
+   pMgr = new PositionMgr(sym, currentMidRate, TradeVol, ThresholdDelta);
 
-Print(" Refresh time is " + TimeToStr(initTime, TIME_DATE | TIME_SECONDS) + " @ " + currentMidRate);
+initTime = TimeCurrent();
+Print(" NEW Epoch time is " + TimeToStr(initTime, TIME_DATE | TIME_SECONDS) + " @ " + currentMidRate);
 }
 
 HedgeRequest* getHedgeRequest() {
    bool tradeFlg = false;
-   string sym = Raspimt4SymStr[pMgr.getSym()];
+   string sym = pMgr.getSym();
    double currentMidRate = utility.calMidRate(MarketInfo(sym, MODE_BID), MarketInfo(sym, MODE_ASK));
    double currentDelta = utility.calCurrentDelta(pMgr.getMidRate(), currentMidRate, ScaleCDF); // SHORT
    double curLongDelta = 1 - currentDelta;
@@ -144,7 +172,8 @@ HedgeRequest* getHedgeRequest() {
    tradeAmount[LONG]  = utility.calInitTradeAmount(curLongDelta, pMgr.getTradeVol());
 
    // TODO: FIRST TRADING for OPENNING BOTH
-   if (pMgr.getPreLtradedDelta() < 0 && pMgr.getPreStradedDelta() < 0) {
+   double preStradedDelta = pMgr.getPreTradedDelta(); // SHORT
+   if (preStradedDelta < 0) {
       // assume traded delta is in (0, 1)
 
 PrintFormat("Init: [%f]  %s", currentDelta, "SHORT");
@@ -153,9 +182,9 @@ PrintFormat("Init: [%f]  %s", curLongDelta, "LONG");
       tradeFlg = true;
    } else {
       // TODO: what type is currentDelta for SHORT?
-      if (fabs(currentDelta - pMgr.getPreStradedDelta()) >= fabs(pMgr.getThresholdDelta())) {
-         tradeAmount[SHORT] = utility.calTradeAmount(currentDelta, pMgr.getPreStradedDelta(), pMgr.getTradeVol());
-         tradeAmount[LONG]  = utility.calTradeAmount(curLongDelta, pMgr.getPreLtradedDelta(), pMgr.getTradeVol());
+      if (fabs(currentDelta - preStradedDelta) >= fabs(pMgr.getThresholdDelta())) {
+         tradeAmount[SHORT] = utility.calTradeAmount(currentDelta, preStradedDelta,     pMgr.getTradeVol());
+         tradeAmount[LONG]  = -tradeAmount[SHORT];
 
          // TODO: debug
          tradeAmount[SHORT] = NormalizeDouble(fabs(tradeAmount[SHORT]) < 0.01? 
@@ -164,21 +193,34 @@ PrintFormat("Init: [%f]  %s", curLongDelta, "LONG");
          tradeAmount[LONG] = NormalizeDouble(fabs(tradeAmount[LONG]) < 0.01?
                               tradeAmount[LONG] < 0? -0.01: 0.01
                               : tradeAmount[LONG], 2);
-PrintFormat("Trade: [%f]  %s", fabs(currentDelta - pMgr.getPreStradedDelta()) - fabs(pMgr.getThresholdDelta()), "diff delta");
+PrintFormat("Trade: [%f]  %s", currentDelta - preStradedDelta, "diff delta");
 PrintFormat("Slot: [%f]  %s", tradeAmount[SHORT], "SHORT");
 PrintFormat("Slot: [%f]  %s", tradeAmount[LONG],  "LONG");
 
          bool isDay = false;
          if (Hour() >= 1 && Hour() < 23)
             isDay = true;
-         tradeFlg = true && isDay;
+         tradeFlg = true; // && isDay;
       }
    }
    if (tradeFlg) {
-      pMgr.setPreStradedDelta(currentDelta);
-      pMgr.setPreLtradedDelta(curLongDelta);
+      // For closeOrder failing recover
+      pMgr.setBackupPreStradedDelta(preStradedDelta);
+      pMgr.setPreTradedDelta(currentDelta);
    }
+
+   // Check if spread floating out of range for USDJPY
+   if (tradeFlg)
+      tradeFlg = chkSpreadRange();
+
    return new HedgeRequest(tradeFlg, tradeAmount);
+}
+
+bool chkSpreadRange()
+{
+   int spread = MarketInfo(pMgr.getSym(), MODE_SPREAD);
+   PrintFormat("[%d] in %s: OK", spread, "chkSpreadRange");
+   return spread < 6;
 }
 
 void printSummary(void)
@@ -202,11 +244,17 @@ bool MyOrderSend2(OrderStack*& aOrderStack[], int type, double lots,
    if (type == OP_BUY) price = Ask;
    if (type == OP_SELL) price = Bid;
 
+   comment = DoubleToStr(pMgr.getPreTradedDelta(), 5);
+
+   int ret = -1;
    // We doesn't care about slipper during OPEN, but need to secure OPEN
    // Maybe 10 is not enough
-   int ret = OrderSend(Raspimt4SymStr[pMgr.getSym()], type, lots, price,
-                Slippage*10, 0, 0, comment,
-                Magic, 0, ArrowColor[type]); // TODO: handle magic
+   if (chkSpreadRange())   // TODO: avoid spread floating
+      ret = OrderSend(pMgr.getSym(), type, lots, price,
+                   0, 0, 0, comment,
+                   Magic, 0, ArrowColor[type]); // TODO: handle magic
+
+// debug PrintFormat("NEW Order Id: [%d]", ret);
    if (ret == -1)
    {
       int err = GetLastError();
@@ -219,8 +267,10 @@ bool MyOrderSend2(OrderStack*& aOrderStack[], int type, double lots,
       // push open orderId
       if (type == OP_BUY) {
          aOrderStack[LONG].push(ret);
+// debug          PrintFormat("Long stack peek: [%d]", aOrderStack[LONG].peek());
       } else {
          aOrderStack[SHORT].push(ret);
+// debug          PrintFormat("Short stack peek: [%d]", aOrderStack[SHORT].peek());
       }
    }
    // send SL and TP orders
@@ -230,28 +280,34 @@ bool MyOrderSend2(OrderStack*& aOrderStack[], int type, double lots,
    return(rtn);
 }
 
-bool MyOrderClose2(OrderStack*& aOrderStack[], int orderId, double aParts)
+// flg: even loss forcily close - true
+bool MyOrderClose2(OrderStack*& aOrderStack[], int orderId, double aParts, bool flg)
 {
    return (aParts < 0)?
-          MyOrderCloseWhole2(aOrderStack, orderId):
+          MyOrderCloseWhole2(aOrderStack, orderId, flg):
           MyOrderCloseParts2(aOrderStack, orderId, aParts);
 }
 
 // send close order wholy
-bool MyOrderCloseWhole2(OrderStack*& aOrderStack[], int orderId)
+bool MyOrderCloseWhole2(OrderStack*& aOrderStack[], int orderId, bool flg)
 {
    bool ret = false;
    if (MyOrderOpenLots2(orderId) == 0)
-      return(ret);
+      return ret;
 
    // for open position
    int type = MyOrderType2(orderId);
 
+PrintFormat("MyOrderCloseWhole2: [%d]", orderId);
    RefreshRates();
-   if ((type == OP_BUY)  && (OrderClosePrice() > OrderOpenPrice()) ||
-       (type == OP_SELL) && (OrderClosePrice() < OrderOpenPrice()))
+   /*
+   if (((type == OP_BUY)  && (OrderClosePrice() > OrderOpenPrice())) ||
+       ((type == OP_SELL) && (OrderClosePrice() < OrderOpenPrice())) ||
+         flg)
+   */
+   if (chkSpreadRange())
       ret = OrderClose(orderId, OrderLots(),
-                    OrderClosePrice(), Slippage,
+                    OrderClosePrice(), 0,
                     ArrowColor[type]);
 
    if (!ret)
@@ -267,7 +323,7 @@ bool MyOrderCloseWhole2(OrderStack*& aOrderStack[], int orderId)
          aOrderStack[SHORT].pop();
       }
    }
-   return(ret);
+   return ret;
 }
 
 // partial closed order id
@@ -298,10 +354,13 @@ bool MyOrderCloseParts2(OrderStack*& aOrderStack[], int orderId, double parts)
 
 PrintFormat("MyOrderCloseParts2: [%d] (%f -- %f)", orderId, MyOrderLots2(orderId), parts);
    RefreshRates();
-   if ((type == OP_BUY)  && (OrderClosePrice() > OrderOpenPrice()) ||
-       (type == OP_SELL) && (OrderClosePrice() < OrderOpenPrice()))
+   /*
+   if (((type == OP_BUY)  && (OrderClosePrice() > OrderOpenPrice())) ||
+       ((type == OP_SELL) && (OrderClosePrice() < OrderOpenPrice())))
+   */
+   if (chkSpreadRange())
       ret = OrderClose(orderId, parts,
-                    OrderClosePrice(), Slippage,
+                    OrderClosePrice(), 0,
                     ArrowColor[type]);
    if (!ret)
    {
@@ -361,4 +420,42 @@ double MyOrderOpenLots2(int orderId)
    if (type == OP_SELL) l = -OrderLots();
 
    return(l);
+}
+
+
+//+------------------------------------------------------------------+
+//| rebuild L/S trading stacks                                       |
+//+------------------------------------------------------------------+
+void MyInitPosition2()
+{
+   OrderStack* orderStack[PositionType_ALL];
+   pMgr.getOrderStack(orderStack);
+
+   for (int i = 0; i < OrdersTotal(); i++) {
+      if (OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) {
+         if (OrderMagicNumber() == Magic) {
+            if (OrderType() == OP_BUY)
+               orderStack[LONG].push(OrderTicket());
+            else
+               orderStack[SHORT].push(OrderTicket());
+         }
+      }
+   }
+   // Rebuild failed
+   if (orderStack[LONG].empty() || orderStack[SHORT].empty()) {
+      while (!orderStack[LONG].empty())
+         MyOrderClose2(orderStack, orderStack[LONG].peek(),  -1, true); // whole
+
+      while (!orderStack[SHORT].empty())
+         MyOrderClose2(orderStack, orderStack[SHORT].peek(), -1, true); // whole
+   } else {
+      double preTradedDelta = StrToDouble(OrderComment()); // use latest in above for {}
+      pMgr.setPreTradedDelta(preTradedDelta);
+      pMgr.setBackupPreStradedDelta(preTradedDelta); // TODO
+
+      // TODO: debug
+      orderStack[LONG].display();
+      orderStack[SHORT].display();
+      PrintFormat("Rebuild stacks: [%f]  Pre-traded-delta ", preTradedDelta);
+   }
 }
