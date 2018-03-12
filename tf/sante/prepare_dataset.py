@@ -27,23 +27,33 @@ def main(argv):
    df = pd.read_json('commit.json', orient='records')
 
    sz = len(df.index)
-   tstsz = int(round(sz * 0.2))
+   valsz = int(round(sz * 0.2))
+   tstsz = int(round(sz * 0.1))
 
    # rebuild path+filename as "./png/xxxx.png"
    df = df["name"].map(lambda x: './png/'+x)
 
-   rows = rd.sample(df.index, tstsz)
+   # value datasets
+   rows = rd.sample(df.index, valsz)
    df_20 = df.ix[rows]
-   df_20.to_json('test.json', orient='records')
+   df_20.to_json('value.json', orient='records')
 
    df_80 = df.drop(rows)
-   df_80.to_json('training.json', orient='records')
-   print 'training: %d, test: %d, total: %d,' % (len(df_80.index), len(df_20.index), len(df.index))
+
+   # test datasets
+   rows = rd.sample(df_80.index, tstsz)
+   df_10 = df_80.ix[rows]
+   df_10.to_json('test.json', orient='records')
+
+   # training datasets
+   df_70 = df_80.drop(rows)
+   df_70.to_json('training.json', orient='records')
+   print 'training: %d, value: %d, test: %d, total: %d' % (len(df_70.index), valsz, tstsz, sz)
 
    # For report deprecated
    '''
    f = open('item.json', 'a')
-   print >> f, '"training": %d, "test": %d,' % (trnsz, tstsz)
+   print >> f, '"training": %d, "value": %d,' % (trnsz, valsz)
    f.close()
    '''
 
