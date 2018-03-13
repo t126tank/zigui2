@@ -43,9 +43,8 @@ def load_ifis_png_dataset(shape):
             imgByteArr = io.BytesIO()
             img.save(imgByteArr, format='BMP')
             imgByteArr = imgByteArr.getvalue()
-            imgByteArr = imgByteArr[len(imgByteArr)-56350:] # remove BMP header
 
-            data.append(np.frombuffer(imgByteArr, np.uint8))
+            data.append(np.frombuffer(imgByteArr, np.uint8, offset=len(imgByteArr)-56350))
         retun data
 
     def load_ifis_png_labels(df):
