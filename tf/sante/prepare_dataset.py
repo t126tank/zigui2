@@ -31,7 +31,8 @@ def main(argv):
    tstsz = int(round(sz * 0.1))
 
    # rebuild path+filename as "./png/xxxx.png"
-   df = df["name"].map(lambda x: './png/'+x)
+   # df = df["name"].map(lambda x: './png/'+x)
+   df['name'] = './png/' + df['name']
 
    # value datasets
    rows = rd.sample(df.index, valsz)
