@@ -14,6 +14,9 @@
 import time
 import pandas as pd
 import numpy as np
+import io
+
+from PIL import Image
 
 import tensorflow as tf
 
@@ -24,24 +27,42 @@ import logging
 # 56350 (322 x 175) vs 784 (28 x 28)
 # ref: http://tensorlayer.readthedocs.io/en/latest/_modules/tensorlayer/files.html#load_mnist_dataset
 def load_ifis_png_dataset(shape):
-    def load_ifis_png_images(path, filename):
+    logging.basicConfig(level=logging.DEBUG,
+                        format='%(asctime)s- %(name)s - %(levelname)s - %(message)s')
+    def load_dataframe(path, filename):
         filepath = path + filename
         logging.info(filepath)
+        return pd.read_json(filepath, orient='records')
+
+    def load_ifis_png_images(df):
+        names = df['name'].values
+        data = []
+        for name in names:
+            img = Image.open(name).convert('L') # (8-bit pixels, black and white)
+
+            imgByteArr = io.BytesIO()
+            img.save(imgByteArr, format='BMP')
+            imgByteArr = imgByteArr.getvalue()
+            imgByteArr = imgByteArr[len(imgByteArr)-56350:] # remove BMP header
+
+            data.append(np.asarray(imgByteArr))
+        retun data
+
+    def load_ifis_png_labels(df):
         return df['trend'].values
 
-    def load_ifis_png_labels(path, filename):
-        filepath = path + filename
-        logging.info(filepath)
-        df = pd.read_json(filepath, orient='records')
-        return df['trend'].values
+    path = './'
+    df = load_dataframe(path, 'training.json')
+    X_train = load_ifis_png_images(df)
+    y_train = load_ifis_png_labels(df)
 
-    df = pd.read_json(filepath, orient='records')
-    X_train = load_ifis_png_images('./', 'training.json')
-    y_train = load_ifis_png_labels('./', 'training.json')
-    X_val = load_ifis_png_images('./',   'value.json')
-    y_val = load_ifis_png_labels('./',   'value.json')
-    X_test = load_ifis_png_images('./',  'test.json')
-    y_test = load_ifis_png_labels('./',  'test.json')
+    df = load_dataframe(path, 'value.json')
+    X_val = load_ifis_png_images(df)
+    y_val = load_ifis_png_labels(df)
+
+    df = load_dataframe(path, 'test.json')
+    X_test = load_ifis_png_images(df)
+    y_test = load_ifis_png_labels(df)
 
     # We just return all the arrays in order, as expected in main().
     # (It doesn't matter how we do this as long as we can read them again.)
