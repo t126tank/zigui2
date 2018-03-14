@@ -93,12 +93,12 @@ def main_test_layers(model='relu'):
         network = tl.layers.DropoutLayer(network, keep=0.5, name='drop2')
         network = tl.layers.DenseLayer(network, n_units=800, act=tf.nn.relu, name='relu2')
         network = tl.layers.DropoutLayer(network, keep=0.5, name='drop3')
-        network = tl.layers.DenseLayer(network, n_units=10, act=tf.identity, name='output')
+        network = tl.layers.DenseLayer(network, n_units=2, act=tf.identity, name='output')
     elif model == 'dropconnect':
         network = tl.layers.InputLayer(x, name='input')
         network = tl.layers.DropconnectDenseLayer(network, keep=0.8, n_units=800, act=tf.nn.relu, name='dropconnect_relu1')
         network = tl.layers.DropconnectDenseLayer(network, keep=0.5, n_units=800, act=tf.nn.relu, name='dropconnect_relu2')
-        network = tl.layers.DropconnectDenseLayer(network, keep=0.5, n_units=10, act=tf.identity, name='output')
+        network = tl.layers.DropconnectDenseLayer(network, keep=0.5, n_units=2, act=tf.identity, name='output')
 
     # To print all attributes of a Layer.
     # attrs = vars(network)
