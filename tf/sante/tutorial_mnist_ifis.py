@@ -29,12 +29,13 @@ import logging
 def load_ifis_png_dataset(shape):
     logging.basicConfig(level=logging.DEBUG,
                         format='%(asctime)s- %(name)s - %(levelname)s - %(message)s')
-    def load_dataframe(path, filename):
+
+    def load_ifis_pngs(path, filename):
         filepath = path + filename
         logging.info(filepath)
-        return pd.read_json(filepath, orient='records')
+        df = pd.read_json(filepath, orient='records')
 
-    def load_ifis_png_images(df):
+        # load each png after converting to grayscale
         names = df['name'].values
         data = []
         for name in names:
@@ -45,23 +46,13 @@ def load_ifis_png_dataset(shape):
             imgByteArr = imgByteArr.getvalue()
 
             data.append(np.frombuffer(imgByteArr, np.uint8, offset=len(imgByteArr)-56350))
-        retun data
-
-    def load_ifis_png_labels(df):
-        return df['trend'].values
+        # img binary buffer array and labels array
+        return data, df['trend'].values
 
     path = './'
-    df = load_dataframe(path, 'training.json')
-    X_train = load_ifis_png_images(df)
-    y_train = load_ifis_png_labels(df)
-
-    df = load_dataframe(path, 'value.json')
-    X_val = load_ifis_png_images(df)
-    y_val = load_ifis_png_labels(df)
-
-    df = load_dataframe(path, 'test.json')
-    X_test = load_ifis_png_images(df)
-    y_test = load_ifis_png_labels(df)
+    X_train, y_train = load_ifis_pngs(path, 'training.json')
+    X_val,   y_val   = load_ifis_pngs(path, 'value.json')
+    X_test,  y_test  = load_ifis_pngs(path, 'test.json')
 
     # We just return all the arrays in order, as expected in main().
     # (It doesn't matter how we do this as long as we can read them again.)
