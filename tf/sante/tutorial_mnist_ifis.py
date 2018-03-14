@@ -24,7 +24,7 @@ import tensorlayer as tl
 
 import logging
 
-# 56350 (322 x 175) vs 784 (28 x 28)
+# 56350 (322 x 175) vs 784 (28 x 28) -> 4600 (46 x 25) x 2 x 2 = (92 x 50)
 # ref: http://tensorlayer.readthedocs.io/en/latest/_modules/tensorlayer/files.html#load_mnist_dataset
 def load_ifis_png_dataset(shape):
     logging.basicConfig(level=logging.DEBUG,
@@ -39,13 +39,10 @@ def load_ifis_png_dataset(shape):
         names = df['name'].values
         data = []
         for name in names:
-            img = Image.open(name).convert('L') # (8-bit pixels, black and white)
+            img = Image.open(name).resize((92,50),Image.ANTIALIAS).convert('L') # (8-bit pixels, black and white)
+            imgByteArr = np.asarray(list(img.getdata()), dtype=np.uint8)
 
-            imgByteArr = io.BytesIO()
-            img.save(imgByteArr, format='BMP')
-            imgByteArr = imgByteArr.getvalue()
-
-            data.append(np.frombuffer(imgByteArr, np.uint8, offset=len(imgByteArr)-56350))
+            data.append(imgByteArr)
         # img binary buffer array and labels array
         return data, df['trend'].values
 
@@ -67,7 +64,7 @@ def load_ifis_png_dataset(shape):
 
 def main_test_layers(model='relu'):
     X_train, y_train, X_val, y_val, X_test, y_test = \
-                                    load_ifis_png_dataset(shape=(-1,56350))
+                                    load_ifis_png_dataset(shape=(-1,4600))
 
     print('X_train.shape', X_train.shape)
     print('y_train.shape', y_train.shape)
@@ -80,7 +77,7 @@ def main_test_layers(model='relu'):
     sess = tf.InteractiveSession()
 
     # placeholder
-    x = tf.placeholder(tf.float32, shape=[None, 56350], name='x')
+    x = tf.placeholder(tf.float32, shape=[None, 4600], name='x')
     y_ = tf.placeholder(
         tf.int64, shape=[
             None,
