@@ -39,7 +39,8 @@ def load_ifis_png_dataset(shape):
         names = df['name'].values
         data = []
         for name in names:
-            img = Image.open(name).resize((92,50),Image.ANTIALIAS).convert('L') # (8-bit pixels, black and white)
+            img = Image.open(name).resize((230, 125),Image.ANTIALIAS).convert('L') # (8-bit pixels, black and white)
+            # img = Image.open(name).convert('L') # (8-bit pixels, black and white)
             imgByteArr = np.asarray(list(img.getdata()), dtype=np.uint8)
 
             data.append(imgByteArr)
@@ -64,7 +65,7 @@ def load_ifis_png_dataset(shape):
 
 def main_test_layers(model='relu'):
     X_train, y_train, X_val, y_val, X_test, y_test = \
-                                    load_ifis_png_dataset(shape=(-1,4600))
+                                    load_ifis_png_dataset(shape=(-1,28750))
 
     print('X_train.shape', X_train.shape)
     print('y_train.shape', y_train.shape)
@@ -77,7 +78,7 @@ def main_test_layers(model='relu'):
     sess = tf.InteractiveSession()
 
     # placeholder
-    x = tf.placeholder(tf.float32, shape=[None, 4600], name='x')
+    x = tf.placeholder(tf.float32, shape=[None, 28750], name='x')
     y_ = tf.placeholder(
         tf.int64, shape=[
             None,
