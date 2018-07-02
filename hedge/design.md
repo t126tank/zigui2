@@ -1,16 +1,16 @@
-■API
-・TopN2Manager
+# API
+## TopN2Manager
   - curTopN : List;
   - oldTopN : List;
 
   + updateTopN2(List);
   + deleteOldTopN1()
 
-・TradewallManager
+## TradewallManager
   - 
 
-■Structures
-・Map<id, Map<pair, state>> - curTopN
+# Structures
+## Map<id, Map<pair, state>> - curTopN
 ```
 [
    {
@@ -84,7 +84,7 @@
 ]
 ```
 
-・Map<id, Map<pair, state>> - oldTopN
+## Map<id, Map<pair, state>> - oldTopN
 ```
 [
    {
@@ -158,9 +158,9 @@
 ]
 ```
 
-・Map<timestamp, List<tradeInfo>> - All trade information
+## Map<timestamp, List<tradeInfo>> - All trade information
 
-・Object - tradeInfo
+## Object - tradeInfo
 ```
 [
     {
@@ -200,8 +200,8 @@
 ["usd/jpy", "usd/eur", "usd/gbp"]
 ```
 
-■
-・初次
+# 主处理
+## 初次处理
  * 初始化
    prevTts = -1
    currTts = time()
@@ -219,7 +219,7 @@
    prevTts = currTts
 
 
-・第X+1次Tts
+## 第X+1次Tts处理
   prevTts = X
   currTts = X+1 -> time()
 
@@ -239,5 +239,5 @@
  * 更新 Tts
    prevTts = currTts
 
-■缩写
-・Tts - Trade Timestamp
+# 缩写
+* Tts - Trade Timestamp
