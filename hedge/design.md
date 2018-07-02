@@ -158,7 +158,7 @@
 ]
 ```
 
-## Map<timestamp, List<tradeInfo>> - All trade information
+## Map<timestamp, List\<TradeInfo>> - All trade information
 
 ## Object - TradeInfo
 ```
@@ -195,19 +195,19 @@
 ```
 
 
-・List - pairsFilter
+## List - pairsFilter
 ```
 ["usd/jpy", "usd/eur", "usd/gbp"]
 ```
 
-# 主处理
+# Tradewall - 主处理
 ## 初次处理
 1. 初始化  
    prevTts = -1  
    currTts = time()
 
-1. 获得 currTts时的List<TradeInfo> - by crawler
-1. 插入 map<currTts, List<tradeInfo>> - in redis
+1. 获得 currTts时的List\<TradeInfo> - by crawler
+1. 插入 map<currTts, List\<tradeInfo>> - in redis
 1. 过滤 tradeInfo->id 在 curTopN
    * id-pair 既存在 - 更新 curTopN 中 对应 id-pair 的 state (buy/sell/closed [tradeInfo->pl ！= -99999])
    * id-pair 不存在 - 插入 curTopN 中 对应 id-pair 的 state (buy/sell [tradeInfo->pl == -99999])
@@ -225,12 +225,12 @@
   prevTts = X  
   currTts = X+1 -> time()
 
-1. 获得currTts时的List<TradeInfo> - by crawler
-1. 获得prevTts时的List<TradeInfo> - from redis
+1. 获得currTts时的List\<TradeInfo> - by crawler
+1. 获得prevTts时的List\<TradeInfo> - from redis
 1. 比较此二List
-   * 无重叠 - crawler 展开至同 prevTts 时的 List<TradeInfo> 产生重叠
+   * 无重叠 - crawler 展开至同 prevTts 时的 List\<TradeInfo> 产生重叠
    * 有重叠
-     * 有新的 tradeinfo - 新的插入map<currTts, List<tradeInfo>> - in redis
+     * 有新的 tradeinfo - 新的插入map<currTts, List\<tradeInfo>> - in redis
      * 无新的 tradeinfo - 终止本次发布
 1. 过滤新的 tradeInfo->id 在 curTopN
    * id-pair 既存在 - 更新 curTopN 中 对应 id-pair 的 state (buy/sell/closed [tradeInfo->pl ！= -99999])
@@ -245,4 +245,3 @@
 
 # 缩写
  * Tts - Trade Timestamp
-
