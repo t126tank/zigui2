@@ -1,7 +1,7 @@
 # API
 ## TopN2Manager
-  - curTopN : List;
-  - oldTopN : List;
+  - curTopN : Map;
+  - oldTopN : Map;
 
   + updateTopN2(List);
   + deleteOldTopN1()
@@ -225,8 +225,8 @@
   prevTts = X  
   currTts = X+1 -> time()
 
-1. 获得currTts时的List\<TradeInfo> - by crawler
-1. 获得prevTts时的List\<TradeInfo> - from redis
+1. 获得 currTts时的List\<TradeInfo> - by crawler
+1. 获得 prevTts时的List\<TradeInfo> - from redis
 1. 比较此二List
    * 无重叠 - crawler 展开至同 prevTts 时的 List\<TradeInfo> 产生重叠
    * 有重叠
@@ -242,6 +242,17 @@
 1. POST 发布
 1. 更新 Tts  
    prevTts = X+1 -> currTts
+
+# TopN - 主处理
+## 初次处理
+1. 初始化  
+   获得 curTopN - by crawler ※ id 对应的 status Map 设空  
+   oldTopN 设空
+
+## 第X+1次
+1. 
+
+
 
 # 缩写
  * Tts - Trade Timestamp
