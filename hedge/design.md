@@ -202,8 +202,8 @@
 
 # 主处理
 ## 初次处理
- * 初始化
-   prevTts = -1
+ * 初始化  
+   prevTts = -1  
    currTts = time()
 
  * 获得 currTts时的List<TradeInfo> - by crawler
@@ -220,7 +220,8 @@
 
 
 ## 第X+1次Tts处理
-  prevTts = X
+ * 初始化  
+  prevTts = X  
   currTts = X+1 -> time()
 
  * 获得currTts时的List<TradeInfo> - by crawler
@@ -240,4 +241,5 @@
    prevTts = currTts
 
 # 缩写
-* Tts - Trade Timestamp
+ * Tts - Trade Timestamp
+
