@@ -262,8 +262,7 @@
    * id 只存在于 curTopN <id> List
      * id 亦不存在于 oldTopN Map，向 curTopN Map 插入 id 及对应的 status Map 设空；oldTopN Map 无更新
      * id 也存在于 oldTopN Map，从 oldTopN Map 转移该 id 至 curTopN Map
-   * id 只存在于 curTopN Map - 从 curTopN Map 转移该 id 至 oldTopN (buy <and> sell stacks 不为 EMPTY)
-1. TBD
+   * id 只存在于 curTopN Map - 从 curTopN Map 转移该 id 至 oldTopN Map (buy <and> sell stacks 不为 EMPTY)
 
 
 # 缩写
