@@ -293,13 +293,13 @@ function setTradeWall($field, $value) { // timestamp: int, all signals: \DS\Vect
 function getTradeWallPrevTimestamp() {
     $this->_redis->select(1);
 
-    return intval($this->_redis->set(self::ZULU_TRADEWALL_LAST));
+    return intval($this->_redis->get(self::ZULU_TRADEWALL_LAST));
 }
 
 function setTradeWallPrevTimestamp($value) {   // timestamp: int
     $this->_redis->select(1);
 
-    $this->_redis->hSet(self::ZULU_TRADEWALL_LAST, strval($value));
+    $this->_redis->set(self::ZULU_TRADEWALL_LAST, strval($value));
 }
 ```
 
