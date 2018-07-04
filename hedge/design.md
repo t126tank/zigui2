@@ -203,7 +203,7 @@
 # Tradewall - 主处理
 ## 初次处理
 1. 初始化  
-   prevTts = -1  
+   prevTts = 0  
    currTts = time()
 
 1. 获得 currTts 时的List\<TradeInfo> - by crawler
@@ -269,37 +269,38 @@
 /*
  * 1 --- Tradewall
  * 1.1 - Key: ZULU_TRADEWALL_HISTORY
- * 1.2 - Key: ZULU_TRADEWALL_LAST
+ * 1.2 - Key: ZULU_TRADEWALL_PREV
  * 
- * 2 --- Trade
+ * 2 --- Tradeinfo
  * 2.1 - Key: userId:timestamp
  * 2.2 - Key: startup
  */
 /* 1.1 */
-function getTradeWall($field) {   // timestamp: int
+function getHistory($field) {   // timestamp: int
     $this->_redis->select(1);
 
     $value = $this->_redis->hGet(self::ZULU_TRADEWALL_HISTORY, strval($field));
     return unserialize($value); // \DS\Vector<TradeInfo>
 }
 
-function setTradeWall($field, $value) { // timestamp: int, all signals: \DS\Vector<TradeInfo>
+function setHistory($field, $value) { // timestamp: int, all signals: \DS\Vector<TradeInfo>
     $this->_redis->select(1);
 
     $this->_redis->hSet(self::ZULU_TRADEWALL_HISTORY, strval($field), serialize($value));
 }
 
 /* 1.2 */
-function getTradeWallPrevTimestamp() {
+function getPrevTimestamp() {
     $this->_redis->select(1);
 
-    return intval($this->_redis->get(self::ZULU_TRADEWALL_LAST));
+    // needs to convert "nil" to 0 if non-exists
+    return intval($this->_redis->get(self::ZULU_TRADEWALL_PREV));
 }
 
-function setTradeWallPrevTimestamp($value) {   // timestamp: int
+function setPrevTimestamp($value) {   // timestamp: int
     $this->_redis->select(1);
 
-    $this->_redis->set(self::ZULU_TRADEWALL_LAST, strval($value));
+    $this->_redis->set(self::ZULU_TRADEWALL_PREV, strval($value));
 }
 ```
 
