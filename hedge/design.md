@@ -264,6 +264,44 @@
      * id 也存在于 oldTopN Map，从 oldTopN Map 转移该 id 至 curTopN Map
    * id 只存在于 curTopN Map - 从 curTopN Map 转移该 id 至 oldTopN Map (buy <and> sell stacks 不为 EMPTY)
 
+# ZuluRedisDao
+```php
+/*
+ * 1 --- Tradewall
+ * 1.1 - Key: ZULU_TRADEWALL_HISTORY
+ * 1.2 - Key: ZULU_TRADEWALL_LAST
+ * 
+ * 2 --- Trade
+ * 2.1 - Key: userId:timestamp
+ * 2.2 - Key: startup
+ */
+/* 1.1 */
+function getTradeWall($field) {   // timestamp: int
+    $this->_redis->select(1);
+
+    $value = $this->_redis->hGet(self::ZULU_TRADEWALL_HISTORY, strval($field));
+    return unserialize($value); // \DS\Vector<TradeInfo>
+}
+
+function setTradeWall($field, $value) { // timestamp: int, all signals: \DS\Vector<TradeInfo>
+    $this->_redis->select(1);
+
+    $this->_redis->hSet(self::ZULU_TRADEWALL_HISTORY, strval($field), serialize($value));
+}
+
+/* 1.2 */
+function getTradeWallPrevTimestamp() {
+    $this->_redis->select(1);
+
+    return intval($this->_redis->set(self::ZULU_TRADEWALL_LAST));
+}
+
+function setTradeWallPrevTimestamp($value) {   // timestamp: int
+    $this->_redis->select(1);
+
+    $this->_redis->hSet(self::ZULU_TRADEWALL_LAST, strval($value));
+}
+```
 
 # 缩写
  * Tts - Trade Timestamp
@@ -320,49 +358,5 @@
 
 ## https://japan.zulutrade.com/tradewall
 ```html
-<table class="clean signal-providers provider-statistics-minimal" border="0" id="main__ctrl_0__ctrl_1_GvProviders">
-    <tr class="solid">
-        <th scope="col">交易者</th><th scope="col">获利 (点数)</th><th scope="col">投资回报率</th>
-    </tr><tr>
-        <td class="trader">
-                <span id="main__ctrl_0__ctrl_1_GvProviders_LblRank_0">1<sup>#</sup></span>
-                <a href="/trader/334440" target="_self" title="GainsPTWS">GainsPTWS</a>
-            </td><td>23,021</td><td>110%</td>
-    </tr><tr class="alternating-row">
-        <td class="trader">
-                <span id="main__ctrl_0__ctrl_1_GvProviders_LblRank_1">2<sup>#</sup></span>
-                <a href="/trader/363099" target="_self" title="Allalgar">Allalgar</a>
-            </td><td>4,101</td><td>353%</td>
-    </tr><tr>
-        <td class="trader">
-                <span id="main__ctrl_0__ctrl_1_GvProviders_LblRank_2">3<sup>#</sup></span>
-                <a href="/trader/317418" target="_self" title="Zlatanic">Zlatanic</a>
-            </td><td>284,771</td><td>198%</td>
-    </tr><tr class="alternating-row">
-        <td class="trader">
-                <span id="main__ctrl_0__ctrl_1_GvProviders_LblRank_3">4<sup>#</sup></span>
-                <a href="/trader/327595" target="_self" title="Teratornis">Teratornis</a>
-            </td><td>2,436</td><td>155%</td>
-    </tr><tr>
-        <td class="trader">
-                <span id="main__ctrl_0__ctrl_1_GvProviders_LblRank_4">5<sup>#</sup></span>
-                <a href="/trader/363769" target="_self" title="Torus001">Torus001</a>
-            </td><td>3,007</td><td>135%</td>
-    </tr><tr class="alternating-row">
-        <td class="trader">
-                <span id="main__ctrl_0__ctrl_1_GvProviders_LblRank_5">6<sup>#</sup></span>
-                <a href="/trader/342249" target="_self" title="rydwaves">rydwaves</a>
-            </td><td>19,947</td><td>178%</td>
-    </tr><tr>
-        <td class="trader">
-                <span id="main__ctrl_0__ctrl_1_GvProviders_LblRank_6">7<sup>#</sup></span>
-                <a href="/trader/318994" target="_self" title="6SmashFX">6SmashFX</a>
-            </td><td>306,103</td><td>215%</td>
-    </tr><tr class="alternating-row">
-        <td class="trader">
-                <span id="main__ctrl_0__ctrl_1_GvProviders_LblRank_7">8<sup>#</sup></span>
-                <a href="/trader/369867" target="_self" title="QuantMaker">QuantMaker</a>
-            </td><td>1,505</td><td>719%</td>
-    </tr>
-</table>
+TBD
 ```
