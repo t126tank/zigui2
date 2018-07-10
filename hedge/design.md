@@ -253,10 +253,11 @@
    从 curTopN <id> List 生成 curTopN Map  
    ※ id 对应的 status(Map) 初始化
 1. oldTopN Map 设空
+1. 保存 curTopN Map and oldTopN Map - in redis <serialize()>
 
 ## 第X+1次
 1. 获得 curTopN <id> List - by crawler
-1. 获得 第X次的 curTopN Map
+1. 获得 第X次的 curTopN Map 及 oldTopN Map - from redis <unserialize()>
 1. 比较 curTopN <id> List 和 curTopN Map
    * id 同时存在 - curTopN Map 及 oldTopN 均无需更新
    * id 只存在于 curTopN <id> List
@@ -265,15 +266,19 @@
    * id 只存在于 curTopN Map - 从 curTopN Map 转移该 id 至 oldTopN Map (buy <and> sell stacks 不为 EMPTY)
 
 # ZuluRedisDao
+## http://redis.shibu.jp/commandreference/
+## https://redis.io/commands
+## http://sandbox.onlinephpfunctions.com/
+
 ```php
 /*
  * 1 --- Tradewall
  * 1.1 - Key: ZULU_TRADEWALL_HISTORY
  * 1.2 - Key: ZULU_TRADEWALL_PREV
  * 
- * 2 --- Tradeinfo
- * 2.1 - Key: userId:timestamp
- * 2.2 - Key: startup
+ * 2 --- TopN2
+ * 2.1 - Key: ZULU_TRADEWALL_TOP: CUR
+ * 2.2 - Key: ZULU_TRADEWALL_TOP: OLD
  */
 /* 1.1 */
 function getHistory($field) {   // timestamp: int
@@ -302,6 +307,35 @@ function setPrevTimestamp($value) {   // timestamp: int
 
     $this->_redis->set(self::ZULU_TRADEWALL_PREV, strval($value));
 }
+
+/* 2.1 */
+function getCurTopN() {   // \DS\Map
+    $this->_redis->select(2);
+
+    $value = $this->_redis->hGet(self::ZULU_TRADEWALL_TOP, self::CUR);
+    return unserialize($value); // \DS\Map<id, status>
+}
+
+function setCurTopN($value) { // \DS\Map<id, status>
+    $this->_redis->select(2);
+
+    $this->_redis->hSet(self::ZULU_TRADEWALL_TOP, self::CUR, serialize($value));
+}
+
+/* 2.2 */
+function getOldTopN() {   // \DS\Map
+    $this->_redis->select(2);
+
+    $value = $this->_redis->hGet(self::ZULU_TRADEWALL_TOP, self::OLD);
+    return unserialize($value); // \DS\Map<id, status>
+}
+
+function setOldTopN($value) { // \DS\Map<id, status>
+    $this->_redis->select(2);
+
+    $this->_redis->hSet(self::ZULU_TRADEWALL_TOP, self::OLD, serialize($value));
+}
+
 ```
 
 # 缩写
