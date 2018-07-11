@@ -12,36 +12,22 @@ require_once __DIR__ . '/tradeMgr.php';
 $currTts = time();
 $prevTts = $dao->getPrevTimestamp();
 
-// TopN2Mgr 获取当前时刻的 curTopN <id> List
+// TopN2Mgr 获取当前时刻的 curTopN <id> List 并更新  TopN2
 $topN2Mgr = TopN2Mgr::getMgr();
-$topN2Mgr->fetchCurTopN($currTts);
+$topN2Mgr->updateTopN2($prevTts);
 
 // TradeMgr 获取当前时刻的 List<TradeInfo>
 $tradeMgr = TradeMgr::getMgr();
-$tradeMgr->fetchCurTradeInfoList($currTts);
+$tradeMgr->updateTradeInfoList($prevTts, $currTts);
 
-// 初次处理
-if ($preTts == 0) {
+// 判断是否有新的交易信息
+if (NULL != $tradeMgr->hasNewInfo()) {
 
-} else {
+  // 保存当次 Trade 的 timestamp
+  $dao->setPrevTimestamp($currTts);
 }
 
-//Enter your code here, enjoy!
-
-$array = array("1" => "PHP code tester Sandbox Online",  
-              "foo" => "bar", 5 , 5 => 89009, 
-              "case" => "Random Stuff: " . rand(100,999),
-              "PHP Version" => phpversion()
-              );
-              
-foreach( $array as $key => $value ){
-    echo $key."\t=>\t".$value."\n";
-}
-
-    // 保存当次 Trade 的 timestamp
-    $dao->setPrevTimestamp($currTts);
-
-    // uninitialization
-    unset(TopN2Mgr::getMgr());
-    unset(TradeMgr::getMgr());
+// uninitialization
+unset(TopN2Mgr::getMgr());
+unset(TradeMgr::getMgr());
 ?>

@@ -1,34 +1,70 @@
 <?php
-    // ※ 预先保存初始 Tts 于 Redis: set(ZULU_TRADEWALL_PREV, "0")
-    // 分别获取当前以及前一时刻 Trade 的 timestamp
-    $currTts = time();
-    $prevTts = $dao->getPrevTimestamp();
+error_reporting(E_ALL);
+ini_set("display_errors", 1);
 
-    // TopN2Mgr 获取当前时刻的 curTopN <id> List
-    $topN2Mgr->fetchCurTopN($currTts);
+require_once __DIR__ . '/RedisDao.php';
+require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__ . '/Client.php';
+require_once __DIR__ . '/TradeInfo.php';
 
-    // TradeMgr 获取当前时刻的 List<TradeInfo>
-    $tradeMgr->fetchCurTradeInfoList($currTts);
+use Goutte\Client;
+// use DS\Map;
+// use DS\Vector;
 
-    // 初次处理
-    if ($preTts == 0) {
+/*
+ *  Singleton classes
+*/
+class TopN2Mgr {
+  private $_newTradeInfoList = NULL;
+  private $_oldTopN = NULL;
+  private $_dao = NULL;
+  private $_client = NULL;
+  // _mgr instance
+  private static $_mgr = NULL;
 
-    } else {
+  private function __construct() {
+    $this->_dao = new RedisDao();
+    $this->_client = new Client();
+  }
+
+  function __destruct() {
+    unset($this->_newTradeInfoList);
+    unset($this->_curTopN);
+    unset($this->_dao);
+    unset($this->_client);
+
+    // flock($this->handle, LOCK_UN);
+    // fclose($this->handle);
+    // echo 'ファイルを閉じて終了します。'.PHP_EOL;
+  }
+
+  static function getMgr() {
+    if (NULL == self::$_mgr) {
+      self::$_mgr = new TopN2Mgr();
     }
-public fetchCurTradeInfoList($ts) {
-}
-//Enter your code here, enjoy!
+    return self::$_mgr;
+  }
 
-$array = array("1" => "PHP code tester Sandbox Online",  
-              "foo" => "bar", 5 , 5 => 89009, 
-              "case" => "Random Stuff: " . rand(100,999),
-              "PHP Version" => phpversion()
-              );
-              
-foreach( $array as $key => $value ){
-    echo $key."\t=>\t".$value."\n";
-}
+  function updateTradeInfoList($ts, $cur) {
+    $tmp = array(5 => 1, 12 => 2);
+    $prevTradeInfoList = NULL;
+    // 初次处理
+    if ($ts == 0) {
+      // 从网页或 WebAPI 获取最新交易信息, pageId = 1,2,3
+      $this->_client->crawler();
+      $this->_newTradeInfoList = new \Ds\Vector();
+    } else {
+      // 从网页或 WebAPI 获取最新交易信息, 如果当前pageId无最新，pageIdMax = 3
+      $this->_client->crawler();
+      $prevTradeInfoList = $this->_dao->getHistory($ts);
+    }
 
-    // 保存当次 Trade 的 timestamp
-    $dao->setPrevTimestamp($currTts);
+    if (NULL != $this->_newTradeInfoList)
+      $this->_dao->setHistory($cur, $this->_newTradeInfoList);
+  }
+
+  function getNewTradeInfoList() {
+    return $this->_newTradeInfoList;
+  }
+}
 ?>
