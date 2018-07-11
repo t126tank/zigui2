@@ -16,7 +16,6 @@ use Goutte\Client;
 */
 class TopN2Mgr {
   private $_newTradeInfoList = NULL;
-  private $_oldTopN = NULL;
   private $_dao = NULL;
   private $_client = NULL;
   // _mgr instance
@@ -28,8 +27,8 @@ class TopN2Mgr {
   }
 
   function __destruct() {
+    $this->_newTradeInfoList->clear();
     unset($this->_newTradeInfoList);
-    unset($this->_curTopN);
     unset($this->_dao);
     unset($this->_client);
 
@@ -46,25 +45,81 @@ class TopN2Mgr {
   }
 
   function updateTradeInfoList($ts, $cur) {
-    $tmp = array(5 => 1, 12 => 2);
-    $prevTradeInfoList = NULL;
+    $pageIdMax = 3;
+
+    $tmpArr = array();
+    $tmp["id"] = "id1";
+    $tmp["pair"]= "usd/jpy";
+    $tmp["op"]= "sell";
+    $tmp["price"] = 110.34;
+    $tmp["pl"] = -99999;
+    $tmpArr[] = $tmp;
+
+    $tmp["id"] = "id1";
+    $tmp["pair"] = "eur/jpy";
+    $tmp["op"]= "sell";
+    $tmpArr[] = $tmp;
+
+    $tmp["id"] = "id2";
+    $tmp["pair"] = "eur/jpy";
+    $tmp["op"]= "buy";
+    $tmp["pl"] = 1.223;
+    $tmpArr[] = $tmp;
+
     // 初次处理
     if ($ts == 0) {
       // 从网页或 WebAPI 获取最新交易信息, pageId = 1,2,3
-      $this->_client->crawler();
+      $this->_client->crawler(1, 2, 3);
       $this->_newTradeInfoList = new \Ds\Vector();
+      $this->_newTradeInfoList->push(...$tmpArr);
     } else {
-      // 从网页或 WebAPI 获取最新交易信息, 如果当前pageId无最新，pageIdMax = 3
-      $this->_client->crawler();
       $prevTradeInfoList = $this->_dao->getHistory($ts);
-    }
+      $newList = new \DS\Vector();
+      $tmpVec = new \DS\Vector();
 
-    if (NULL != $this->_newTradeInfoList)
-      $this->_dao->setHistory($cur, $this->_newTradeInfoList);
+      // 从网页或 WebAPI 获取最新交易信息, 如果当前pageId无最新，pageIdMax = 3
+      // TODO: 存在丢失信号的风险
+      while ($pageIdMax--) {
+        $tmpVec->clear();
+
+        $this->_client->crawler(3 - $pageIdMax);
+        $tmpVec->push(...$tmpArr);
+        $newList->push(...$tmpArr);
+
+        // 判断同前次是否有重叠
+        if (isPrevListHasNew($prevTradeInfoList, $tmpVec))  break; // 有重叠
+      }
+
+      $tmpVec->clear();
+      unset($tmpVec);
+
+      // 过滤掉重叠部分
+      $newList->filter(function($info) use ($prevTradeInfoList) {
+        return !$prevTradeInfoList->contains($info);
+      });
+
+      // 全部重叠 - 无实际最新交易信息
+      if ($newList->isEmpty()) {
+        unset($newList);
+        // $this->_newTradeInfoList = NULL;
+        return;
+      }
+
+      $this->_newTradeInfoList = $newList;
+    }
+    $this->_dao->setHistory($cur, $this->_newTradeInfoList);
   }
 
   function getNewTradeInfoList() {
     return $this->_newTradeInfoList;
+  }
+
+  private function isPrevListHasNew($prevVec, $newVec) {
+    foreach ($newVec as $info)
+      // 有重叠
+      if ($prevVec->contains($info)) return true;
+
+    return false;
   }
 }
 ?>
