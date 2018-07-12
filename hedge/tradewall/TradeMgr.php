@@ -8,8 +8,8 @@ require_once __DIR__ . '/Client.php';
 require_once __DIR__ . '/TradeInfo.php';
 
 use Goutte\Client;
-// use DS\Map;
-// use DS\Vector;
+// use Ds\Map;
+// use Ds\Vector;
 
 /*
  *  Singleton classes
@@ -27,8 +27,10 @@ class TopN2Mgr {
   }
 
   function __destruct() {
-    $this->_newTradeInfoList->clear();
-    unset($this->_newTradeInfoList);
+    if (NULL != $this->_newTradeInfoList) {
+      $this->_newTradeInfoList->clear();
+      unset($this->_newTradeInfoList);
+    }
     unset($this->_dao);
     unset($this->_client);
 
@@ -44,7 +46,8 @@ class TopN2Mgr {
     return self::$_mgr;
   }
 
-  function updateTradeInfoList($ts, $cur) {
+  function updateTradeInfoList() {
+    $prev = $this->_dao->getPrevTimestamp();
     $pageIdMax = 3;
 
     $tmpArr = array();
@@ -67,18 +70,18 @@ class TopN2Mgr {
     $tmpArr[] = $tmp;
 
     // 初次处理
-    if ($ts == 0) {
+    if ($prev == 0) {
       // 从网页或 WebAPI 获取最新交易信息, pageId = 1,2,3
       $this->_client->crawler(1, 2, 3);
       $this->_newTradeInfoList = new \Ds\Vector();
       $this->_newTradeInfoList->push(...$tmpArr);
     } else {
-      $prevTradeInfoList = $this->_dao->getHistory($ts);
-      $newList = new \DS\Vector();
-      $tmpVec = new \DS\Vector();
+      $prevTradeInfoList = $this->_dao->getHistory($prev);
+      $newList = new \Ds\Vector();
+      $tmpVec = new \Ds\Vector();
 
       // 从网页或 WebAPI 获取最新交易信息, 如果当前pageId无最新，pageIdMax = 3
-      // TODO: 存在丢失信号的风险
+      // TODO: 存在丢失信号的风险 tolerance
       while ($pageIdMax--) {
         $tmpVec->clear();
 
@@ -107,7 +110,11 @@ class TopN2Mgr {
 
       $this->_newTradeInfoList = $newList;
     }
-    $this->_dao->setHistory($cur, $this->_newTradeInfoList);
+
+    // 保存当次交易 的 timestamp 及 最新交易信息
+    $curr = time();
+    $this->_dao->setPrevTimestamp($curr);
+    $this->_dao->setHistory($curr, $this->_newTradeInfoList);
   }
 
   function getNewTradeInfoList() {

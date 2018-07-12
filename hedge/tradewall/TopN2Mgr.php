@@ -5,9 +5,10 @@ ini_set("display_errors", 1);
 require_once __DIR__ . '/RedisDao.php';
 require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/Client.php';
+require_once __DIR__ . '/TradeInfo.php';
 
 use Goutte\Client;
-// use DS\Map;
+// use Ds\Map;
 
 /*
  *  Singleton classes
@@ -43,25 +44,50 @@ class TopN2Mgr {
     return self::$_mgr;
   }
 
-  function updateTopN2($ts) {
-    // 从网页或 WebAPI 获取最新排行榜
+  function updateTopN2() {
+    // 从网页或 WebAPI 获取最新排行榜 - curTopN <id> List
     $this->_client->crawler();
+    $newTopVec = new \Ds\Vector();
+    $newTopVec->push(...["id1", "id2", "id3"]); // trim()
+
+    // 准备新的 TopN
+    $curTopN = new \Ds\Map();
+
+    // prepare status of Map<pair, state> for each id
+    foreach ($newTopVec as $id) {
+      $status = new \Ds\Map();
+      $curTopN->put($id, $status);
+    }
 
     // 初次处理
-    if ($ts == 0) {
-      $this->_curTopN = new \Ds\Map();
-      $this->_oldTopN = new \Ds\Map();
+    if ($this->_dao->getPrevTimestamp() == 0) {
+      $oldTopN = new \Ds\Map();
     } else {
-      $this->_curTopN = $this->_dao->getCurTopN();
-      $this->_oldTopN = $this->_dao->getOldTopN();
+      // 从 Redis 取得 TopN2
+      $curTopN = $this->_dao->getCurTopN();
+      $oldTopN = $this->_dao->getOldTopN();
     }
+
+    // 更新 TopN2
+    $this->_curTopN = $curTopN;
+    $this->_oldTopN = $oldTopN;
   }
 
-  function getCurTopN() {
+  function saveTopN2() {
+    $this->_dao->setCurTopN($this->_curTopN);
+    $this->_dao->setOldTopN($this->_oldTopN);
+  }
+
+  public function filterTradeInfo(TradeInfo $info) {
+    $rtn = false;
+
+    return $rtn;
+  }
+  private function getCurTopN() {
     return $this->_curTopN;
   }
 
-  function getOldTopN() {
+  private function getOldTopN() {
     return $this->_oldTopN;
   }
 }
