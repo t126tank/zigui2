@@ -4,8 +4,8 @@ ini_set("display_errors", 1);
 
 require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/Client.php';
-require_once __DIR__ . '/topN2Mgr.php';
-require_once __DIR__ . '/tradeMgr.php';
+require_once __DIR__ . '/TopN2Mgr.php';
+require_once __DIR__ . '/TradeMgr.php';
 
 // ※ 预先保存初始 Tts 于 Redis: set(ZULU_TRADEWALL_PREV, "0")
 
@@ -21,8 +21,8 @@ $tradeMgr->updateTradeInfoList();
 if (NULL != $tradeMgr->getNewTradeInfoList()) {
 
   // 对当前最新交易信息按 TopN2 进行过滤
-  $toPublish = $tradeMgr->getNewTradeInfoList()->copy();
-  $toPublish->filter(function ($info) use ($topN2Mgr) {
+  $toPublish = new \Ds\Vector($tradeMgr->getNewTradeInfoList()); // Due to copy() is shallow copy
+  $toPublish->filter(function ($info) use ($topN2Mgr) {  // TODO: &$topN2Mgr ? 
     return $topN2Mgr->filterTradeInfo($info);
   });
 
@@ -31,12 +31,13 @@ if (NULL != $tradeMgr->getNewTradeInfoList()) {
 
     // Publish
   }
+  unset($toPublish);
 }
 
-// 保存 TopN2 (in Redis)
+// 保存 TopN2 (into Redis)
 $topN2Mgr->saveTopN2();
 
 // uninit
-unset(TopN2Mgr::getMgr());
-unset(TradeMgr::getMgr());
+unset($topN2Mgr);
+unset($tradeMgr);
 ?>

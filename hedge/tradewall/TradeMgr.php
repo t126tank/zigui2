@@ -14,7 +14,7 @@ use Goutte\Client;
 /*
  *  Singleton classes
 */
-class TopN2Mgr {
+class TradeMgr {
   private $_newTradeInfoList = NULL;
   private $_dao = NULL;
   private $_client = NULL;
@@ -41,7 +41,7 @@ class TopN2Mgr {
 
   static function getMgr() {
     if (NULL == self::$_mgr) {
-      self::$_mgr = new TopN2Mgr();
+      self::$_mgr = new TradeMgr();
     }
     return self::$_mgr;
   }
