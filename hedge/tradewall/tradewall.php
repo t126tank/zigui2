@@ -61,7 +61,7 @@ foreach ($jsonArr as $v) {
    $tradwallArr[] = $obj;
 }
 
-echo json_encode($tradwallArr);
+echo json_encode($tradwallArr, JSON_UNESCAPED_UNICODE);
 
 $length = ob_get_length();
 
