@@ -25,7 +25,7 @@ $opts = array(
                'pageIndex'=> 1,
                'pageSize'=> 20,
                'platform'=>"forex",
-               'providerName'=>NULL
+               'providerName'=>""
             )),
             'header'=>"Host: japan.zulutrade.com\r\n".
                      "User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:61.0) Gecko/20100101 Firefox/61.0\r\n".
@@ -46,22 +46,22 @@ $opts = array(
 $ctx = stream_context_create($opts);
 //$html = file_get_html($tradewall, false, $ctx);
 $jsonObj = file_get_contents($tradewall, false, $ctx);
-echo $jsonObj;
+//echo $jsonObj;
 
 $jsonArr = json_decode($jsonObj, true);
 $jsonArr = $jsonArr['d'];
 //print_r($jsonArr);
 
-$rankArr = array();
+$tradwallArr = array();
 
 foreach ($jsonArr as $v) {
    $obj = array(
-      //'name'=>$v['n'],
+      'trade'=>$v['t'],
       'id'=>$v['pid']);
-   $rankArr[] = $obj;
+   $tradwallArr[] = $obj;
 }
 
-echo json_encode($rankArr);
+echo json_encode($tradwallArr);
 
 $length = ob_get_length();
 
