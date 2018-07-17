@@ -152,26 +152,11 @@ class TopN2Mgr {
     return $rtn;
   }
 
-  private function isTopN2hasId($top2, $id) {
-    foreach ($newVec as $info)
-      // 有重叠
-      if ($prevVec->contains($info)) return true;
-  
-    return false;
-  }
-  private function getCurTopN() {
-    return $this->_curTopN;
-  }
-
-  private function getOldTopN() {
-    return $this->_oldTopN;
-  }
-
   private function isStacksBothEmpty($stacks) {
     return $stacks[TradeOpEnum::BUY]->isEmpty() && $stacks[TradeOpEnum::SELL]->isEmpty();
   }
 
-  private static function opReverse(TradeOpEnum $op) {
+  private function opReverse(TradeOpEnum $op) {
     return $op == TradeOpEnum::BUY? TradeOpEnum::SELL: TradeOpEnum::BUY;
   }
 }
