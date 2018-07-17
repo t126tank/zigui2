@@ -35,7 +35,7 @@ $opts = array(
                      "X-Requested-With: XMLHttpRequest\r\n".
                      //"Content-Length: 130\r\n".
                      "Cookie: zt_Cult=ja; zt_FPBan=1505877354494.12; _ga=GA1.2.1573027694.1503285357; __qca=P0-1796664665-1503285356946; intercom-id-jlr1fm54=472fca3c-d774-4d25-aa83-3441a6b10eb7; _gid=GA1.2.1855047514.1531573422; zt_Ses=ca2bwuatqhuvgy2byx2wit1d; __RequestVerificationToken=12k9a3nXzityxX0RnW6CAqwgwY7iXbO6oIiTguAD5nHPupcw8itiYcvag8FIOlJvlnCDZV6k4qx96LH2z6VI8ANhyc_bHw-2q3tbmEq7mJ3AGVcLqUkXgRPJbxeHKxW6gcbXWQ2; _hjIncludedInSample=1; zt_Perf=%7B%22SortExpression%22%3A%22Ranking%22%2C%22SortDirection%22%3A%22Ascending%22%2C%22TimeFrame%22%3A10000%7D; _gat=1\r\n".
-                     "Connection: keep-alive\r\n".
+                     //"Connection: keep-alive\r\n".
                      "Cache-Control: max-age=0\r\n"
          )
 );
@@ -43,6 +43,7 @@ $opts = array(
 // print_r($opts);
 $ctx = stream_context_create($opts);
 //$html = file_get_html($providers, false, $ctx);
+
 $jsonObj = file_get_contents($providers, false, $ctx);
 //echo $jsonObj;
 
@@ -53,10 +54,13 @@ $jsonArr = $jsonArr['d'];
 $rankArr = array();
 
 foreach ($jsonArr as $v) {
+   /*
    $obj = array(
       'name'=>$v['n'],
       'id'=>$v['id']);
    $rankArr[] = $obj;
+   */
+   $rankArr[] = $v['id'];
    if (--$num == 0) break;
 }
 
