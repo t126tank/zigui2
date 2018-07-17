@@ -2,10 +2,10 @@
 
 //include('../dom/simple_html_dom.php');
 
-$num = 10;
-if (isset($_GET["num"]) && is_numeric($_GET["num"])) {
-   $tmp = abs(intval($_GET["num"]));
-   $num = ($tmp == 0)? $num: ($tmp > 50 ? 50: $tmp);
+$idx = 1;
+if (isset($_GET["idx"]) && is_numeric($_GET["idx"])) {
+   $tmp = abs(intval($_GET["idx"]));
+   $idx = ($tmp == 0)? $idx: ($tmp > 3 ? 3: $tmp);
 }
 
 ob_start();
@@ -22,8 +22,8 @@ $opts = array(
                'displayStatusMessages'=> true,
                'minutesAgo'=>	288000000,
                'onlyFollowedByMe'=>	false,
-               'pageIndex'=> 1,
-               'pageSize'=> 20,
+               'pageIndex'=> $idx,
+               'pageSize'=> 33,
                'platform'=>"forex",
                'providerName'=>""
             )),
@@ -37,8 +37,8 @@ $opts = array(
                      "X-RequestVerificationToken:MoUvRVqejIsTwO8CmFjfdCJmo_dnS6qGX5uRV4XYec8MGI4Wldi0PwehDizeXylKdHgDFsbnNSGg7BLTU7TgnGPKmck3HTfYzLLWERTvKPlC67izrTPDz5x4QbnnL2YWSC14FA2\r\n".
                      "X-Requested-With: XMLHttpRequest\r\n".
                      //"Content-Length: 230\r\n".
-                     "Cookie: zt_Cult=ja; zt_FPBan=1505877354494.12; _ga=GA1.2.1573027694.1503285357; __qca=P0-1796664665-1503285356946; intercom-id-jlr1fm54=472fca3c-d774-4d25-aa83-3441a6b10eb7; _gid=GA1.2.1855047514.1531573422; zt_Ses=ca2bwuatqhuvgy2byx2wit1d; __RequestVerificationToken=12k9a3nXzityxX0RnW6CAqwgwY7iXbO6oIiTguAD5nHPupcw8itiYcvag8FIOlJvlnCDZV6k4qx96LH2z6VI8ANhyc_bHw-2q3tbmEq7mJ3AGVcLqUkXgRPJbxeHKxW6gcbXWQ2; _hjIncludedInSample=1; zt_Perf=%7B%22SortExpression%22%3A%22Ranking%22%2C%22SortDirection%22%3A%22Ascending%22%2C%22TimeFrame%22%3A10000%7D; _gat=1\r\n".
-                     "Connection: keep-alive\r\n"
+                     //"Connection: keep-alive\r\n".
+                     "Cookie: zt_Cult=ja; zt_FPBan=1505877354494.12; _ga=GA1.2.1573027694.1503285357; __qca=P0-1796664665-1503285356946; intercom-id-jlr1fm54=472fca3c-d774-4d25-aa83-3441a6b10eb7; _gid=GA1.2.1855047514.1531573422; zt_Ses=ca2bwuatqhuvgy2byx2wit1d; __RequestVerificationToken=12k9a3nXzityxX0RnW6CAqwgwY7iXbO6oIiTguAD5nHPupcw8itiYcvag8FIOlJvlnCDZV6k4qx96LH2z6VI8ANhyc_bHw-2q3tbmEq7mJ3AGVcLqUkXgRPJbxeHKxW6gcbXWQ2; _hjIncludedInSample=1; zt_Perf=%7B%22SortExpression%22%3A%22Ranking%22%2C%22SortDirection%22%3A%22Ascending%22%2C%22TimeFrame%22%3A10000%7D; _gat=1\r\n"
          )
 );
 
@@ -55,9 +55,16 @@ $jsonArr = $jsonArr['d'];
 $tradwallArr = array();
 
 foreach ($jsonArr as $v) {
+   $op = strpos($v['t'], 'BUY') !== false? 'BUY': 'SELL';
+   $state = strpos($v['t'], 'PnL') !== false? 'CLOSED': 'OPEN';
    $obj = array(
-      'trade'=>$v['t'],
-      'id'=>$v['pid']);
+      'id'=>strval($v['pid']),
+      'pl'=>$v['pnl'],
+      'price'=>$v['pr'],
+      'op'=>$op,
+      'state'=>$state,
+      'pair'=>$v['cun']
+   );
    $tradwallArr[] = $obj;
 }
 
