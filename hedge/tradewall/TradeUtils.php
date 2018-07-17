@@ -23,7 +23,14 @@ class TradeCrawler {
   }
 
   public static function getTradewall($idx) {
-    return self::getApiData(self::TRADEWALL . $idx);
+    $infos = array();
+
+    $jsonArray = self::getApiData(self::TRADEWALL . $num);
+    foreach ($jsonArray as $info) {
+      $infos[] = new TradeInfo($info);
+    }
+
+    return $infos;
   }
 
   private static function getApiData($url) {
