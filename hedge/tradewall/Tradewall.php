@@ -18,7 +18,7 @@ $tradeMgr->updateTradeInfoList();
 
 // 对当前最新交易信息按 TopN2 进行过滤
 $toPublish = new \Ds\Vector($tradeMgr->getNewTradeInfoList()); // Due to copy() is shallow copy
-$toPublish->filter(function ($info) use ($topN2Mgr) {  // TODO: &$topN2Mgr ?
+$toPublish = $toPublish->filter(function ($info) use ($topN2Mgr) {  // TODO: &$topN2Mgr ?
   return $topN2Mgr->filterTradeInfo($info);
 });
 

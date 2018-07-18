@@ -3,12 +3,8 @@ error_reporting(E_ALL);
 ini_set("display_errors", 1);
 
 require_once __DIR__ . '/RedisDao.php';
-require_once __DIR__ . '/vendor/autoload.php';
-require_once __DIR__ . '/Client.php';
+require_once __DIR__ . '/TradeUtils.php';
 require_once __DIR__ . '/TradeInfo.php';
-
-use Goutte\Client;
-// use Ds\Map;
 
 /*
  *  Singleton classes
@@ -17,24 +13,17 @@ class TopN2Mgr {
   private $_curTopN = NULL;
   private $_oldTopN = NULL;
   private $_dao = NULL;
-  private $_client = NULL;
   // _mgr instance
   private static $_mgr = NULL;
 
   private function __construct() {
     $this->_dao = new RedisDao();
-    $this->_client = new Client();
   }
 
   function __destruct() {
     unset($this->_curTopN);
     unset($this->_curTopN);
     unset($this->_dao);
-    unset($this->_client);
-
-    // flock($this->handle, LOCK_UN);
-    // fclose($this->handle);
-    // echo 'ファイルを閉じて終了します。'.PHP_EOL;
   }
 
   static function getMgr() {
@@ -46,9 +35,10 @@ class TopN2Mgr {
 
   function updateTopN2() {
     // 从网页或 WebAPI 获取最新排行榜 - curTopN <id> List
-    $this->_client->crawler();
+    $ids = TradeUtils::getRank(10);
+
     $newTopVec = new \Ds\Vector();
-    $newTopVec->push(...["id1", "id2", "id3"]); // trim()
+    $newTopVec->push(...$ids);
 
     // 初次处理
     if ($this->_dao->getPrevTimestamp() == 0) {

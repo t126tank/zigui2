@@ -6,6 +6,7 @@ require_once __DIR__ . '/TradeUtils.php';
 
 class TradeInfo {
   private $_id = NULL;
+  private $_tid = NULL;
   private $_pair = NULL;
   private $_price = 0.0;
   private $_pl = 0.0;
@@ -15,13 +16,18 @@ class TradeInfo {
 
   public function __construct($info) {
     $this->_id = trim($info['id']);
+    $this->_tid = trim($info['tid']);
     $this->_pair = strtoupper(trim($info['pair']));
     $this->_price = $info['price'];
     $this->_pl = $info['pl'];
-    $this->_op = strcasecmp(trim($info['op']), TradeOpEnum::BUY) == 0? TradeOpEum::BUY: TradeOpEnum::SELL;
+    $this->_op = strcasecmp(trim($info['op']), TradeOpEnum::BUY) == 0? TradeOpEnum::BUY: TradeOpEnum::SELL;
     $this->_state = strcasecmp(trim($info['state']), TradeStateEnum::OPEN) == 0? TradeStateEnum::OPEN: TradeStateEnum::CLOSED;
     // $this->_ts = $info['ts'];
-    $this->_ts = time();
+    // $this->_ts = time();
+  }
+
+  public function equals(TradeInfo $info) {
+    return ($this->_tid == $info->getTid()) && ($this->_op == $info->getOp())
   }
 
   public function __destruct() {
@@ -31,6 +37,10 @@ class TradeInfo {
 
   public function getId() {
     return $this->_id;
+  }
+
+  public function getTid() {
+    return $this->_tid;
   }
 
   public function getPair() {

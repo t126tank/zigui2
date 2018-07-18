@@ -36,13 +36,13 @@ class TradeMgr {
 
   function updateTradeInfoList() {
     $prev = $this->_dao->getPrevTimestamp();
-    $pageIdMax = 3;
 
     // 初次处理
     if ($prev == 0) {
       // 从网页或 WebAPI 获取最新交易信息, pageId = 1,2,3
       $this->_newTradeInfoList = new \Ds\Vector();
 
+      $pageIdMax = 3;
       while ($pageIdMax--) {
         $tmpArr = TradeCrawler::getTradewall(3 - $pageIdMax);
         $this->_newTradeInfoList->push(...$tmpArr);
@@ -54,15 +54,16 @@ class TradeMgr {
 
       // 从网页或 WebAPI 获取最新交易信息, 如果当前pageId无最新，pageIdMax = 3
       // TODO: 存在丢失信号的风险 tolerance
+      $pageIdMax = 8; // max = 8 * 100
       while ($pageIdMax--) {
         $tmpVec->clear();
 
-        $tmpArr = TradeCrawler::getTradewall(3 - $pageIdMax);
+        $tmpArr = TradeCrawler::getTradewall(10 - $pageIdMax);
         $tmpVec->push(...$tmpArr);
         $newList->push(...$tmpArr);
 
         // 判断同前次是否有重叠
-        if ($this->isPrevListHasNew($prevTradeInfoVec, $tmpVec)) 
+        if ($this->isPrevListHasNew($prevTradeInfoVec, $tmpVec))
           break; // 有重叠
       }
 
@@ -70,7 +71,7 @@ class TradeMgr {
       unset($tmpVec);
 
       // 过滤掉重叠部分
-      $newList->filter(function($info) use ($prevTradeInfoVec) {
+      $newList = $newList->filter(function($info) use ($prevTradeInfoVec) {
         return !$prevTradeInfoVec->contains($info);
       });
 

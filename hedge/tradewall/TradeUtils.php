@@ -25,8 +25,11 @@ class TradeCrawler {
   public static function getTradewall($idx) {
     $infos = array();
 
-    $jsonArray = self::getApiData(self::TRADEWALL . $num);
-    foreach ($jsonArray as $info) {
+    $jsonArr = self::getApiData(self::TRADEWALL . $idx);
+    foreach ($jsonArr as $info) {
+      if (empty($info['tid']) || $info['price'] == 0 || $info['pair'] == NULL)
+        break;
+
       $infos[] = new TradeInfo($info);
     }
 
