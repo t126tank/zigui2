@@ -27,7 +27,7 @@ class TradeInfo {
   }
 
   public function equals(TradeInfo $info) {
-    return ($this->_tid == $info->getTid()) && ($this->_op == $info->getOp())
+    return ($this->_tid == $info->getTid()) && ($this->_op == $info->getOp());
   }
 
   public function __destruct() {
