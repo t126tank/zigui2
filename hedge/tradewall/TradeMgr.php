@@ -52,18 +52,24 @@ class TradeMgr {
       $newList = new \Ds\Vector();
       $tmpVec = new \Ds\Vector();
 
-      // 从网页或 WebAPI 获取最新交易信息, 如果当前pageId无最新，pageIdMax = 3
+      // 从网页或 WebAPI 获取最新交易信息, 如果当前pageId无最新，pageIdMax = 8
       // TODO: 存在丢失信号的风险 tolerance
       $pageIdMax = 8; // max = 8 * 100
       while ($pageIdMax--) {
         $tmpVec->clear();
 
-        $tmpArr = TradeCrawler::getTradewall(10 - $pageIdMax);
+        $tmpArr = TradeCrawler::getTradewall(8 - $pageIdMax);
         $tmpVec->push(...$tmpArr);
         $newList->push(...$tmpArr);
 
         // 判断同前次是否有重叠
-        if ($this->isPrevListHasNew($prevTradeInfoVec, $tmpVec))
+        if (!$tmpVec->filter(function($info) use ($prevTradeInfoVec) {
+            foreach ($prevTradeInfoVec as $v)
+              if ($info->equals($v))
+                return true;
+
+            return false;
+          })->isEmpty())
           break; // 有重叠
       }
 
@@ -72,7 +78,11 @@ class TradeMgr {
 
       // 过滤掉重叠部分
       $newList = $newList->filter(function($info) use ($prevTradeInfoVec) {
-        return !$prevTradeInfoVec->contains($info);
+        foreach ($prevTradeInfoVec as $v)
+          if ($info->equals($v))
+            return false; // if exists, drop
+
+        return true;
       });
 
       // 全部重叠 - 无实际最新交易信息
@@ -93,14 +103,6 @@ class TradeMgr {
 
   public function getNewTradeInfoList() {
     return $this->_newTradeInfoList;
-  }
-
-  private function isPrevListHasNew($prevVec, $newVec) {
-    foreach ($newVec as $info)
-      if ($prevVec->contains($info))  // 有重叠
-        return true;
-
-    return false;
   }
 }
 ?>
