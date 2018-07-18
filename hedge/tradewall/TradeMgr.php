@@ -85,8 +85,24 @@ class TradeMgr {
         return true;
       });
 
+      // 从前次过滤掉重叠部分后再判断同"前前"次是否有重叠
+      $prev2 = $this->_dao->getPrevTimestamp2();
+      $hasNew = true;
+      if ($prev2 != 0 && !$newList->isEmpty()) {
+        $prevTradeInfoVec2 = $this->_dao->getHistory($prev2);
+
+        if (!$newList->filter(function($info) use ($prevTradeInfoVec2) {
+            foreach ($prevTradeInfoVec2 as $v)
+              if ($info->equals($v))
+                return true;
+
+            return false;
+          })->isEmpty())
+          $hasNew = false; // 若同"前前"次也有重叠，无实际最新交易信息
+      }
+
       // 全部重叠 - 无实际最新交易信息
-      if ($newList->isEmpty()) {
+      if ($newList->isEmpty() || !$hasNew) {
         unset($newList);
         // $this->_newTradeInfoList = NULL;
         return;
@@ -97,6 +113,7 @@ class TradeMgr {
 
     // 保存当次交易 的 timestamp 及 最新交易信息
     $curr = time();
+    $this->_dao->setPrevTimestamp2($prev);
     $this->_dao->setPrevTimestamp($curr);
     $this->_dao->setHistory($curr, $this->_newTradeInfoList);
   }
