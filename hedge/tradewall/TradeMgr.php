@@ -63,13 +63,7 @@ class TradeMgr {
         $newList->push(...$tmpArr);
 
         // 判断同前次是否有重叠
-        if (!$tmpVec->filter(function($info) use ($prevTradeInfoVec) {
-            foreach ($prevTradeInfoVec as $v)
-              if ($info->equals($v))
-                return true;
-
-            return false;
-          })->isEmpty())
+        if (isAhasSameEleInB($tmpVec, $prevTradeInfoVec))
           break; // 有重叠
       }
 
@@ -91,17 +85,11 @@ class TradeMgr {
       if ($prev2 != 0 && !$newList->isEmpty()) {
         $prevTradeInfoVec2 = $this->_dao->getHistory($prev2);
 
-        if (!$newList->filter(function($info) use ($prevTradeInfoVec2) {
-            foreach ($prevTradeInfoVec2 as $v)
-              if ($info->equals($v))
-                return true;
-
-            return false;
-          })->isEmpty())
+        if (isAhasSameEleInB($newList, $prevTradeInfoVec2))
           $hasNew = false; // 若同"前前"次也有重叠，无实际最新交易信息
       }
 
-      // 全部重叠 - 无实际最新交易信息
+      // 全部重叠 或 无实际最新交易信息
       if ($newList->isEmpty() || !$hasNew) {
         unset($newList);
         // $this->_newTradeInfoList = NULL;
@@ -120,6 +108,18 @@ class TradeMgr {
 
   public function getNewTradeInfoList() {
     return $this->_newTradeInfoList;
+  }
+
+  // 判断 A and B 是否有重叠: A 中有元素在B 中(相反不一定成立)
+  public function isAhasSameEleInB(\Ds\Vector $a, \Ds\Vector $b) {
+    return
+    !$a->filter(function($info) use ($b) {
+      foreach ($b as $v)
+        if ($info->equals($v))
+          return true;
+
+      return false;
+    })->isEmpty();
   }
 }
 ?>
