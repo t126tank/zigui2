@@ -63,7 +63,7 @@ class TradeMgr {
         $newList->push(...$tmpArr);
 
         // 判断同前次是否有重叠
-        if (isAhasSameEleInB($tmpVec, $prevTradeInfoVec))
+        if ($this->isAhasSameEleInB($tmpVec, $prevTradeInfoVec))
           break; // 有重叠
       }
 
@@ -85,7 +85,7 @@ class TradeMgr {
       if ($prev2 != 0 && !$newList->isEmpty()) {
         $prevTradeInfoVec2 = $this->_dao->getHistory($prev2);
 
-        if (isAhasSameEleInB($newList, $prevTradeInfoVec2))
+        if ($this->isAhasSameEleInB($newList, $prevTradeInfoVec2))
           $hasNew = false; // 若同"前前"次也有重叠，无实际最新交易信息
       }
 
