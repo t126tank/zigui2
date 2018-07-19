@@ -23,6 +23,7 @@ class TradeInfo implements JsonSerializable {
     $this->_op = strcasecmp(trim($info['op']), TradeOpEnum::BUY) == 0? TradeOpEnum::BUY: TradeOpEnum::SELL;
     $this->_state = strcasecmp(trim($info['state']), TradeStateEnum::OPEN) == 0? TradeStateEnum::OPEN: TradeStateEnum::CLOSED;
     $this->_ts = new DateTime();
+    $this->_ts->setTimeZone(new DateTimeZone('Asia/Tokyo'));
   }
 
   // @Impl JsonSerializable::jsonSerialize()
