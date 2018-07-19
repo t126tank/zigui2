@@ -275,6 +275,7 @@
  * 1 --- Tradewall
  * 1.1 - Key: ZULU_TRADEWALL_HISTORY
  * 1.2 - Key: ZULU_TRADEWALL_PREV
+ * 1.3 - Key: ZULU_TRADEWALL_PREV2
  * 
  * 2 --- TopN2
  * 2.1 - Key: ZULU_TRADEWALL_TOP: CUR
@@ -285,10 +286,10 @@ function getHistory($field) {   // timestamp: int
     $this->_redis->select(1);
 
     $value = $this->_redis->hGet(self::ZULU_TRADEWALL_HISTORY, strval($field));
-    return unserialize($value); // \DS\Vector<TradeInfo>
+    return unserialize($value); // \Ds\Vector<TradeInfo>
 }
 
-function setHistory($field, $value) { // timestamp: int, all signals: \DS\Vector<TradeInfo>
+function setHistory($field, $value) { // timestamp: int, all signals: \Ds\Vector<TradeInfo>
     $this->_redis->select(1);
 
     $this->_redis->hSet(self::ZULU_TRADEWALL_HISTORY, strval($field), serialize($value));
@@ -308,29 +309,43 @@ function setPrevTimestamp($value) {   // timestamp: int
     $this->_redis->set(self::ZULU_TRADEWALL_PREV, strval($value));
 }
 
+/* 1.3 */
+function getPrevTimestamp2() {
+    $this->_redis->select(1);
+
+    // needs to convert "nil" to 0 if non-exists
+    return intval($this->_redis->get(self::ZULU_TRADEWALL_PREV2));
+}
+
+function setPrevTimestamp2($value) {   // timestamp: int
+    $this->_redis->select(1);
+
+    $this->_redis->set(self::ZULU_TRADEWALL_PREV2, strval($value));
+}
+
 /* 2.1 */
-function getCurTopN() {   // \DS\Map
+function getCurTopN() {   // \Ds\Map
     $this->_redis->select(2);
 
     $value = $this->_redis->hGet(self::ZULU_TRADEWALL_TOP, self::CUR);
-    return unserialize($value); // \DS\Map<id, status>
+    return unserialize($value); // \Ds\Map<id, status>
 }
 
-function setCurTopN($value) { // \DS\Map<id, status>
+function setCurTopN($value) { // \Ds\Map<id, status>
     $this->_redis->select(2);
 
     $this->_redis->hSet(self::ZULU_TRADEWALL_TOP, self::CUR, serialize($value));
 }
 
 /* 2.2 */
-function getOldTopN() {   // \DS\Map
+function getOldTopN() {   // \Ds\Map
     $this->_redis->select(2);
 
     $value = $this->_redis->hGet(self::ZULU_TRADEWALL_TOP, self::OLD);
-    return unserialize($value); // \DS\Map<id, status>
+    return unserialize($value); // \Ds\Map<id, status>
 }
 
-function setOldTopN($value) { // \DS\Map<id, status>
+function setOldTopN($value) { // \Ds\Map<id, status>
     $this->_redis->select(2);
 
     $this->_redis->hSet(self::ZULU_TRADEWALL_TOP, self::OLD, serialize($value));
