@@ -111,7 +111,7 @@ class TradeMgr {
   }
 
   // 判断 A and B 是否有重叠: A 中有元素在B 中(相反不一定成立)
-  public function isAhasSameEleInB(\Ds\Vector $a, \Ds\Vector $b) {
+  private function isAhasSameEleInB(\Ds\Vector $a, \Ds\Vector $b) {
     return
     !$a->filter(function($info) use ($b) {
       foreach ($b as $v)
