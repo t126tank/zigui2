@@ -4,7 +4,7 @@ ini_set("display_errors", 1);
 
 require_once __DIR__ . '/TradeUtils.php';
 
-class TradeInfo {
+class TradeInfo implements JsonSerializable {
   private $_id = NULL;
   private $_tid = NULL;
   private $_pair = NULL;
@@ -12,7 +12,7 @@ class TradeInfo {
   private $_pl = 0.0;
   private $_op = NULL;
   private $_state = NULL;
-  private $_ts = 0;  // TODO: which timestamp? order or system
+  private $_ts = NULL;
 
   public function __construct($info) {
     $this->_id = trim($info['id']);
@@ -22,8 +22,21 @@ class TradeInfo {
     $this->_pl = $info['pl'];
     $this->_op = strcasecmp(trim($info['op']), TradeOpEnum::BUY) == 0? TradeOpEnum::BUY: TradeOpEnum::SELL;
     $this->_state = strcasecmp(trim($info['state']), TradeStateEnum::OPEN) == 0? TradeStateEnum::OPEN: TradeStateEnum::CLOSED;
-    // $this->_ts = $info['ts'];
-    // $this->_ts = time();
+    $this->_ts = new DateTime();
+  }
+
+  // @Impl JsonSerializable::jsonSerialize()
+  public function jsonSerialize() {
+    return [
+      'id' => $this->_id,
+      'tid' => $this->_tid,
+      'pair' => $this->_pair,
+      'price' => $this->_price,
+      'pl' => $this->_pl,
+      'op' => $this->_op,
+      'state' => $this->_state,
+      'ts' => $this->_ts->format(DateTime::ISO8601)
+    ];
   }
 
   public function equals(TradeInfo $info) {
@@ -31,8 +44,7 @@ class TradeInfo {
   }
 
   public function __destruct() {
-    // unset($this->_op);
-    // unset($this->_state);
+    unset($this->_ts);
   }
 
   public function getId() {
