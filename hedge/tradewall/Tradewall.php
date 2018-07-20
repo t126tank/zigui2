@@ -24,8 +24,12 @@ if (NULL != $tradeMgr->getNewTradeInfoList()) {
     return $topN2Mgr->filterTradeInfo($info);
   });
 
+  // 保存 TopN2 (into Redis)
+  $topN2Mgr->saveTopN2();
+  unset($topN2Mgr);
+
   // 交易标的 过筛
-  $pairsArr = ["USD/JPY", "EUR/JPY", "GBP/JPY"];
+  $pairsArr = ["USD/JPY", "EUR/JPY", "GBP/JPY", "ZAR/JPY", "NZD/JPY", "AUD/JPY"];
   $pairsVec = new \Ds\Vector();
   $pairsVec->push(...$pairsArr);
   $toPublish = $toPublish->filter(function ($info) use ($pairsVec) {
@@ -34,35 +38,28 @@ if (NULL != $tradeMgr->getNewTradeInfoList()) {
   unset($pairsArr);
   unset($pairsVec);
 
-  // 判断经 TopN2 及交易标的Vector 过滤后是否需要发布
-  if (!$toPublish->isEmpty()) {
-    // Publish
-    publishSignals($toPublish);
-  }
+  // 判断经 TopN2 及交易标的Vector 过滤后发布
+  publishSignals($toPublish);
+
   unset($toPublish);
-
-  // 保存 TopN2 (into Redis)
-  $topN2Mgr->saveTopN2();
-
-  // uninit
-  unset($topN2Mgr);
 }
 
+// uninit
 unset($tradeMgr);
 
 function publishSignals(\Ds\Vector $signals) {
-   if (!$signals->isEmpty()) {
-      $context = stream_context_create(
-         array (
+  if (!$signals->isEmpty()) {
+    $context = stream_context_create(
+        array (
             'http' => array (
-               'method'=> 'POST',
-               'header'=> 'Content-type: application/json; charset=UTF-8',
-               'content' => json_encode($signals, JSON_PRETTY_PRINT)
+                'method'=> 'POST',
+                'header'=> 'Content-type: application/json; charset=UTF-8',
+                'content' => json_encode($signals, JSON_PRETTY_PRINT)
             )
-         )
-      );
+        )
+    );
 
-      file_get_contents('url', false, $context);
-   }
+    file_get_contents('url', false, $context);
+  }
 }
 ?>
