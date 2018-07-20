@@ -58,7 +58,8 @@ foreach ($jsonArr as $v) {
    $op = strpos($v['t'], 'BUY') !== false? 'BUY': 'SELL';
    $state = strpos($v['t'], 'PnL') !== false? 'CLOSED': 'OPEN';
    $obj = array(
-      'id'=>strval($v['pid']),
+      'id'=>trim(strval($v['pid'])),
+      'tid'=>trim(strval($v['tid'])),
       'pl'=>$v['pnl'],
       'price'=>$v['pr'],
       'op'=>$op,
