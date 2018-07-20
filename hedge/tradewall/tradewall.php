@@ -5,7 +5,7 @@
 $idx = 1;
 if (isset($_GET["idx"]) && is_numeric($_GET["idx"])) {
    $tmp = abs(intval($_GET["idx"]));
-   $idx = ($tmp == 0)? $idx: ($tmp > 3 ? 3: $tmp);
+   $idx = ($tmp == 0)? $idx: ($tmp > 8 ? 8: $tmp);
 }
 
 ob_start();
@@ -23,7 +23,7 @@ $opts = array(
                'minutesAgo'=>	288000000,
                'onlyFollowedByMe'=>	false,
                'pageIndex'=> $idx,
-               'pageSize'=> 33,
+               'pageSize'=> 100,
                'platform'=>"forex",
                'providerName'=>""
             )),
