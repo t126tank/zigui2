@@ -34,7 +34,7 @@ class TradeMgr {
     return self::$_mgr;
   }
 
-  function updateTradeInfoList() {
+  private function updateTradeInfoList() {
     $prev = $this->_dao->getPrevTimestamp();
 
     // 初次处理
@@ -107,6 +107,7 @@ class TradeMgr {
   }
 
   public function getNewTradeInfoList() {
+    $this->updateTradeInfoList();
     return $this->_newTradeInfoList;
   }
 

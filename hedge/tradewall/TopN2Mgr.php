@@ -70,7 +70,7 @@ class TopN2Mgr {
     foreach ($this->_curTopN as $k => $v) {  // TODO: &$v ?
       // 从 curTopN Map 转移该 id 至 oldTopN Map (buy <and> sell stacks 不为 EMPTY)
       if ($newTopVec->find($k) !== true) {
-        $v->filter(function($kk, $vv) {
+        $v = $v->filter(function($kk, $vv) {
           return !$this->isStacksBothEmpty($vv);
         });
 
