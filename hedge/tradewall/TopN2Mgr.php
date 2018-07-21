@@ -142,7 +142,7 @@ class TopN2Mgr {
     return $rtn;
   }
 
-  private function isStacksBothEmpty($stacks) {
+  private function isStacksBothEmpty(\Ds\Stack $stacks) {
     return $stacks[TradeOpEnum::BUY]->isEmpty() && $stacks[TradeOpEnum::SELL]->isEmpty();
   }
 
