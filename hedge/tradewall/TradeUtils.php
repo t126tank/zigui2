@@ -12,6 +12,9 @@ class TradeOpEnum {
 
   const BUY = "buy";
   const SELL = "sell";
+  
+  public static function opReverse(TradeOpEnum $op) {
+    return $op == self::BUY? self::SELL: self::BUY;
 }
 
 class TradeCrawler {
