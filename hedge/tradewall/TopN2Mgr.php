@@ -107,7 +107,7 @@ class TopN2Mgr {
         $rtn = true;
       } else if ($info->getState() == TradeStateEnum::CLOSED && $status->hasKey($info->getPair())) {
         // close - sell -> to pop buy::stack; buy -> to pop sell::stack
-        $toClz = self::opReverse($info->getOp());
+        $toClz = TradeOpEnum::opReverse($info->getOp());
 
         // 相应 open 栈不为空则可以 pop()
         if (!$status->get($info->getPair())[$toClz]->isEmpty()) {
@@ -124,13 +124,13 @@ class TopN2Mgr {
         $stacks = $status->get($info->getPair());
 
         // close - sell -> to pop buy::stack; buy -> to pop sell::stack
-        $toClz = self::opReverse($info->getOp());
+        $toClz = TradeOpEnum::opReverse($info->getOp());
         if (!$stacks[$toClz]->isEmpty()) {
           $stacks[$toClz]->pop();
           $rtn = true;
         }
         // 若 id - pair 的 sell <and> buy 的 stacks 均为 EMPTY，删除 oldTopN 中 id 对应的 pair
-        if (isStacksBothEmpty($stacks))
+        if ($this->isStacksBothEmpty($stacks))
           $status->remove($info->getPair());
 
         // 若 id 的 status (Map) 为 EMPTY, 删除 oldTopN 中对应的 id
@@ -144,10 +144,6 @@ class TopN2Mgr {
 
   private function isStacksBothEmpty(\Ds\Stack $stacks) {
     return $stacks[TradeOpEnum::BUY]->isEmpty() && $stacks[TradeOpEnum::SELL]->isEmpty();
-  }
-
-  private function opReverse(TradeOpEnum $op) {
-    return $op == TradeOpEnum::BUY? TradeOpEnum::SELL: TradeOpEnum::BUY;
   }
 }
 ?>

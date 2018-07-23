@@ -5,6 +5,7 @@ ini_set("display_errors", 1);
 require_once __DIR__ . '/TradeUtils.php';
 
 class TradeInfo implements JsonSerializable {
+  const DETAILS = "https://japan.zulutrade.com/trader/";
   private $_id = NULL;
   private $_tid = NULL;
   private $_pair = NULL;
@@ -13,6 +14,7 @@ class TradeInfo implements JsonSerializable {
   private $_op = NULL;
   private $_state = NULL;
   private $_ts = NULL;
+  private $_details = NULL;
 
   public function __construct($info) {
     $this->_id = trim($info['id']);
@@ -22,14 +24,17 @@ class TradeInfo implements JsonSerializable {
     $this->_pl = $info['pl'];
     $this->_op = strcasecmp(trim($info['op']), TradeOpEnum::BUY) == 0? TradeOpEnum::BUY: TradeOpEnum::SELL;
     $this->_state = strcasecmp(trim($info['state']), TradeStateEnum::OPEN) == 0? TradeStateEnum::OPEN: TradeStateEnum::CLOSED;
+    $this->_op = ($this->_state == TradeStateEnum::OPEN)? $this->_op: TradeOpEnum::opReverse($this->_op); // Close 时,翻转仓类型
     $this->_ts = new DateTime();
     $this->_ts->setTimeZone(new DateTimeZone('Asia/Tokyo'));
+    $this->_details = self::DETAILS . $this->_id;
   }
 
   // @Impl JsonSerializable::jsonSerialize()
   public function jsonSerialize() {
     return [
       'id' => $this->_id,
+      'details' => $this->_details,
       'tid' => $this->_tid,
       'pair' => $this->_pair,
       'price' => $this->_price,
