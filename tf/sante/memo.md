@@ -23,3 +23,5 @@
 ```
 $ curl -X POST -H 'Content-Type:application/x-www-form-urlencoded' -H 'User-Agent:Mozilla/5.0 (Windows NT 6.1; W…) ecko/20100101 Firefox/62.0' -d 'code=1301' -d 'csv=1' -d 'year=2017' https://kabuoji3.com/stock/file.php --insecure
 ```
+> LANG=ja_jp.sjis/utf-8
+> teraterm = sjis
