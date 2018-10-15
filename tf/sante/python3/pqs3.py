@@ -26,11 +26,42 @@ def main(argv):
 
    # though its name is "test", to be used for the evaluation
    IRIS_TEST     = "iris_test.csv"
-
    # Read in test csv's where there are 81 features and a target
    csvTest = np.genfromtxt(IRIS_TEST, delimiter=",", skip_header=1)
    X_test = np.array(csvTest[:, :81])
    y_test = csvTest[:,81]
+
+   IRIS_TRAINING = "iris_training.csv"
+
+   # Data loading and preprocessing
+   # Read in train csv's where there are 81 features and a target
+   csvTrain = np.genfromtxt(IRIS_TRAINING, delimiter=",", skip_header=1)
+   X_train = np.array(csvTrain[:, :81])
+   y_train = csvTrain[:,81]
+
+   # X_train = X_train.reshape([-1,7,7,1])
+   # X_test = X_test.reshape([-1,7,7,1])
+
+   # reshape Y and Y_test to have shape (batch_size, 1).
+   # y_train = y_train.reshape([-1, 28, 28, 1])
+   # y_test = y_test.reshape([-1, 28, 28, 1])
+
+   # X_val=[]
+   # X_val=np.array(X_val)
+
+   # y_val=[]
+   # y_val=np.array(y_val)
+
+
+   ### Ori ###
+   # prepare data
+   # X_train, y_train, X_val, y_val, X_test, y_test = \
+   #                                tl.files.load_mnist_dataset(shape=(-1,784))
+   ###########
+
+   # define placeholder
+   x = tf.placeholder(tf.float32, shape=[None, 81], name='x')
+   y_ = tf.placeholder(tf.int64, shape=[None, ], name='y_')
 
    path0 = '../stocks/' + code + '/out/'
    npzPath = path0 + code + '.npz'
@@ -60,38 +91,6 @@ def main(argv):
    if os.path.isfile(npzPath) and not train:
       tl.files.load_and_assign_npz(sess=sess, name=npzPath, network=network)
    else:
-      IRIS_TRAINING = "iris_training.csv"
-
-      # Data loading and preprocessing
-      # Read in train csv's where there are 81 features and a target
-      csvTrain = np.genfromtxt(IRIS_TRAINING, delimiter=",", skip_header=1)
-      X_train = np.array(csvTrain[:, :81])
-      y_train = csvTrain[:,81]
-
-      # X_train = X_train.reshape([-1,7,7,1])
-      # X_test = X_test.reshape([-1,7,7,1])
-
-      # reshape Y and Y_test to have shape (batch_size, 1).
-      # y_train = y_train.reshape([-1, 28, 28, 1])
-      # y_test = y_test.reshape([-1, 28, 28, 1])
-
-      # X_val=[]
-      # X_val=np.array(X_val)
-
-      # y_val=[]
-      # y_val=np.array(y_val)
-
-
-      ### Ori ###
-      # prepare data
-      # X_train, y_train, X_val, y_val, X_test, y_test = \
-      #                                tl.files.load_mnist_dataset(shape=(-1,784))
-      ###########
-
-      # define placeholder
-      x = tf.placeholder(tf.float32, shape=[None, 81], name='x')
-      y_ = tf.placeholder(tf.int64, shape=[None, ], name='y_')
-
       # define cost function and metric.
       y = network.outputs
       cost = tl.cost.cross_entropy(y, y_)
