@@ -2,6 +2,7 @@
 
 import sys
 import pandas as pd
+import json
 
 def main(argv):
    srcDir = "."
@@ -10,12 +11,23 @@ def main(argv):
 
    result = []
 
-   item = pd.read_json(srcDir + '/out/item.json')
-   result.append(item)
+   item = {}
+   with open(srcDir + '/out/item.json') as infile:
+      item = json.load(infile)
 
-   nn  = pd.read_json('nn.json')
+   itemArr = []
+   # array/list has ONLY ONE element
+   itemArr.append(item)
+
+   # pandas loads array/list
+   itemDf = pd.DataFrame(itemArr)
+   # item = pd.read_json(srcDir + '/out/item.json')
+   result.append(itemDf)
+
+   nn = pd.read_json('nn.json')
    result.append(nn)
 
+   # print(result)
    frame = pd.concat(result)
    frame = frame.reset_index(drop=True)
 
