@@ -23,6 +23,8 @@ def main(argv):
 
    n_cls         = 2
    INPUT_RECORD  = "input.csv"
+
+   # though its name is "test", to be used for the evaluation
    IRIS_TEST     = "iris_test.csv"
 
    # Read in test csv's where there are 81 features and a target
@@ -34,6 +36,9 @@ def main(argv):
    npzPath = path0 + code + '.npz'
 
    sess = tf.InteractiveSession()
+
+   # initialize all variables in the session
+   tl.layers.initialize_global_variables(sess)
 
    # define the network
    network = tl.layers.InputLayer(x, name='input_layer')
@@ -53,7 +58,6 @@ def main(argv):
 
    # <code>.npz exists and to use it directly
    if os.path.isfile(npzPath) and not train:
-      tl.layers.initialize_global_variables(sess)
       tl.files.load_and_assign_npz(sess=sess, name=npzPath, network=network)
    else:
       IRIS_TRAINING = "iris_training.csv"
@@ -100,9 +104,6 @@ def main(argv):
       train_op = tf.train.AdamOptimizer(learning_rate=0.0001, beta1=0.9, beta2=0.999,
                                         epsilon=1e-08, use_locking=False).minimize(cost, var_list=train_params)
 
-      # initialize all variables in the session
-      tl.layers.initialize_global_variables(sess)
-
       # print network information
       # network.print_params()
       # network.print_layers()
@@ -117,10 +118,11 @@ def main(argv):
 
    # evaluation
    # test_acc = tl.utils.test(sess, network, acc, X_test, y_test, x, y_, batch_size=None, cost=cost)
+   #### https://tensorlayer.readthedocs.io/en/1.3.0/_modules/tensorlayer/utils.html#test
+   #### /usr/local/lib/python2.7/dist-packages/tensorlayer/utils.py - if needs patching
 
-   #### /usr/local/lib/python2.7/dist-packages/tensorlayer/utils.py
-
-   c_mat, f1, test_acc, f1_macro = tl.utils.evaluation(y_test=y_test, y_predict=None, n_classes=n_cls)
+   y_predict = tl.utils.predict(sess, network, X_test, x, y_op)
+   c_mat, f1, test_acc, f1_macro = tl.utils.evaluation(y_test=y_test, y_predict=y_predict, n_classes=n_cls)
 
    # save the network to .npz file
    tl.files.save_npz(network.all_params , name=modelPath)
