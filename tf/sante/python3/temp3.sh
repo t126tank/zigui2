@@ -33,23 +33,23 @@ do
    mkdir -p $OUT_DIR
 
    touch $sym/out/${item}
-   echo "[{" > $sym/out/${item}
+#  echo "[{" > $sym/out/${item}
 
    python3 readCsv3.py $sym
 
    python3 writeCsv3.py $sym > $sym/out/new.txt
-#   rm -rf /tmp/iris_model/
+#  rm -rf /tmp/iris_model/
 
    python3 tfCsv3.py $sym
 
    pushd iris
-#   cp -f ../$sym/out/iris_test.csv ../$sym/out/iris_training.csv ../$sym/out/input.csv  .
-#   python3 pqs.py $code
+#  cp -f ../$sym/out/iris_test.csv ../$sym/out/iris_training.csv ../$sym/out/input.csv  .
+#  python3 pqs.py $code
 
-   echo "}]" >> ../$sym/out/${item}
+#  echo "}]" >> ../$sym/out/${item}
 
    # backup model
-#   cp model.npz ../$sym/$pre$code.npz
+#  cp model.npz ../$sym/$pre$code.npz
 
    popd
 
