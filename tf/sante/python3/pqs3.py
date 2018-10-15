@@ -14,10 +14,21 @@ import os.path
 
 def main(argv):
    code = "1301"
+   train = False
+
    if len(argv) != 0:
       code = argv[0]
+      if len(argv) > 1:
+         train = True
 
+   n_cls         = 2
    INPUT_RECORD  = "input.csv"
+   IRIS_TEST     = "iris_test.csv"
+
+   # Read in test csv's where there are 81 features and a target
+   csvTest = np.genfromtxt(IRIS_TEST, delimiter=",", skip_header=1)
+   X_test = np.array(csvTest[:, :81])
+   y_test = csvTest[:,81]
 
    path0 = '../stocks/' + code + '/out/'
    npzPath = path0 + code + '.npz'
@@ -40,25 +51,18 @@ def main(argv):
                                   act = tf.identity,
                                   name='output_layer')
 
-
    # <code>.npz exists and to use it directly
-   if os.path.isfile(npzPath):
+   if os.path.isfile(npzPath) and not train:
       tl.layers.initialize_global_variables(sess)
       tl.files.load_and_assign_npz(sess=sess, name=npzPath, network=network)
    else:
-      n_cls         = 2
       IRIS_TRAINING = "iris_training.csv"
-      IRIS_TEST     = "iris_test.csv"
 
       # Data loading and preprocessing
-      # Read in train and test csv's where there are 81 features and a target
+      # Read in train csv's where there are 81 features and a target
       csvTrain = np.genfromtxt(IRIS_TRAINING, delimiter=",", skip_header=1)
       X_train = np.array(csvTrain[:, :81])
       y_train = csvTrain[:,81]
-
-      csvTest = np.genfromtxt(IRIS_TEST, delimiter=",", skip_header=1)
-      X_test = np.array(csvTest[:, :81])
-      y_test = csvTest[:,81]
 
       # X_train = X_train.reshape([-1,7,7,1])
       # X_test = X_test.reshape([-1,7,7,1])
@@ -94,7 +98,7 @@ def main(argv):
       # define the optimizer
       train_params = network.all_params
       train_op = tf.train.AdamOptimizer(learning_rate=0.0001, beta1=0.9, beta2=0.999,
-                                  epsilon=1e-08, use_locking=False).minimize(cost, var_list=train_params)
+                                        epsilon=1e-08, use_locking=False).minimize(cost, var_list=train_params)
 
       # initialize all variables in the session
       tl.layers.initialize_global_variables(sess)
@@ -110,15 +114,16 @@ def main(argv):
                   eval_train=True)
       #           X_val=X_val, y_val=y_val, eval_train=False)
 
-      # evaluation
-      test_acc = tl.utils.test(sess, network, acc, X_test, y_test, x, y_, batch_size=None, cost=cost)
 
-      #### /usr/local/lib/python2.7/dist-packages/tensorlayer/utils.py
+   # evaluation
+   # test_acc = tl.utils.test(sess, network, acc, X_test, y_test, x, y_, batch_size=None, cost=cost)
 
-      # c_mat, f1, test_acc, f1_macro = tl.utils.evaluation(y_test=y_test, y_predict=None, n_classes=n_cls)
+   #### /usr/local/lib/python2.7/dist-packages/tensorlayer/utils.py
 
-      # save the network to .npz file
-      tl.files.save_npz(network.all_params , name=modelPath)
+   c_mat, f1, test_acc, f1_macro = tl.utils.evaluation(y_test=y_test, y_predict=None, n_classes=n_cls)
+
+   # save the network to .npz file
+   tl.files.save_npz(network.all_params , name=modelPath)
 
    # predict
    new_samples = []
