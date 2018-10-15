@@ -125,7 +125,7 @@ def main(argv):
    c_mat, f1, test_acc, f1_macro = tl.utils.evaluation(y_test=y_test, y_predict=y_predict, n_classes=n_cls)
 
    # save the network to .npz file
-   tl.files.save_npz(network.all_params , name=modelPath)
+   tl.files.save_npz(network.all_params , name=npzPath)
 
    # predict
    new_samples = []
