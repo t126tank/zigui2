@@ -38,13 +38,13 @@ do
    python3 readCsv3.py $sym
 
    python3 writeCsv3.py $sym > $sym/out/new.txt
-#  rm -rf /tmp/iris_model/
+   rm -rf /tmp/iris_model/
 
    python3 tfCsv3.py $sym
 
    pushd iris
-#  cp -f ../$sym/out/iris_test.csv ../$sym/out/iris_training.csv ../$sym/out/input.csv  .
-#  python3 pqs.py $code
+   cp -f ../$sym/out/iris_test.csv ../$sym/out/iris_training.csv ../$sym/out/input.csv  .
+   env MPLBACKEND=Agg python3 pqs.py $code
 
 #  echo "}]" >> ../$sym/out/${item}
 
@@ -60,9 +60,9 @@ do
    # sudo cp $nn  $csv /var/www/html/nn/
 done
 
-# pre=($(date "+%Y%m%d-%H%M%S-"))
+pre=($(date "+%Y%m%d-%H%M%S-"))
 
-# cp $nn  $pre$nn
+cp $nn  $pre$nn
 # cp $nn  $csv  /var/www/html/nn/
 
 # rm  backup.zip
