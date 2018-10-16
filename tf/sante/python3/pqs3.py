@@ -69,7 +69,7 @@ def main(argv):
    sess = tf.InteractiveSession()
 
    # initialize all variables in the session
-   tl.layers.initialize_global_variables(sess)
+   # tl.layers.initialize_global_variables(sess)
 
    # define the network
    network = tl.layers.InputLayer(x, name='input_layer')
@@ -102,6 +102,8 @@ def main(argv):
       train_params = network.all_params
       train_op = tf.train.AdamOptimizer(learning_rate=0.0001, beta1=0.9, beta2=0.999,
                                         epsilon=1e-08, use_locking=False).minimize(cost, var_list=train_params)
+      # https://tensorlayer.readthedocs.io/en/stable/_modules/tensorlayer/layers/utils.html#initialize_global_variables
+      # http://mosapro.hatenablog.com/entry/2017/05/17/094606
 
       # print network information
       # network.print_params()
