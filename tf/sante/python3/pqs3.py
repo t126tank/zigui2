@@ -139,9 +139,15 @@ def main(argv):
 
    # For report
    item = {}
+
+   # Read in
+   with open('item.json') as infile:
+      item = json.load(infile)
+
    item['possibility'] = test_acc
    item['result'] = int(result[0])
 
+   # Write out
    with open(path0 + 'item.json', 'w') as outfile:
       json.dump(item, outfile)
 
