@@ -4,6 +4,8 @@
 # https://raw.githubusercontent.com/tensorlayer/tensorlayer/master/examples/basic_tutorials/tutorial_mnist_simple.py
 # https://raw.githubusercontent.com/tensorlayer/tensorlayer/master/examples/text_generation/tutorial_generate_text.py
 # https://github.com/tensorlayer/tensorlayer/issues/12#issuecomment-271084773
+# https://www.jb51.net/article/134956.htm
+# https://www.jianshu.com/p/300b462a11c2
 
 import tensorflow as tf
 import tensorlayer as tl
@@ -60,9 +62,14 @@ def main(argv):
    ###########
 
    # define placeholder
-   x = tf.placeholder(tf.float32, shape=[None, 81], name='x')
-   y_ = tf.placeholder(tf.int64, shape=[None, ], name='y_')
+   with tf.name_scope('input'):
+      x = tf.placeholder(tf.float32, shape=[None, 81], name='x')
+      y_ = tf.placeholder(tf.int64, shape=[None, ], name='y_')
 
+   with tf.name_scope('input_reshape'):
+      image_shaped_input = tf.reshape(x, [-1, 9, 9, 1])
+      tf.summary.image('input', image_shaped_input, 2)
+ 
    path0 = '../stocks/' + code + '/out/'
    npzPath = path0 + code + '.npz'
 
