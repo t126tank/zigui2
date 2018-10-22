@@ -69,7 +69,7 @@ def main(argv):
    with tf.name_scope('input_reshape'):
       image_shaped_input = tf.reshape(x, [-1, 9, 9, 1])
       tf.summary.image('input', image_shaped_input, 2)
- 
+
    path0 = '../stocks/' + code + '/out/'
    npzPath = path0 + code + '.npz'
 
@@ -77,6 +77,7 @@ def main(argv):
 
    # initialize all variables in the session
    # tl.layers.initialize_global_variables(sess)
+   # init = tf.global_variables_initializer()
 
    # define the network
    network = tl.layers.InputLayer(x, name='input_layer')
@@ -94,23 +95,26 @@ def main(argv):
                                   act = tf.identity,
                                   name='output_layer')
 
+   # define cost function and metric.
+   y = network.outputs
+   cost = tl.cost.cross_entropy(y, y_, 'cost')
+   correct_prediction = tf.equal(tf.argmax(y, 1), y_)
+   acc = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+   y_op = tf.argmax(tf.nn.softmax(y), 1)
+
    # <code>.npz exists and to use it directly
    if os.path.isfile(npzPath) and not train:
       tl.files.load_and_assign_npz(sess=sess, name=npzPath, network=network)
    else:
-      # define cost function and metric.
-      y = network.outputs
-      cost = tl.cost.cross_entropy(y, y_, 'cost')
-      correct_prediction = tf.equal(tf.argmax(y, 1), y_)
-      acc = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-      y_op = tf.argmax(tf.nn.softmax(y), 1)
-
       # define the optimizer
       train_params = network.all_params
       train_op = tf.train.AdamOptimizer(learning_rate=0.0001, beta1=0.9, beta2=0.999,
                                         epsilon=1e-08, use_locking=False).minimize(cost, var_list=train_params)
+
       # https://tensorlayer.readthedocs.io/en/stable/_modules/tensorlayer/layers/utils.html#initialize_global_variables
       # http://mosapro.hatenablog.com/entry/2017/05/17/094606
+
+      sess.run(tf.global_variables_initializer())
 
       # print network information
       # network.print_params()
@@ -146,9 +150,8 @@ def main(argv):
 
    # For report
    item = {}
-
    # Read in
-   with open('item.json') as infile:
+   with open(path0 + 'item.json') as infile:
       item = json.load(infile)
 
    item['possibility'] = test_acc
@@ -164,4 +167,3 @@ if __name__ == "__main__":
 
 
 # Ref: http://qiita.com/akasakas/items/fad4ca279c9a726998e0
-
