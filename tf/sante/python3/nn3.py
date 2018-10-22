@@ -8,6 +8,7 @@ def main(argv):
    srcDir = "."
    if len(argv) != 0:
       srcDir = argv[0]
+      pre    = argv[1]
 
    result = []
 
@@ -24,15 +25,15 @@ def main(argv):
    # item = pd.read_json(srcDir + '/out/item.json')
    result.append(itemDf)
 
-   nn = pd.read_json('nn.json')
+   nn = pd.read_json(pre + 'nn.json')
    result.append(nn)
 
    # print(result)
    frame = pd.concat(result)
    frame = frame.reset_index(drop=True)
 
-   frame.to_json('nn.json', orient='records')
-   frame.to_csv('nn.csv', index=False)
+   frame.to_json(pre + 'nn.json', orient='records')
+   frame.to_csv(pre + 'nn.csv', index=False)
 
 if __name__ == "__main__":
    main(sys.argv[1:])
