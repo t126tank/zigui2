@@ -7,6 +7,7 @@ import json
 
 def o_f():
    outpath = "out"
+
    if not os.path.exists(outpath):
       os.makedirs(outpath)
 
@@ -14,8 +15,12 @@ def o_f():
 
 def main(argv):
    srcDir = "."
+   csvs = "*2018.csv"
+
    if len(argv) != 0:
       srcDir = argv[0]
+      if len(argv) > 1:
+         csvs = "*.csv"
 
    frame = pd.DataFrame()
    list_ = []
@@ -24,7 +29,7 @@ def main(argv):
    os.chdir(srcDir)
 
    # Fetch all *.csv files
-   for csvFile in glob.glob("*.csv"):
+   for csvFile in glob.glob(csvs):
       # print csvFile
 
       # Specify encode and read csv contents "SHIFT-JIS"
