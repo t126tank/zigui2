@@ -15,7 +15,7 @@ def o_f():
 
 def main(argv):
    srcDir = "."
-   csvs = "*2018.csv"
+   csvs = "*201[7-8].csv"
 
    if len(argv) != 0:
       srcDir = argv[0]
