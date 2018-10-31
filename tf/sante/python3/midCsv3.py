@@ -55,16 +55,16 @@ def main(argv):
             if cnt > 5:
                 break
 
-        fields.append(dt)           # "tradeTime"
-        fields.append(nums[1])      # "o"
-        fields.append(nums[2])      # "h"
-        fields.append(nums[3])      # "l"
-        fields.append(stoksPrice)   # "c"
-        fields.append(nums[4])      # "volume"
-        fields.append(stoksPrice)   # "modified p"
+        fields.append(str(dt))          # "tradeTime"
+        fields.append(str(nums[1]))     # "o"
+        fields.append(str(nums[2]))     # "h"
+        fields.append(str(nums[3]))     # "l"
+        fields.append(str(stoksPrice))  # "c"
+        fields.append(str(nums[4]))     # "volume"
+        fields.append(str(stoksPrice))  # "modified p"
 
         with open(csvfile, 'a') as f:
-            writer = csv.writer(f)
+            writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
             writer.writerow(fields)
 
         # Debug
