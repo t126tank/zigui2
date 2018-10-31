@@ -60,7 +60,7 @@ def main(argv):
         fields.append(str(nums[2]))     # "h"
         fields.append(str(nums[3]))     # "l"
         fields.append(str(stoksPrice))  # "c"
-        fields.append(str(nums[4]))     # "volume"
+        fields.append(str(round(nums[4])))     # "volume"
         fields.append(str(stoksPrice))  # "modified p"
 
         with open(csvfile, 'a', newline='') as f:
