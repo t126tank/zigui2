@@ -63,7 +63,7 @@ def main(argv):
         fields.append(str(nums[4]))     # "volume"
         fields.append(str(stoksPrice))  # "modified p"
 
-        with open(csvfile, 'a') as f:
+        with open(csvfile, 'a', newline='') as f:
             writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
             writer.writerow(fields)
 
