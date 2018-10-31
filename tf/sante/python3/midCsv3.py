@@ -10,8 +10,8 @@ from bs4 import BeautifulSoup
 
 target_url = 'https://stocks.finance.yahoo.co.jp/stocks/detail/?code=1301'
 try:
-    r = requests.get(target_url)            #requests���g���āAweb����擾
-    soup = BeautifulSoup(r.text, 'lxml')    #�v�f�𒊏o (lxml)
+    r = requests.get(target_url)            #requestsを使って、webから取得
+    soup = BeautifulSoup(r.text, 'lxml')    #要素を抽出 (lxml)
 
     stoksPrice = soup.find('td', class_='stoksPrice')
     stoksPrice = stoksPrice.find_next_sibling('td').text
@@ -35,7 +35,7 @@ try:
         print(td.get('class'))
     '''
 
-    #�����N��\�� (lxml)
+    #リンクを表示 (lxml)
     '''
     for a in soup.find_all('a'):
         print(a.get('href'))
@@ -47,11 +47,11 @@ except Exception as e:
 
 ### output
 '''
-3095.0
-3005.0
-3025.0
-3105.0
-3025.0
-26000.0
-79571.0
+3095.0 => 現値
+3005.0 => 前日終値
+3025.0 => 始値
+3105.0 => 高値
+3025.0 => 安値
+26000.0 => 出来高
+79571.0 => 売買代金 (x 1000 千円)
 '''
