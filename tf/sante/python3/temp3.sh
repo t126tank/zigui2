@@ -35,13 +35,18 @@ do
    touch $sym/out/${item}
 #  echo "[{" > $sym/out/${item}
 
-   if [[ $# -gt 0 ]]; then
-      python3 readCsv3.py $sym all
+   if [[ $# -gt 0 ]] && [[ $1 = "all" ]]; then
+      python3 readCsv3.py $sym $1
    else
       pushd $sym/out/
       zip -r $$.zip iris*.csv data.*
       popd
 
+      if [[ $1 = "mid" ]]; then
+         python3 midCsv3.py $sym
+      fi
+
+      # python3 midCsv3.py  $sym
       python3 readCsv3.py $sym
    fi
 
@@ -49,7 +54,7 @@ do
 
    if [[ $# -eq 0 ]]; then
       pushd $sym/out/
-      unzip -f $$.zip
+      unzip -o $$.zip
       rm -rf *.zip
       popd
    fi
@@ -88,3 +93,4 @@ done
 # cp -f backup.zip /var/www/html/nn/
 
 popd
+
