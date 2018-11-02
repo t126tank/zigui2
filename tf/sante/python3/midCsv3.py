@@ -23,15 +23,15 @@ def main(argv):
 
     # 日付を取る
     dt = datetime.datetime.today().strftime('%Y-%m-%d')
-    print(dt)
+    # print(dt)
 
     year = datetime.datetime.today().strftime('%Y')
-    print(year)
+    # print(year)
 
     csvfile = 'stocks_' + code + '-T_1d_' + year + '.csv'
-    print(csvfile)
+    # print(csvfile)
 
-    target_url = 'https://stocks.finance.yahoo.co.jp/stocks/detail/?code=1301'
+    target_url = 'https://stocks.finance.yahoo.co.jp/stocks/detail/?code=' + code
     try:
         r = requests.get(target_url)            #requestsを使って、webから取得
         soup = BeautifulSoup(r.text, 'lxml')    #要素を抽出 (lxml)
@@ -39,7 +39,7 @@ def main(argv):
         stoksPrice = soup.find('td', class_='stoksPrice')
         stoksPrice = stoksPrice.find_next_sibling('td').text
         stoksPrice = float(re.sub('[,]', '', stoksPrice))
-        print(stoksPrice)
+        # print(stoksPrice)
 
         cnt = 0
         fields = []
@@ -48,20 +48,26 @@ def main(argv):
         for dd in soup.find_all('dd', class_='ymuiEditLink mar0'):
             stng = dd.find('strong').text
             stng = float(re.sub('[,]', '', stng))
-            print(stng)
+            # print(stng)
             nums.append(stng)
 
             cnt += 1
             if cnt > 5:
                 break
 
-        fields.append(str(dt))          # "tradeTime"
-        fields.append(str(nums[1]))     # "o"
-        fields.append(str(nums[2]))     # "h"
-        fields.append(str(nums[3]))     # "l"
-        fields.append(str(stoksPrice))  # "c"
-        fields.append(str(round(nums[4])))     # "volume"
-        fields.append(str(stoksPrice))  # "modified p"
+        fields.append(str(dt))              # "tradeTime"
+        fields.append(str(nums[1]))         # "o"
+        fields.append(str(nums[2]))         # "h"
+        fields.append(str(nums[3]))         # "l"
+        fields.append(str(stoksPrice))      # "c"
+        fields.append(str(round(nums[4])))  # "volume"
+        fields.append(str(stoksPrice))      # "modified p"
+
+        # if last line isn't empty but has EOF
+        with open(csvfile, 'r+') as f:
+            # http://codepad.org/S3zjnKoD
+            if f.readlines()[-1][-1:] != '\n':
+                f.write('\n')
 
         with open(csvfile, 'a', newline='') as f:
             writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
