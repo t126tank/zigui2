@@ -64,7 +64,7 @@ def main(argv):
         fields.append(str(stoksPrice))      # "modified p"
 
         # if last line isn't empty but has EOF
-        with open(csvfile, 'r+') as f:
+        with open(csvfile, 'r+', encoding='shift-jis') as f:
             # http://codepad.org/S3zjnKoD
             if f.readlines()[-1][-1:] != '\n':
                 f.write('\n')
