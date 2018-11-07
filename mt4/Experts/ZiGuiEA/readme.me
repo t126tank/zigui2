@@ -1,6 +1,9 @@
-curr = 100
-high = 140
-low  = 80
+highest = 120   // 2  sigma
+high = 110      // 1  sigma
+mid = 100
+low  = 100      // -1 sigma
+lowest  = 90    // -2 sigma
+
 max = 10
 profit = 3
 space = 2
@@ -56,8 +59,8 @@ int start() {
     for (int i = 0; i < OrdersTotal(); i++)
         if (OrderSelect(i, SELECT_BY_POS, MODE_TRADES))
             if (OrderMagicNumber() == Magic) { // symbol needs checking as well
+                ordOpenInfo.ordId[OrderType()][ordOpenInfo.openLen[OrderType()]] = ordId;
                 ordOpenInfo.ordOpen[OrderType()][ordOpenInfo.openLen[OrderType()]++] = openPrice;
-                ordOpenInfo.ordId[OrderType()][ordOpenInfo.openLen[OrderType()]++] = ordId;
             }
 
     // ONLY First Time
@@ -71,13 +74,13 @@ int start() {
     for (openum op = OP_BUY; op++; op <= OP_SELL) {
         openum dualOp = OP_SELL - op;
         // sorting order open array: OP_SELL - ASC, OP_BUY - DESC
-        quicksort(ordOpenInfo.ordOpen[op], 0, ordOpenInfo.openLen[op] - 1, op);
+        quicksort(ordOpenInfo.ordOpen[dualOp], 0, ordOpenInfo.openLen[dualOp] - 1, dualOp);
 
         int sum = 0;
         int opMax = param[dualOp].max; // BUY behavior handles OrdOpenInfo.ordOpen[OP_SELL];
         while (true) { // bu bu zu
-            if (((curr + space*(sum+1) < ordOpenInfo.ordOpen[OP_SELL][0] && op == OP_BUY) ||
-                ((curr - space*(sum+1) > ordOpenInfo.ordOpen[OP_BUY][0] && op == OP_SELL)) &&
+            if (((curr + space*(sum+1) < ordOpenInfo.ordOpen[dualOp][0] && op == OP_BUY) ||
+                ((curr - space*(sum+1) > ordOpenInfo.ordOpen[dualOp][0] && op == OP_SELL)) &&
                 (opMax > 0)) {
                 send(dualOp, 50);
                 sum++;
