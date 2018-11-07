@@ -1,4 +1,3 @@
-'''
 // glt_simple_EA2.mq4
 #property copyright "Copyright 2018, Katokunou Corp."
 #property link      "http://katokunou.com/"
@@ -16,6 +15,7 @@ input double Lots = 0.01;
 
 // definition
 #define FACTOR(op)  (op == OP_BUY? 1: -1)
+#define ARRAY_MAX 1000
 
 // data structures
 struct PARAM {
@@ -30,7 +30,7 @@ struct OrdOpen {
 };
 
 struct OrdOpenInfo {
-    OrdOpen ordOpen[2][1000];
+    OrdOpen ordOpen[2][ARRAY_MAX];
     int openLen[2];
 };
 
@@ -76,8 +76,16 @@ int start() {
 
     for (op = OP_BUY; op <= OP_SELL; op++) {
         int dualOp = OP_SELL - op;
+
         // sorting order open array: OP_SELL - ASC, OP_BUY - DESC
-        quicksort(ordOpenInfo.ordOpen[dualOp], 0, ordOpenInfo.openLen[dualOp] - 1, dualOp);
+        OrdOpen dst[ARRAY_MAX];
+        for (i = 0; i < ordOpenInfo.openLen[dualOp]; i++)
+            dst[i] = ordOpenInfo.ordOpen[dualOp][i];
+
+        quicksort(dst, 0, ordOpenInfo.openLen[dualOp] - 1, dualOp);
+
+        for (i = 0; i < ordOpenInfo.openLen[dualOp]; i++)
+            ordOpenInfo.ordOpen[dualOp][i] = dst[i];
 
         int sum = 0;
         int opMax = params[dualOp].max; // BUY behavior handles OrdOpenInfo.ordOpen[OP_SELL];
@@ -165,7 +173,6 @@ void quicksort(OrdOpen& a[], int left, int right, int op) {
       quicksort(a, j + 1, right, op); /* 分割した右を再帰的にソート */
    }
 }
-'''
 
 ・initial
 to open long  - 98 96 94 92 90 88 86 84 82 80
