@@ -2,6 +2,9 @@
 #property copyright "Copyright 2018, Katokunou Corp."
 #property link      "http://katokunou.com/"
 
+#include <stderror.mqh>
+#include <stdlib.mqh>
+
 // input
 input double Highest = 120.555;
 input double SHigh = 115.666;
@@ -9,8 +12,8 @@ input double BLow  = 105.666;
 input double Lowest  = 100.555;
 
 input int Max = 10;
-input double Profit = 0.055;
-input double Space = 0.041;
+input double Profit = 0.015;
+input double Space = 0.011;
 input double Lots = 0.01;
 
 // definition
@@ -81,6 +84,7 @@ int start() {
 
         // sorting order open array: OP_SELL - ASC, OP_BUY - DESC
         OrdOpen dst[ARRAY_MAX];
+
         for (i = 0; i < ordOpenInfo.openLen[dualOp]; i++)
             dst[i] = ordOpenInfo.ordOpen[dualOp][i];
 
@@ -88,18 +92,26 @@ int start() {
 
         for (i = 0; i < ordOpenInfo.openLen[dualOp]; i++)
             ordOpenInfo.ordOpen[dualOp][i] = dst[i];
-
+        
         int sum = 0;
         int opMax = params[dualOp].max; // BUY behavior handles OrdOpenInfo.ordOpen[OP_SELL];
-        double curr = currRate();
         while (TRUE) { // bu bu zu
+            double curr = currRate();
             double price = op == OP_BUY? curr + Space*(sum+1): curr - Space*(sum+1);
+
             if (((price < ordOpenInfo.ordOpen[dualOp][0].openPrice && op == OP_BUY) ||
                 (price > ordOpenInfo.ordOpen[dualOp][0].openPrice && op == OP_SELL)) &&
                 (opMax > 0)) {
-                double tp = op == OP_BUY? price + Profit: price - Profit;
-                price = NormalizeDouble(price + Profit, MarketInfo(Sym, MODE_DIGITS));
-                OrderSend(Sym, op, Lots, price,0,0, tp, "send", Magic, 0, ArrowColor[op]);
+                double tp = op == OP_BUY? price - Profit: price + Profit;
+                price = NormalizeDouble(price, MarketInfo(Sym, MODE_DIGITS));
+                tp = NormalizeDouble(tp, MarketInfo(Sym, MODE_DIGITS));
+                int ret = OrderSend(Sym, dualOp, Lots, price, 0,0, tp, "send", Magic, 0, ArrowColor[dualOp]);
+                if (ret < 0) {
+                    int err = GetLastError();
+                    Print("OrderSend : ", err, " " , ErrorDescription(err));
+                } else
+                    Print("OrderSend : ret = ", ret);
+
                 sum++;
                 opMax--;
             } else
