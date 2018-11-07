@@ -1,3 +1,4 @@
+'''
 // glt_simple_EA2.mq4
 #property copyright "Copyright 2018, Katokunou Corp."
 #property link      "http://katokunou.com/"
@@ -164,6 +165,8 @@ void quicksort(OrdOpen& a[], int left, int right, int op) {
       quicksort(a, j + 1, right, op); /* 分割した右を再帰的にソート */
    }
 }
+'''
+
 ・initial
 to open long  - 98 96 94 92 90 88 86 84 82 80
 current       - 100
