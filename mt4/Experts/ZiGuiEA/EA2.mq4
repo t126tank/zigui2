@@ -16,6 +16,7 @@ input double Lots = 0.01;
 // definition
 #define FACTOR(op)  (op == OP_BUY? 1: -1)
 #define ARRAY_MAX 1000
+#define PAIR 2
 
 // data structures
 struct PARAM {
@@ -30,16 +31,16 @@ struct OrdOpen {
 };
 
 struct OrdOpenInfo {
-    OrdOpen ordOpen[2][ARRAY_MAX];
-    int openLen[2];
+    OrdOpen ordOpen[PAIR][ARRAY_MAX];
+    int openLen[PAIR];
 };
 
 // global variables
 OrdOpenInfo ordOpenInfo;
-PARAM params[2];
+PARAM params[PAIR];
 const int Magic = 20181107;
 const string Sym = "USDJPY";
-const color ArrowColor[6] = {Blue, Red};
+const color ArrowColor[PAIR] = {Blue, Red};
 
 int init() {
     params[OP_BUY].max = Max;
@@ -106,7 +107,7 @@ int start() {
         }
 
         while (++opMax < ordOpenInfo.openLen[dualOp])   // sun you yu
-            OrderDelete(ordOpenInfo.ordOpen[dualOp][opMax-1].ordId);
+            OrderDelete(ordOpenInfo.ordOpen[dualOp][opMax-1].ordId, ArrowColor[op]);
     }
     return 0;
 }
@@ -176,6 +177,7 @@ void quicksort(OrdOpen& a[], int left, int right, int op) {
       quicksort(a, j + 1, right, op); /* 分割した右を再帰的にソート */
    }
 }
+
 
 ・initial
 to open long  - 98 96 94 92 90 88 86 84 82 80
