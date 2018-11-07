@@ -1,25 +1,27 @@
-highest = 120   // 2  sigma
-high = 110      // 1  sigma
-mid = 100
-low  = 100      // -1 sigma
-lowest  = 90    // -2 sigma
+// glt_simple_EA2.mq4
+#property copyright "Copyright 2018, Katokunou Corp."
+#property link      "http://katokunou.com/"
 
-max = 10
-profit = 3
-space = 2
-lots = 0.01
+// input
+input double Highest = 120.555;
+input double SHigh = 110.666;
+input double BLow  = 100.666;
+input double Lowest  = 90.555;
 
-OP_BUY=0
-OP_SELL=1
+input double Max = 10;
+input double Profit = 0.055;
+input double Space = 0.041;
+input double Lots = 0.01;
 
+// definition
 #define FACTOR(op)  (op == OP_BUY? 1: -1)
 
+// data structures
 struct PARAM {
     int max;
-    double limit;
+    double limit1;
+    double limit2;
 };
-
-struct PARAM param[2];
 
 struct OrdOpen {
     int ordId;
@@ -31,21 +33,20 @@ struct OrdOpenInfo {
     int openLen[2];
 };
 
+// global variables
 OrdOpenInfo ordOpenInfo;
-
-enum SORT {
-    ASC
-    DESC
-};
+PARAM params[2];
+const int Magic = 20181107;
+const string Sym = "USDJPY";
 
 int init() {
-    param[OP_BUY].max = max;
-    param[OP_BUY].limit1 = high;
-    param[OP_BUY].limit2 = highest; // highest should be gt high
+    params[OP_BUY].max = Max;
+    params[OP_BUY].limit2 = Highest; // highest should be gt high
+    params[OP_BUY].limit1 = SHigh;
 
-    param[OP_SELL].max = max;
-    param[OP_SELL].limit1 = low;
-    param[OP_SELL].limit2 = lowest; // lowest should be lt low
+    params[OP_SELL].max = Max;
+    params[OP_SELL].limit1 = BLow;
+    params[OP_SELL].limit2 = Lowest; // lowest should be lt low
 
     return 0;
 }
@@ -59,69 +60,80 @@ int start() {
     for (int i = 0; i < OrdersTotal(); i++)
         if (OrderSelect(i, SELECT_BY_POS, MODE_TRADES))
             if (OrderMagicNumber() == Magic) { // symbol needs checking as well
-                ordOpenInfo.ordId[OrderType()][ordOpenInfo.openLen[OrderType()]] = ordId;
-                ordOpenInfo.ordOpen[OrderType()][ordOpenInfo.openLen[OrderType()]++] = openPrice;
+                int opType = OrderType();
+                ordOpenInfo.ordOpen[opType][ordOpenInfo.openLen[opType]].ordId = OrderTicket();
+                ordOpenInfo.ordOpen[opType][ordOpenInfo.openLen[opType]++].openPrice = OrderOpenPrice();
             }
 
     // ONLY First Time
-    for (openum op = OP_BUY; op++; op <= OP_SELL)
+    for (int op = OP_BUY; op <= OP_SELL; op++)
         if (ordOpenInfo.openLen[op] == 0)
-            ordOpenInfo.ordOpen[op][0] = op == OP_BUY? 0: 1000;
+            ordOpenInfo.ordOpen[op][0].openPrice = op == OP_BUY? 0: 1000;
 
     // Update both to send orders' max limitations
     updOrdSendMax();
 
-    for (openum op = OP_BUY; op++; op <= OP_SELL) {
-        openum dualOp = OP_SELL - op;
+    for (op = OP_BUY; op <= OP_SELL; op++) {
+        int dualOp = OP_SELL - op;
         // sorting order open array: OP_SELL - ASC, OP_BUY - DESC
         quicksort(ordOpenInfo.ordOpen[dualOp], 0, ordOpenInfo.openLen[dualOp] - 1, dualOp);
 
         int sum = 0;
-        int opMax = param[dualOp].max; // BUY behavior handles OrdOpenInfo.ordOpen[OP_SELL];
-        while (true) { // bu bu zu
-            if (((curr + space*(sum+1) < ordOpenInfo.ordOpen[dualOp][0] && op == OP_BUY) ||
-                ((curr - space*(sum+1) > ordOpenInfo.ordOpen[dualOp][0] && op == OP_SELL)) &&
+        int opMax = params[dualOp].max; // BUY behavior handles OrdOpenInfo.ordOpen[OP_SELL];
+        double curr = currRate();
+        while (TRUE) { // bu bu zu
+            double price = op == OP_BUY? curr + Space*(sum+1): curr - Space*(sum+1);
+            if (((price < ordOpenInfo.ordOpen[dualOp][0].openPrice && op == OP_BUY) ||
+                (price > ordOpenInfo.ordOpen[dualOp][0].openPrice && op == OP_SELL)) &&
                 (opMax > 0)) {
-                send(dualOp, 50);
+                OrderSend(Sym, op, Lots, price,0,0, Profit);
                 sum++;
                 opMax--;
             } else
                 break;
         }
 
-        while (++opMax < ordOpenInfo.openLen[dualOp]) { // jian you yu
-            if non-exists continue;
-            cancel(ordOpenInfo.ordId[dualOp][opMax-1]);
-        }
+        while (++opMax < ordOpenInfo.openLen[dualOp])   // sun you yu
+            OrderDelete(ordOpenInfo.ordOpen[dualOp][opMax-1].ordId);
     }
+    return 0;
 }
 
+double currRate() {
+    return (MarketInfo(Sym, MODE_BID) + MarketInfo(Sym, MODE_ASK)) / 2;
+}
+
+int intMax(int l, int r) {
+    return l > r? l: r;
+}
 
 void updOrdSendMax() {
-    for (openum op = OP_BUY; op++; op <= OP_SELL) {
-        openum dualOp = OP_SELL - op;
+    for (int op = OP_BUY; op <= OP_SELL; op++) {
+        int dualOp = OP_SELL - op;
+
         // judge range
-        double diff1 = (curr - param[op].limit1) * FACTOR(op);
-        double diff2 = (curr - param[op].limit2) * FACTOR(op);
+        double curr = currRate();
+        double diff1 = (curr - params[op].limit1) * FACTOR(op);
+        double diff2 = (curr - params[op].limit2) * FACTOR(op);
         if (diff2 > 0) { // out of trading limitation2
-            int reduce = max - round(diff2 / space);
-            param[op].max = 0;
-            param[dualOp].max = intMax(reduce, 0);
+            int reduce = Max - round(diff2 / Space);
+            params[op].max = 0;
+            params[dualOp].max = intMax(reduce, 0);
             break;
         } else if (diff1 > 0) { // out of trading limitation1
-            int reduce = max - round(diff1 / space);
-            param[op].max = intMax(reduce, 0);
-            param[dualOp].max = max;
+            reduce = Max - round(diff1 / Space);
+            params[op].max = intMax(reduce, 0);
+            params[dualOp].max = Max;
             break;
         } else {
-            param[op].max = max;
-            param[dualOp].max = max;
+            params[op].max = Max;
+            params[dualOp].max = Max;
         }
     }
 }
 
 /* x, y, z の中間値を返す */
-OrdOpen med3(OrdOpen& x, OrdOpen& y, OrdOpen& z, openum op) {
+OrdOpen med3(OrdOpen& x, OrdOpen& y, OrdOpen& z, int op) {
    if (((x.openPrice < y.openPrice) && (op == OP_SELL)) || ((x.openPrice > y.openPrice) && (op == OP_BUY))) // ASC || DESC
       if (y.openPrice < z.openPrice) return op == OP_SELL? y: z; else if (z.openPrice < x.openPrice) return op == OP_SELL? x: z; else return z; else
       if (z.openPrice < y.openPrice) return op == OP_SELL? y: z; else if (x.openPrice < z.openPrice) return op == OP_SELL? x: z; else return z;
@@ -132,11 +144,11 @@ OrdOpen med3(OrdOpen& x, OrdOpen& y, OrdOpen& z, openum op) {
  * left  : ソートするデータの開始位置
  * right : ソートするデータの終了位置
  */
-void quicksort(OrdOpen& a[], int left, int right, openum op) {
+void quicksort(OrdOpen& a[], int left, int right, int op) {
    if (left < right) {
       int i = left, j = right;
       OrdOpen tmp, pivot = med3(a[i], a[i + (j - i) / 2], a[j], op); /* (i+j)/2ではオーバーフローしてしまう */
-      while (1) { /* a[] を pivot 以上と以下の集まりに分割する */
+      while (TRUE) { /* a[] を pivot 以上と以下の集まりに分割する */
          if (op == OP_SELL) { // ASC
             while (a[i].openPrice < pivot.openPrice) i++; /* a[i] >= pivot となる位置を検索 */
             while (pivot.openPrice < a[j].openPrice) j--; /* a[j] <= pivot となる位置を検索 */
@@ -152,8 +164,6 @@ void quicksort(OrdOpen& a[], int left, int right, openum op) {
       quicksort(a, j + 1, right, op); /* 分割した右を再帰的にソート */
    }
 }
-
-
 ・initial
 to open long  - 98 96 94 92 90 88 86 84 82 80
 current       - 100
