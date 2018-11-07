@@ -61,62 +61,64 @@ int start() {
             }
 
     // ONLY First Time
-    for (opnum op = OP_BUY; op++; op <= OP_SELL)
+    for (openum op = OP_BUY; op++; op <= OP_SELL)
         if (ordOpenInfo.openLen[op] == 0)
             ordOpenInfo.ordOpen[op][0] = op == OP_BUY? 0: 1000;
 
     // Update both to send orders' max limitations
     updOrdSendMax();
 
-    for (opnum op = OP_BUY; op++; op <= OP_SELL) {
+    for (openum op = OP_BUY; op++; op <= OP_SELL) {
+        openum dualOp = OP_SELL - op;
         // sorting order open array: OP_SELL - ASC, OP_BUY - DESC
         quicksort(ordOpenInfo.ordOpen[op], 0, ordOpenInfo.openLen[op] - 1, op);
 
         int sum = 0;
-        int opMax = param[OP_SELL - op].max; // BUY behavior handles OrdOpenInfo.ordOpen[OP_SELL];
+        int opMax = param[dualOp].max; // BUY behavior handles OrdOpenInfo.ordOpen[OP_SELL];
         while (true) { // bu bu zu
             if (((curr + space*(sum+1) < ordOpenInfo.ordOpen[OP_SELL][0] && op == OP_BUY) ||
                 ((curr - space*(sum+1) > ordOpenInfo.ordOpen[OP_BUY][0] && op == OP_SELL)) &&
                 (opMax > 0)) {
-                send(OP_SELL - op, 50);
+                send(dualOp, 50);
                 sum++;
                 opMax--;
             } else
                 break;
         }
 
-        while (++opMax < ordOpenInfo.openLen[OP_SELL - op]) { // jian you yu
+        while (++opMax < ordOpenInfo.openLen[dualOp]) { // jian you yu
             if non-exists continue;
-            cancel(ordOpenInfo.ordId[OP_SELL - op][opMax-1]);
+            cancel(ordOpenInfo.ordId[dualOp][opMax-1]);
         }
     }
 }
 
 
 void updOrdSendMax() {
-    for (opnum op = OP_BUY; op++; op <= OP_SELL) {
+    for (openum op = OP_BUY; op++; op <= OP_SELL) {
+        openum dualOp = OP_SELL - op;
         // judge range
         double diff1 = (curr - param[op].limit1) * FACTOR(op);
         double diff2 = (curr - param[op].limit2) * FACTOR(op);
         if (diff2 > 0) { // out of trading limitation2
             int reduce = max - round(diff2 / space);
             param[op].max = 0;
-            param[OP_SELL - op].max = intMax(reduce, 0);
+            param[dualOp].max = intMax(reduce, 0);
             break;
         } else if (diff1 > 0) { // out of trading limitation1
             int reduce = max - round(diff1 / space);
             param[op].max = intMax(reduce, 0);
-            param[OP_SELL - op].max = max;
+            param[dualOp].max = max;
             break;
         } else {
             param[op].max = max;
-            param[OP_SELL - op].max = max;
+            param[dualOp].max = max;
         }
     }
 }
 
 /* x, y, z の中間値を返す */
-OrdOpen med3(OrdOpen& x, OrdOpen& y, OrdOpen& z, opnum op) {
+OrdOpen med3(OrdOpen& x, OrdOpen& y, OrdOpen& z, openum op) {
    if (((x.openPrice < y.openPrice) && (op == OP_SELL)) || ((x.openPrice > y.openPrice) && (op == OP_BUY))) // ASC || DESC
       if (y.openPrice < z.openPrice) return op == OP_SELL? y: z; else if (z.openPrice < x.openPrice) return op == OP_SELL? x: z; else return z; else
       if (z.openPrice < y.openPrice) return op == OP_SELL? y: z; else if (x.openPrice < z.openPrice) return op == OP_SELL? x: z; else return z;
@@ -127,7 +129,7 @@ OrdOpen med3(OrdOpen& x, OrdOpen& y, OrdOpen& z, opnum op) {
  * left  : ソートするデータの開始位置
  * right : ソートするデータの終了位置
  */
-void quicksort(OrdOpen& a[], int left, int right, opnum op) {
+void quicksort(OrdOpen& a[], int left, int right, openum op) {
    if (left < right) {
       int i = left, j = right;
       OrdOpen tmp, pivot = med3(a[i], a[i + (j - i) / 2], a[j], op); /* (i+j)/2ではオーバーフローしてしまう */
@@ -146,30 +148,6 @@ void quicksort(OrdOpen& a[], int left, int right, opnum op) {
       quicksort(a, left, i - 1, op);  /* 分割した左を再帰的にソート */
       quicksort(a, j + 1, right, op); /* 分割した右を再帰的にソート */
    }
-}
-
-
-for (opnum op = OP_BUY; op++; op <= OP_SELL) {
-
-
-
-    // judge range
-    double diff1 = (curr - param[op].limit1) * FACTOR(op);
-    double diff2 = (curr - param[op].limit2) * FACTOR(op);
-    if (diff2 > 0) { // out of trading limitation2
-        int reduce = max - round(diff2 / space);
-        param[op].max = 0;
-        param[OP_SELL - op].max = intMax(reduce, 0);
-        break;
-    } else if (diff1 > 0) { // out of trading limitation1
-        int reduce = max - round(diff1 / space);
-        param[op].max = intMax(reduce, 0);
-        param[OP_SELL - op].max = max;
-        break;
-    } else {
-        param[op].max = max;
-        param[OP_SELL - op].max = max;
-    }
 }
 
 
