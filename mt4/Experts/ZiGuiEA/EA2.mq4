@@ -95,7 +95,9 @@ int start() {
             if (((price < ordOpenInfo.ordOpen[dualOp][0].openPrice && op == OP_BUY) ||
                 (price > ordOpenInfo.ordOpen[dualOp][0].openPrice && op == OP_SELL)) &&
                 (opMax > 0)) {
-                OrderSend(Sym, op, Lots, price,0,0, Profit);
+                double tp = op == OP_BUY? price + Profit: price - Profit;
+                price = NormalizeDouble(price + Profit, MarketInfo(Sym, MODE_DIGITS));
+                OrderSend(Sym, op, Lots, price,0,0, tp);
                 sum++;
                 opMax--;
             } else
