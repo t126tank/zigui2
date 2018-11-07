@@ -4,11 +4,11 @@
 
 // input
 input double Highest = 120.555;
-input double SHigh = 110.666;
-input double BLow  = 100.666;
-input double Lowest  = 90.555;
+input double SHigh = 115.666;
+input double BLow  = 105.666;
+input double Lowest  = 100.555;
 
-input double Max = 10;
+input int Max = 10;
 input double Profit = 0.055;
 input double Space = 0.041;
 input double Lots = 0.01;
