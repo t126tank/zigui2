@@ -14,7 +14,7 @@ OP_SELL=1
 struct PARAM {
     int max;
     double limit;
-}
+};
 
 struct PARAM param[2];
 
@@ -52,17 +52,18 @@ int start() {
     ordOpenInfo.openLen[OP_BUY]  = 0;
     ordOpenInfo.openLen[OP_SELL] = 0;
 
-    // OrdOpen arrays intial
+    // OrdOpen arrays initial
     for (int i = 0; i < OrdersTotal(); i++)
         if (OrderSelect(i, SELECT_BY_POS, MODE_TRADES))
-            if (OrderMagicNumber() == Magic) // symbol needs checking as well
-                ordOpenInfo.ordOpen[OrderType()][ordOpenInfo.openLen[OrderType()]++];
+            if (OrderMagicNumber() == Magic) { // symbol needs checking as well
+                ordOpenInfo.ordOpen[OrderType()][ordOpenInfo.openLen[OrderType()]++] = openPrice;
+                ordOpenInfo.ordId[OrderType()][ordOpenInfo.openLen[OrderType()]++] = ordId;
+            }
 
     // ONLY First Time
-    if (ordOpenInfo.openLen[OP_BUY] == 0)
-        ordOpenInfo.ordOpen[OP_BUY][0] = 0;
-    if (ordOpenInfo.openLen[OP_SELL] == 0)
-        ordOpenInfo.ordOpen[OP_SELL][0] = 1000;
+    for (opnum op = OP_BUY; op++; op <= OP_SELL)
+        if (ordOpenInfo.openLen[op] == 0)
+            ordOpenInfo.ordOpen[op][0] = op == OP_BUY? 0: 1000;
 
     // Update both to send orders' max limitations
     updOrdSendMax();
@@ -71,36 +72,25 @@ int start() {
         // sorting order open array: OP_SELL - ASC, OP_BUY - DESC
         quicksort(ordOpenInfo.ordOpen[op], 0, ordOpenInfo.openLen[op] - 1, op);
 
-        int opMax = param[OP_SELL - op].max; // BUY behavior handles OrdOpenInfo.ordOpen[OP_SELL]
-        if (param[OP_SELL - op].max > 0)
+        int sum = 0;
+        int opMax = param[OP_SELL - op].max; // BUY behavior handles OrdOpenInfo.ordOpen[OP_SELL];
+        while (true) { // bu bu zu
+            if (((curr + space*(sum+1) < ordOpenInfo.ordOpen[OP_SELL][0] && op == OP_BUY) ||
+                ((curr - space*(sum+1) > ordOpenInfo.ordOpen[OP_BUY][0] && op == OP_SELL)) &&
+                (opMax > 0)) {
+                send(OP_SELL - op, 50);
+                sum++;
+                opMax--;
+            } else
+                break;
+        }
+
+        while (++opMax < ordOpenInfo.openLen[OP_SELL - op]) { // jian you yu
+            if non-exists continue;
+            cancel(ordOpenInfo.ordId[OP_SELL - op][opMax-1]);
+        }
     }
 }
-
-
-
-
-sum = 0;
-while (true) {
-    op_b handles opens
-        if (curr + space*(sum+1) < asc min)     7 8 9 && (max[s-op_b] > 0)
-            send(s - op_b, 50);
-            sum++;
-            max[s-op_b]--;
-        else
-            break;
-}
-
-while (++max[s-op_b] < opens.len)
-    if non-exists continue;
-    cancel(max[s-op_b]);
-}
-
-
-op_s handles openb
-  curr - space*i > dasc max    9 8 7
-  send(s - op_s, 50)
-
-
 
 
 void updOrdSendMax() {
