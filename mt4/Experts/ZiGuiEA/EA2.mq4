@@ -39,6 +39,7 @@ OrdOpenInfo ordOpenInfo;
 PARAM params[2];
 const int Magic = 20181107;
 const string Sym = "USDJPY";
+const color ArrowColor[6] = {Blue, Red};
 
 int init() {
     params[OP_BUY].max = Max;
@@ -97,7 +98,7 @@ int start() {
                 (opMax > 0)) {
                 double tp = op == OP_BUY? price + Profit: price - Profit;
                 price = NormalizeDouble(price + Profit, MarketInfo(Sym, MODE_DIGITS));
-                OrderSend(Sym, op, Lots, price,0,0, tp);
+                OrderSend(Sym, op, Lots, price,0,0, tp, "send", Magic, 0, ArrowColor[op]);
                 sum++;
                 opMax--;
             } else
