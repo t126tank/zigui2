@@ -66,7 +66,7 @@ int start() {
     for (int i = 0; i < OrdersTotal(); i++)
         if (OrderSelect(i, SELECT_BY_POS, MODE_TRADES))
             if (OrderMagicNumber() == Magic) { // symbol needs checking as well
-                int opType = OrderType();
+                int opType = OrderType() - 2;
                 ordOpenInfo.ordOpen[opType][ordOpenInfo.openLen[opType]].ordId = OrderTicket();
                 ordOpenInfo.ordOpen[opType][ordOpenInfo.openLen[opType]++].openPrice = OrderOpenPrice();
             }
@@ -105,7 +105,7 @@ int start() {
                 double tp = op == OP_BUY? price - Profit: price + Profit;
                 price = NormalizeDouble(price, MarketInfo(Sym, MODE_DIGITS));
                 tp = NormalizeDouble(tp, MarketInfo(Sym, MODE_DIGITS));
-                int ret = OrderSend(Sym, dualOp, Lots, price, 0,0, tp, "send", Magic, 0, ArrowColor[dualOp]);
+                int ret = OrderSend(Sym, dualOp + 2, Lots, price, 0,0, tp, "send", Magic, 0, ArrowColor[dualOp]);
                 if (ret < 0) {
                     int err = GetLastError();
                     Print("OrderSend : ", err, " " , ErrorDescription(err));
