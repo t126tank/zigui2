@@ -65,8 +65,8 @@ int start() {
     // OrdOpen arrays initial
     for (int i = 0; i < OrdersTotal(); i++)
         if (OrderSelect(i, SELECT_BY_POS, MODE_TRADES))
-            if (OrderMagicNumber() == Magic) { // symbol needs checking as well
-                int opType = OrderType() - 2;
+            if (OrderMagicNumber() == Magic && OrderType() > OP_SELL) { // symbol needs checking as well
+                int opType = OrderType() - OP_BUYLIMIT; // -2
                 ordOpenInfo.ordOpen[opType][ordOpenInfo.openLen[opType]].ordId = OrderTicket();
                 ordOpenInfo.ordOpen[opType][ordOpenInfo.openLen[opType]++].openPrice = OrderOpenPrice();
             }
@@ -85,30 +85,45 @@ int start() {
         // sorting order open array: OP_SELL - ASC, OP_BUY - DESC
         OrdOpen dst[ARRAY_MAX];
 
-        for (i = 0; i < ordOpenInfo.openLen[dualOp]; i++)
+        string text = "Array";
+        string trdType = " BUY";
+        if (dualOp == OP_SELL)
+          trdType = " SELL ";
+
+        text = StringConcatenate(text, " [", trdType ,"]");
+        text = StringConcatenate(text, " [", IntegerToString(ordOpenInfo.openLen[dualOp]) ,"]");
+
+        for (i = 0; i < ordOpenInfo.openLen[dualOp]; i++) {
             dst[i] = ordOpenInfo.ordOpen[dualOp][i];
+            //text = StringConcatenate(text, " :: ", DoubleToStr(ordOpenInfo.ordOpen[dualOp][i].openPrice));
+        }
+        //Print(text);
+        //text = "Sorted";
 
         quicksort(dst, 0, ordOpenInfo.openLen[dualOp] - 1, dualOp);
-
-        for (i = 0; i < ordOpenInfo.openLen[dualOp]; i++)
+        for (i = 0; i < ordOpenInfo.openLen[dualOp]; i++) {
             ordOpenInfo.ordOpen[dualOp][i] = dst[i];
-        
+            text = StringConcatenate(text, " :: ", DoubleToStr(ordOpenInfo.ordOpen[dualOp][i].openPrice));
+        }
+        Print(text);
+
         int sum = 0;
         int opMax = params[dualOp].max; // BUY behavior handles OrdOpenInfo.ordOpen[OP_SELL];
         while (TRUE) { // bu bu zu
             double curr = currRate();
             double price = op == OP_BUY? curr + Space*(sum+1): curr - Space*(sum+1);
 
-            if (((price < ordOpenInfo.ordOpen[dualOp][0].openPrice && op == OP_BUY) ||
-                (price > ordOpenInfo.ordOpen[dualOp][0].openPrice && op == OP_SELL)) &&
+            if (((price + Space < ordOpenInfo.ordOpen[dualOp][0].openPrice && op == OP_BUY) ||
+                (price - Space > ordOpenInfo.ordOpen[dualOp][0].openPrice && op == OP_SELL)) &&
                 (opMax > 0)) {
                 double tp = op == OP_BUY? price - Profit: price + Profit;
                 price = NormalizeDouble(price, MarketInfo(Sym, MODE_DIGITS));
                 tp = NormalizeDouble(tp, MarketInfo(Sym, MODE_DIGITS));
-                int ret = OrderSend(Sym, dualOp + 2, Lots, price, 0,0, tp, "send", Magic, 0, ArrowColor[dualOp]);
+                int ret = OrderSend(Sym, dualOp + OP_BUYLIMIT, Lots, price, 0, 0, tp, "send", Magic, 0, ArrowColor[dualOp]);
                 if (ret < 0) {
                     int err = GetLastError();
                     Print("OrderSend : ", err, " " , ErrorDescription(err));
+                    Print("OrderSend : op - ", dualOp, " price - " , price, " tp - ", tp);
                 } else
                     Print("OrderSend : ret = ", ret);
 
@@ -189,7 +204,6 @@ void quicksort(OrdOpen& a[], int left, int right, int op) {
       quicksort(a, j + 1, right, op); /* 分割した右を再帰的にソート */
    }
 }
-
 
 ・initial
 to open long  - 98 96 94 92 90 88 86 84 82 80
