@@ -9,7 +9,7 @@
 OR  
 -〉实际下跌后，卖 1357
 
-https://dlbuy.dip.jp/hedge/queryTrades.php?startupId=aaa:1542168185
+https://dlbuy.dip.jp/hedge/queryTrades.php?startupId=aaa:1542168185  
 https://dlbuy.dip.jp/hedge/queryPositions.php?userId=aaa
 
 ```
