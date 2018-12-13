@@ -8,3 +8,18 @@
  \# 提前 多 日元  
 OR  
 -〉实际下跌后，卖 1357
+
+https://dlbuy.dip.jp/hedge/queryTrades.php?startupId=aaa:1542168185
+https://dlbuy.dip.jp/hedge/queryPositions.php?userId=aaa
+
+```
+My NEW positon: aaa:1542168185
+My NEW positon: aaa:1540340043
+My NEW positon: aaa:1539222662
+My NEW positon: aaa:1534724944
+My NEW positon: aaa:1531876503
+My NEW positon: aaa:1529024402
+My NEW positon: aaa:1526533744
+My NEW positon: aaa:1525911426
+My NEW positon: aaa:1523586422
+```
