@@ -244,23 +244,32 @@ def tradeB(o):
     return o.getInfo().getSp() < o.getInfo().getVal() and o.getInfo().getVal() > 0
 
 
-def tradeL(o):
-    if o.getInfo().getBp() > o.getInfo().getVal() and o.getInfo().getVal() > 0:
-        # Long
+def trade(o, t):
+    limit1 = ipsilon2
+    limit2 = ipsilon1
+    if t == "long":
+        limit1 = ipsilon1
+        limit2 = ipsilon2
+
+    if (
+        (o.getInfo().getBp() > o.getInfo().getVal() and o.getInfo().getVal() > 0 and o.getInfo().getSp() < 100) or
+        (o.getInfo().getBp() > 0 and o.getInfo().getSp() < 150)
+       ):
         if (
-            (o.getType() == "call" and o.getInfo().getDelta() < ipsilon1) or
-            (o.getType() == "put"  and abs(o.getInfo().getDelta()) < ipsilon2)
+            (o.getType() == "call" and o.getInfo().getDelta() < limit1) or
+            (o.getType() == "put"  and abs(o.getInfo().getDelta()) < limit2)
            ):
             return True
 
+def tradeL(o):
+    # Long
+    return trade(o, "long")
+
+
 def tradeS(o):
-    if o.getInfo().getBp() > o.getInfo().getVal() and o.getInfo().getVal() > 0:
-        # Short
-        if (
-            (o.getType() == "call" and o.getInfo().getDelta() < ipsilon2) or
-            (o.getType() == "put"  and abs(o.getInfo().getDelta()) < ipsilon1)
-           ):
-            return True
+    # Short
+    return trade(o, "short")
+
 
 def dbgPrint(o):
     val = o.getInfo().getVal()
@@ -291,3 +300,55 @@ def main(argv):
 
 if __name__ == "__main__":
     main(sys.argv[1:])
+
+'''
+>>> Common Buy:
+2019/01/10  ::  23625  ::  call  :: (SELL) 2  :: < ( 0.5 ) :: (val)  3  :: > ( -2.0 ) :: (BUY)  1
+2019/01/10  ::  23500  ::  call  :: (SELL) 3  :: < ( 0.333 ) :: (val)  4  :: > ( -1.0 ) :: (BUY)  2
+2019/01/10  ::  23375  ::  call  :: (SELL) 4  :: < ( 0.5 ) :: (val)  6  :: > ( -1.0 ) :: (BUY)  3
+2019/01/10  ::  23250  ::  call  :: (SELL) 5  :: < ( 0.4 ) :: (val)  7  :: > ( -0.75 ) :: (BUY)  4
+2019/01/10  ::  23125  ::  call  :: (SELL) 6  :: < ( 0.5 ) :: (val)  9  :: > ( -0.8 ) :: (BUY)  5
+2019/01/10  ::  23000  ::  call  :: (SELL) 9  :: < ( 0.556 ) :: (val)  14  :: > ( -0.75 ) :: (BUY)  8
+2019/01/10  ::  22875  ::  call  :: (SELL) 12  :: < ( 0.5 ) :: (val)  18  :: > ( -0.636 ) :: (BUY)  11
+2019/01/10  ::  22750  ::  call  :: (SELL) 16  :: < ( 0.5 ) :: (val)  24  :: > ( -0.714 ) :: (BUY)  14
+2019/01/10  ::  22625  ::  call  :: (SELL) 21  :: < ( 0.571 ) :: (val)  33  :: > ( -0.65 ) :: (BUY)  20
+2019/01/10  ::  22500  ::  call  :: (SELL) 28  :: < ( 0.536 ) :: (val)  43  :: > ( -0.593 ) :: (BUY)  27
+2019/01/10  ::  22375  ::  call  :: (SELL) 36  :: < ( 0.556 ) :: (val)  56  :: > ( -0.6 ) :: (BUY)  35
+→ 看多，36 买价值 56 的call option，折价率 55.6%
+
+2018/12/27  ::  20625  ::  call  :: (SELL) 515  :: < ( 0.233 ) :: (val)  635  :: > ( -0.351 ) :: (BUY)  470
+>>> Long:
+2019/01/10  ::  18750  ::  put  :: (SELL) 45  :: < ( -0.156 ) :: (val)  38  :: > ( 0.116 ) :: (BUY)  43
+2019/01/10  ::  18500  ::  put  :: (SELL) 35  :: < ( -0.171 ) :: (val)  29  :: > ( 0.121 ) :: (BUY)  33
+2019/01/10  ::  18250  ::  put  :: (SELL) 27  :: < ( -0.111 ) :: (val)  24  :: > ( 0.077 ) :: (BUY)  26
+2019/02/07  ::  16000  ::  put  :: (SELL) 33  :: < ( -0.273 ) :: (val)  24  :: > ( 0.226 ) :: (BUY)  31
+2019/02/07  ::  15000  ::  put  :: (SELL) 20  :: < ( -0.35 ) :: (val)  13  :: > ( 0.316 ) :: (BUY)  19
+2019/02/07  ::  14000  ::  put  :: (SELL) 13  :: < ( -0.462 ) :: (val)  7  :: > ( 0.417 ) :: (BUY)  12
+2019/02/07  ::  12000  ::  put  :: (SELL) 5  :: < ( -0.4 ) :: (val)  3  :: > ( 0.25 ) :: (BUY)  4
+2019/03/07  ::  15500  ::  put  :: (SELL) 45  :: < ( -0.156 ) :: (val)  38  :: > ( 0.095 ) :: (BUY)  42
+→ 看多，42 卖价值 38 的put option，溢价率 9.5%
+
+2019/03/07  ::  15250  ::  put  :: (SELL) 40  :: < ( -0.175 ) :: (val)  33  :: > ( 0.108 ) :: (BUY)  37
+2019/03/07  ::  15000  ::  put  :: (SELL) 35  :: < ( -0.143 ) :: (val)  30  :: > ( 0.091 ) :: (BUY)  33
+2019/03/07  ::  14750  ::  put  :: (SELL) 31  :: < ( -0.161 ) :: (val)  26  :: > ( 0.103 ) :: (BUY)  29
+2019/03/07  ::  14500  ::  put  :: (SELL) 28  :: < ( -0.179 ) :: (val)  23  :: > ( 0.08 ) :: (BUY)  25
+2019/03/07  ::  14000  ::  put  :: (SELL) 22  :: < ( -0.182 ) :: (val)  18  :: > ( 0.1 ) :: (BUY)  20
+2018/12/20  ::  20250  ::  put  :: (SELL) 33  :: < ( -0.152 ) :: (val)  28  :: > ( 0.034 ) :: (BUY)  29
+>>> Short
+2019/01/10  ::  18750  ::  put  :: (SELL) 45  :: < ( -0.156 ) :: (val)  38  :: > ( 0.116 ) :: (BUY)  43
+2019/01/10  ::  18500  ::  put  :: (SELL) 35  :: < ( -0.171 ) :: (val)  29  :: > ( 0.121 ) :: (BUY)  33
+2019/01/10  ::  18250  ::  put  :: (SELL) 27  :: < ( -0.111 ) :: (val)  24  :: > ( 0.077 ) :: (BUY)  26
+2019/02/07  ::  16000  ::  put  :: (SELL) 33  :: < ( -0.273 ) :: (val)  24  :: > ( 0.226 ) :: (BUY)  31
+→ 看空，31 卖价值 24 的put option，溢价率 22.6%
+
+2019/02/07  ::  15000  ::  put  :: (SELL) 20  :: < ( -0.35 ) :: (val)  13  :: > ( 0.316 ) :: (BUY)  19
+2019/02/07  ::  14000  ::  put  :: (SELL) 13  :: < ( -0.462 ) :: (val)  7  :: > ( 0.417 ) :: (BUY)  12
+2019/02/07  ::  12000  ::  put  :: (SELL) 5  :: < ( -0.4 ) :: (val)  3  :: > ( 0.25 ) :: (BUY)  4
+2019/03/07  ::  15500  ::  put  :: (SELL) 45  :: < ( -0.156 ) :: (val)  38  :: > ( 0.095 ) :: (BUY)  42
+2019/03/07  ::  15250  ::  put  :: (SELL) 40  :: < ( -0.175 ) :: (val)  33  :: > ( 0.108 ) :: (BUY)  37
+2019/03/07  ::  15000  ::  put  :: (SELL) 35  :: < ( -0.143 ) :: (val)  30  :: > ( 0.091 ) :: (BUY)  33
+2019/03/07  ::  14750  ::  put  :: (SELL) 31  :: < ( -0.161 ) :: (val)  26  :: > ( 0.103 ) :: (BUY)  29
+2019/03/07  ::  14500  ::  put  :: (SELL) 28  :: < ( -0.179 ) :: (val)  23  :: > ( 0.08 ) :: (BUY)  25
+2019/03/07  ::  14000  ::  put  :: (SELL) 22  :: < ( -0.182 ) :: (val)  18  :: > ( 0.1 ) :: (BUY)  20
+2018/12/20  ::  20250  ::  put  :: (SELL) 33  :: < ( -0.152 ) :: (val)  28  :: > ( 0.034 ) :: (BUY)  29
+'''
