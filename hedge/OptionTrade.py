@@ -87,15 +87,15 @@ class Target:
         return self.tgt
 
 targets = [
-#    Target("https://www.jpx.co.jp/markets/derivatives/index.html", "https://svc.qri.jp/jpx/nkopm/"),
-#    Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/1"),
-#    Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/2"),
-#    Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopw/"),
+    Target("https://www.jpx.co.jp/markets/derivatives/index.html", "https://svc.qri.jp/jpx/nkopm/"),
+    Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/1"),
+    Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/2"),
+    Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopw/"),
     Target("https://svc.qri.jp/jpx/nkopw/", "https://svc.qri.jp/jpx/nkopw/1")
 ]
 
-ipsilon1 = 0.05
-ipsilon2 = 0.07
+ipsilon1 = 0.2
+ipsilon2 = 0.4
 
 options = []
 
@@ -105,6 +105,23 @@ def intDelComma(str):
         rtn = int(re.sub('[,]', '', str.strip()))
 
     return rtn
+
+def convPrice(str):
+    return int(re.sub('[,]', '', str.strip()))
+
+
+def getPrices(str):
+    val = re.split('[()]', str)
+
+    sp = 99999
+    if val[0].find("-") == -1:
+        sp = convPrice(val[0])
+
+    bp = 0
+    if val[2].find("-") == -1:
+        bp = convPrice(val[2])
+
+    return sp, bp
 
 
 def convDelta(str):
@@ -153,7 +170,6 @@ def crawler(t):
             tds.append(td.text)
             # print(td.text)
 
-        options = []
         for idx,item in enumerate(tds):
             plus1 = idx + 1
             if plus1 % ITEM_NUM == 0:
@@ -161,8 +177,13 @@ def crawler(t):
                 atm = isATM(tds[idx-16])
                 kp = getKp(tds[idx-16])
 
-                options.append(Option("call", dd, kp, OptInfo(atm, intDelComma(tds[idx-24]), 12, 8, convDelta(tds[idx-7])), tm, ts))
-                options.append(Option("put",  dd, kp, OptInfo(atm, intDelComma(tds[idx-8]),  12, 8, convDelta(tds[idx-3])), tm, ts))
+                csp, cbp = getPrices(tds[idx-20])
+                # print("call::", csp, " :: ", intDelComma(tds[idx-24]), " :: ", cbp)
+                options.append(Option("call", dd, kp, OptInfo(atm, intDelComma(tds[idx-24]), cbp, csp, convDelta(tds[idx-7])), tm, ts))
+
+                psp, pbp = getPrices(tds[idx-12])
+                # print("put::", psp, " :: ", intDelComma(tds[idx-8]), " :: ", pbp)
+                options.append(Option("put",  dd, kp, OptInfo(atm, intDelComma(tds[idx-8]),  pbp, psp, convDelta(tds[idx-3])), tm, ts))
             ''' 
             elif plus1 % ITEM_NUM == 1:
                 print('清算値 <C>: ', item)
@@ -220,11 +241,11 @@ def crawler(t):
 
 def tradeB(o):
     # Common Buy
-    if o.getInfo().getSp() < o.getInfo().getVal() and o.getInfo().getVal() != 0:
-        return True
+    return o.getInfo().getSp() < o.getInfo().getVal() and o.getInfo().getVal() > 0
+
 
 def tradeL(o):
-    if o.getInfo().getBp() > o.getInfo().getVal() and o.getInfo().getVal() != 0:
+    if o.getInfo().getBp() > o.getInfo().getVal() and o.getInfo().getVal() > 0:
         # Long
         if (
             (o.getType() == "call" and o.getInfo().getDelta() < ipsilon1) or
@@ -233,7 +254,7 @@ def tradeL(o):
             return True
 
 def tradeS(o):
-    if o.getInfo().getBp() > o.getInfo().getVal() and o.getInfo().getVal() != 0:
+    if o.getInfo().getBp() > o.getInfo().getVal() and o.getInfo().getVal() > 0:
         # Short
         if (
             (o.getType() == "call" and o.getInfo().getDelta() < ipsilon2) or
@@ -242,16 +263,25 @@ def tradeS(o):
             return True
 
 def dbgPrint(o):
-    print(o.getDd(), ' :: ', o.getKp(), ' :: ', o.getType(), ' :: ', o.getInfo().getVal)
+    val = o.getInfo().getVal()
+    sp  = o.getInfo().getSp()
+    bp  = o.getInfo().getBp()
+    rateSp = round(val/sp - 1, 3)
+    rateBp = '*' if bp == 0 else round(1 - val/bp, 3)
+
+    print(o.getDd(), ' :: ', o.getKp(), ' :: ', o.getType(),    \
+        ' :: (SELL)', sp,  \
+        ' :: < (', rateSp,') :: (val) ', val,  \
+        ' :: > (', rateBp,') :: (BUY) ', bp)
 
 def main(argv):
     list(map(crawler, targets))
 
-    print(">>> Common Buy")
+    print(">>> Common Buy:")
     optBs = list(filter(tradeB, options))
     list(map(dbgPrint, optBs))
 
-    print(">>> Long")
+    print(">>> Long:")
     optLs = list(filter(tradeL, options))
     list(map(dbgPrint, optLs))
 
