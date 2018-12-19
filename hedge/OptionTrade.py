@@ -87,15 +87,15 @@ class Target:
         return self.tgt
 
 targets = [
-    Target("https://www.jpx.co.jp/markets/derivatives/index.html", "https://svc.qri.jp/jpx/nkopm/"),
-    Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/1"),
-    Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/2"),
+    # Target("https://www.jpx.co.jp/markets/derivatives/index.html", "https://svc.qri.jp/jpx/nkopm/"),
+    # Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/1"),
+    # Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/2"),
     Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopw/"),
     Target("https://svc.qri.jp/jpx/nkopw/", "https://svc.qri.jp/jpx/nkopw/1")
 ]
 
-ipsilon1 = 0.2
-ipsilon2 = 0.4
+ipsilon1 = 0.08
+ipsilon2 = 0.15
 
 options = []
 
@@ -126,8 +126,9 @@ def getPrices(str):
 
 def convDelta(str):
     rtn = 1.0
+
     try:
-        rtn = float(str)
+        rtn = float(str.strip())
     except:
         return rtn
 
@@ -247,20 +248,28 @@ def tradeB(o):
 def trade(o, t):
     limit1 = ipsilon2
     limit2 = ipsilon1
+    type   = "put"
+    ret1   = False
+    ret2   = False
+    ret3   = False
+
     if t == "long":
         limit1 = ipsilon1
         limit2 = ipsilon2
+        type   = "call"
 
-    if (
-        (o.getInfo().getBp() > o.getInfo().getVal() and o.getInfo().getVal() > 0 and o.getInfo().getSp() < 100) or
-        (o.getInfo().getBp() > 0 and o.getInfo().getSp() < 150)
-       ):
-        if (
-            (o.getType() == "call" and o.getInfo().getDelta() < limit1) or
-            (o.getType() == "put"  and abs(o.getInfo().getDelta()) < limit2)
-           ):
-            return True
+    # Sell chance
+    ret1 = (o.getInfo().getBp() > o.getInfo().getVal() and o.getInfo().getVal() > 0)
 
+    # Low risk sell chance
+    ret2 = ((o.getType() == "call" and o.getInfo().getDelta() < limit1) or
+            (o.getType() == "put"  and abs(o.getInfo().getDelta()) < limit2))
+
+    # Hedge chance
+    # ret3 = (o.getInfo().getBp() > 0 and o.getInfo().getSp() < 150 and o.getType() == type)
+
+    return (ret1 or ret2 or ret3)
+ 
 def tradeL(o):
     # Long
     return trade(o, "long")
