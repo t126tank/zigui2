@@ -15,6 +15,8 @@ import sys
 from bs4 import BeautifulSoup
 
 ITEM_NUM = 25
+OPT_PUT  = "put"
+OPT_CALL = "call"
 
 class OptInfo:
     def __init__(self, atm, val, bp, sp, delta=0.02, iv=1.1, gama=2.2):
@@ -87,15 +89,15 @@ class Target:
         return self.tgt
 
 targets = [
-    # Target("https://www.jpx.co.jp/markets/derivatives/index.html", "https://svc.qri.jp/jpx/nkopm/"),
-    # Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/1"),
-    # Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/2"),
+    Target("https://www.jpx.co.jp/markets/derivatives/index.html", "https://svc.qri.jp/jpx/nkopm/"),
+    Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/1"),
+    Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/2"),
     Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopw/"),
     Target("https://svc.qri.jp/jpx/nkopw/", "https://svc.qri.jp/jpx/nkopw/1")
 ]
 
-ipsilon1 = 0.08
-ipsilon2 = 0.15
+ipsilon1 = 0.06
+ipsilon2 = 0.11
 
 options = []
 
@@ -180,11 +182,11 @@ def crawler(t):
 
                 csp, cbp = getPrices(tds[idx-20])
                 # print("call::", csp, " :: ", intDelComma(tds[idx-24]), " :: ", cbp)
-                options.append(Option("call", dd, kp, OptInfo(atm, intDelComma(tds[idx-24]), cbp, csp, convDelta(tds[idx-7])), tm, ts))
+                options.append(Option(OPT_CALL, dd, kp, OptInfo(atm, intDelComma(tds[idx-24]), cbp, csp, convDelta(tds[idx-7])), tm, ts))
 
                 psp, pbp = getPrices(tds[idx-12])
                 # print("put::", psp, " :: ", intDelComma(tds[idx-8]), " :: ", pbp)
-                options.append(Option("put",  dd, kp, OptInfo(atm, intDelComma(tds[idx-8]),  pbp, psp, convDelta(tds[idx-3])), tm, ts))
+                options.append(Option(OPT_PUT,  dd, kp, OptInfo(atm, intDelComma(tds[idx-8]),  pbp, psp, convDelta(tds[idx-3])), tm, ts))
             ''' 
             elif plus1 % ITEM_NUM == 1:
                 print('清算値 <C>: ', item)
@@ -246,24 +248,23 @@ def tradeB(o):
 
 
 def trade(o, t):
-    limit1 = ipsilon2
-    limit2 = ipsilon1
-    type   = "put"
+    limit1 = max(abs(ipsilon2), abs(ipsilon1))
+    limit2 = min(abs(ipsilon2), abs(ipsilon1))
+    type   = OPT_PUT
     ret1   = False
     ret2   = False
     ret3   = False
 
     if t == "long":
-        limit1 = ipsilon1
-        limit2 = ipsilon2
-        type   = "call"
+        limit1, limit2 = limit2, limit1
+        type   = OPT_CALL
 
     # Sell chance
     ret1 = (o.getInfo().getBp() > o.getInfo().getVal() and o.getInfo().getVal() > 0)
 
     # Low risk sell chance
-    ret2 = ((o.getType() == "call" and o.getInfo().getDelta() < limit1) or
-            (o.getType() == "put"  and abs(o.getInfo().getDelta()) < limit2))
+    ret2 = ((o.getType() == OPT_CALL and o.getInfo().getDelta() < limit1) or
+            (o.getType() == OPT_PUT  and abs(o.getInfo().getDelta()) < limit2))
 
     # Hedge chance
     # ret3 = (o.getInfo().getBp() > 0 and o.getInfo().getSp() < 150 and o.getType() == type)
@@ -303,7 +304,7 @@ def main(argv):
     optLs = list(filter(tradeL, options))
     list(map(dbgPrint, optLs))
 
-    print(">>> Short")
+    print(">>> Short:")
     optSs = list(filter(tradeS, options))
     list(map(dbgPrint, optSs))
 
