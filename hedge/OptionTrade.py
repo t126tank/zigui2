@@ -90,8 +90,8 @@ class Target:
 
 targets = [
     Target("https://www.jpx.co.jp/markets/derivatives/index.html", "https://svc.qri.jp/jpx/nkopm/"),
-    Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/1"),
-    Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/2"),
+    # Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/1"),
+    # Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/2"),
     Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopw/"),
     Target("https://svc.qri.jp/jpx/nkopw/", "https://svc.qri.jp/jpx/nkopw/1")
 ]
@@ -244,16 +244,15 @@ def crawler(t):
 
 def tradeB(o):
     # Common Buy
-    return o.getInfo().getSp() < o.getInfo().getVal() and o.getInfo().getVal() > 0
+    ret1 = o.getInfo().getSp() < o.getInfo().getVal() and o.getInfo().getVal() > 0
+    ret2 = o.getInfo().getSp() < 150
 
+    return (ret1 and ret2)
 
 def trade(o, t):
     limit1 = max(abs(ipsilon2), abs(ipsilon1))
     limit2 = min(abs(ipsilon2), abs(ipsilon1))
     type   = OPT_PUT
-    ret1   = False
-    ret2   = False
-    ret3   = False
 
     if t == "long":
         limit1, limit2 = limit2, limit1
@@ -267,6 +266,7 @@ def trade(o, t):
             (o.getType() == OPT_PUT  and abs(o.getInfo().getDelta()) < limit2))
 
     # Hedge chance
+    ret3 = False
     # ret3 = (o.getInfo().getBp() > 0 and o.getInfo().getSp() < 150 and o.getType() == type)
 
     return (ret1 or ret2 or ret3)
