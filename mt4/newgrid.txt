@@ -28,6 +28,14 @@ sell = rangeMax - margin
 
 
 1. 取得当前rate, iband 中值及sigma
+    static bool isRefreshed = false;
+    ...
+    if (Minute() > 33 && isRefreshed) {
+        isRefreshed = false;
+    } else if (Minute() > 34 && !isRefreshed) {
+        // refresh
+        isRefreshed = true;
+    }
 
 2. 确定 N 及其正负
     int diff = curr - mid;
