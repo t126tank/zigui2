@@ -1,0 +1,78 @@
+swing = spread / 2  + margin
+profit < swing ?
+margin = 2
+profit = 4
+
+range:
+    mid +/- 2*N*swing ~ mid +/- 2*(N+1)*swing
+
+
+rangeMin = mid + 2*N*swing
+rangeMax = mid + 2*(N+1)*swing
+
+OR
+
+rangeMin = mid - 2*(N+1)*swing
+rangeMax = mid - 2*N*swing
+
+buy  = rangeMin + margin
+sell = rangeMax - margin
+
+
+
+* 当前range中，buy  opening nor waiting for opening, send buy,  if send failing, forcibly
+* 当前range中，sell opening nor waiting for opening, send sell, if send failing, forcibly
+
+* 每个小时的40min，cancle all waiting for opening，更新mid
+
+
+
+1. 取得当前rate, iband 中值及sigma
+
+2. 确定 N 及其正负
+    int diff = curr - mid;
+    int n = floor(abs(diff) / (2 * swing));
+    int flg = diff < 0? -1: 1;
+2.1 确定当前范围
+    double rangeMin = mid + 2*n*swing*flg;
+    double rangeMax = mid + 2*(n+1)*swing*flg;
+    if (flg < 0) {
+        tmp = rangeMin;
+        rangeMin = rangeMax;
+        rangeMax = tmp;
+    }
+2.2. 确定b/s 价格
+    buy  = rangeMin + margin
+    sell = rangeMax - margin
+2.3. 确定lots 数
+    dev1 < 0.02 < dev2 < 0.01
+
+3. 发送Order
+3.1. bool isExist(int op, double rmin, double rmax) {
+        bool ret = false;
+        // OrdOpen iterating
+        for (int i = 0; i < OrdersTotal(); i++)
+            if (OrderSelect(i, SELECT_BY_POS, MODE_TRADES))
+                if (OrderMagicNumber() == Magic) { // symbol needs checking as well
+                    int opType = OrderType();
+                    double oprice = OrderOpenPrice();
+                    if ((oprice > rmin && oprice < rmax) &&
+                        (opType == op || opType == op + OP_BUYLIMIT)) {
+                        ret = true;
+                        break;
+                    }
+                }
+        return ret;
+     }
+
+3.2.
+    for (int op = OP_BUY; op <= OP_SELL; op++) {
+        if (!isExist(op, rangeMin, rangeMax)) {
+            price = NormalizeDouble(op == OP_BUY? buy: sell, MarketInfo(Sym, MODE_DIGITS));
+            ret = OrderSend(Sym, op + OP_BUYLIMIT, Lots, price, 0, 0, tp, "send", Magic, 0, ArrowColor[op]);
+            if (!ret) {
+                OrderSend(curr);
+            }
+        }
+    }
+
