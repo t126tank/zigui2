@@ -90,8 +90,8 @@ class Target:
 
 targets = [
     Target("https://www.jpx.co.jp/markets/derivatives/index.html", "https://svc.qri.jp/jpx/nkopm/"),
-    # Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/1"),
-    # Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/2"),
+    Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/1"),
+    Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/2"),
     Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopw/"),
     Target("https://svc.qri.jp/jpx/nkopw/", "https://svc.qri.jp/jpx/nkopw/1")
 ]
@@ -285,8 +285,8 @@ def dbgPrint(o):
     val = o.getInfo().getVal()
     sp  = o.getInfo().getSp()
     bp  = o.getInfo().getBp()
-    rateSp = round(val/sp - 1, 3)
-    rateBp = '*' if bp == 0 else round(1 - val/bp, 3)
+    rateSp = round(sp/val - 1, 3)
+    rateBp = '*' if val == 0 else round(bp/val - 1, 3)
 
     print(o.getDd(), ' :: ', o.getKp(), ' :: ', o.getType(),    \
         ' :: (SELL)', sp,  \
