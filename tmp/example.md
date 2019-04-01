@@ -11,7 +11,8 @@ echo $output[0];
 
 $to = "to@gls.jp";
 $subject = "TEST MAIL";
-$message = "Hello!\r\nThis is TEST MAIL.";
+// $message = "Hello!\r\nThis is TEST MAIL.";
+$message = $output[0];
 $headers = "From: from@gls.jp";
 
 mail($to, $subject, $message, $headers);
