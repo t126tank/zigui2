@@ -61,6 +61,7 @@ try:
     isTitle = True
     myIndices = [0, 1, 2, 6, 7]
     for row in my_list:
+      if isTitle or isTarget(row):
         myRow = [row[i] for i in myIndices]
 
         if not isTitle:
