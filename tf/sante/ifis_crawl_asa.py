@@ -61,14 +61,13 @@ try:
     isTitle = True
     myIndices = [0, 1, 2, 6, 7]
     for row in my_list:
-      myRow = []
-      if isTitle or isTarget(row):
         myRow = [row[i] for i in myIndices]
-        isTitle = False
 
-        if isTarget(row):
+        if not isTitle:
           urlLnk = 'http://stocks.finance.yahoo.co.jp/stocks/detail/?code=' + myRow[0] + '.T&d=6m'
           myRow.append(urlLnk)
+
+        isTitle = False
 
         print(myRow)
         json_list.append(myRow)
