@@ -9,7 +9,6 @@ import json
 import sys
 import csv
 import time
-#import re
 import requests
 import urllib3
 from urllib3.exceptions import InsecureRequestWarning
