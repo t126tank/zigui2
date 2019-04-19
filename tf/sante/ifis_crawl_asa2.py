@@ -97,7 +97,7 @@ try:
       urlLnk = 'http://stocks.finance.yahoo.co.jp/stocks/detail/?code=' + cd + '.T&d=6m'
 
       href = msg.find('a')['href']
-      ctxLnk = 'https://monex.ifis.co.jp/' + href + '&' + hc_code
+      ctxLnk = BASE_URL + href + '&' + hc_code
 
       row.append(dtTxt)
       row.append(cd)
