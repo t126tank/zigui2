@@ -12,13 +12,15 @@ import time
 import requests
 import urllib3
 from urllib3.exceptions import InsecureRequestWarning
-urllib3.disable_warnings(InsecureRequestWarning)
 from bs4 import BeautifulSoup
+
+urllib3.disable_warnings(InsecureRequestWarning)
+
 
 BASE_URL = "https://monex.ifis.co.jp/"
 
 def hcCode():
-  url = "http://127.0.0.1/ifis.php"
+  url = "http://127.0.0.1/ifis/ifis.php"
   resp = requests.get(url, verify=False)
   return "&hc=" + resp.text
 
@@ -45,7 +47,7 @@ try:
   json_data = {}
 
   n = 1
-  endPage = 1
+  endPage = -1
   while True:
     url = ifisUrl(n, hc_code)  # pageID=<n>
 
@@ -65,7 +67,6 @@ try:
     grp = soup.find_all('div', class_='group')
 
     # fields in each group
-    json_list = []
     for fields in grp:
       # print("debug: " + fields.text)
       if len(fields.text.strip()) == 0:
@@ -73,8 +74,9 @@ try:
 
       row = []
       dt = fields.find('div', class_='date').find('span', class_='date_new')
-      if not dt:
+
       # if today not in dtTxt:
+      if not dt:
         endPage = n
         break
 
@@ -94,10 +96,14 @@ try:
       msg = fields.find('div', class_='title_link')
       urlLnk = 'http://stocks.finance.yahoo.co.jp/stocks/detail/?code=' + cd + '.T&d=6m'
 
+      href = msg.find('a')['href']
+      ctxLnk = 'https://monex.ifis.co.jp/' + href + '&' + hc_code
+
       row.append(dtTxt)
       row.append(cd)
       row.append(nm)
       row.append(msg.text)
+      row.append(ctxLnk)
       row.append(urlLnk)
       json_list.append(row)
 
@@ -118,14 +124,15 @@ try:
   # f.write(json.dumps(list, ensure_ascii=False)) # JPN utf-8
   # f.close()
 
-  url_items = 'webMail API'
   json_data["業績ニュース(■業績予想&レーティング)"] = json_list
   # print(json_data)
 
+  url_items = 'web送信API'
   json_str = json.dumps(json_data, ensure_ascii=False, indent=1).encode('utf-8')
   # print(json_str)
-  r_post = requests.post(url_items, json_str, headers={'Content-type': 'application/json; charset=utf8'})
+  # r_post = requests.post(url_items, json_str, headers={'Content-type': 'application/json; charset=utf8'})
 
 except Exception as e:
     print("error: {0}".format(e), file=sys.stderr)
     exitCode = 2
+
