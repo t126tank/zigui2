@@ -22,11 +22,11 @@ def hcCode():
   resp = requests.get(url, verify=False)
   return "&hc=" + resp.text
 
-# https://monex.ifis.co.jp/index.php?sa=consNews&date=0&stock_code=0&wd2=&sector=0&topix_type=2&topix_score=0
+# https://monex.ifis.co.jp/index.php?sa=consNews&date=0&stock_code=0&wd2=&sector=0&topix_type=0&topix_score=0
 def ifisUrl(page_id, hc_code):
   arg0 = "index.php?"
   arg1 = "sa=consNews&date=0&stock_code=0&wd2=&sector=0&"
-  arg2 = "topix_type=2&topix_score=0&"
+  arg2 = "topix_type=0&topix_score=0&"
   arg3 = "pageID=" + str(page_id)
   return BASE_URL + arg0 + arg1 + arg2 + arg3 + hc_code
 
@@ -78,6 +78,14 @@ try:
         endPage = n
         break
 
+      # 業績予想&レーティング
+      img = fields.find('div', class_='type').find('img')
+      src = img['src']
+      p2 = 'ico_tpx_type_M_02.png'
+      p7 = 'ico_tpx_type_M_07.png'
+      if p2 not in src and p7 not in src:
+        continue
+
       dtTxt = dt.text
       dtTxt = dtTxt[:10] + ' ' + dtTxt[10:]
       stock = fields.find('div', class_='stock')
@@ -111,7 +119,7 @@ try:
   # f.close()
 
   url_items = 'webMail API'
-  json_data["業績ニュース(業績予想)"] = json_list
+  json_data["業績ニュース(■業績予想&レーティング)"] = json_list
   # print(json_data)
 
   json_str = json.dumps(json_data, ensure_ascii=False, indent=1).encode('utf-8')
