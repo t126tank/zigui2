@@ -96,7 +96,7 @@ try:
       msg = fields.find('div', class_='title_link')
       bad1 = '引き下げ'
       bad2 = '弱気'
-      if bad1 in msg or bad2 in msg.text:
+      if bad1 in msg.text or bad2 in msg.text:
         continue
 
       urlLnk = 'http://stocks.finance.yahoo.co.jp/stocks/detail/?code=' + cd + '.T&d=6m'
