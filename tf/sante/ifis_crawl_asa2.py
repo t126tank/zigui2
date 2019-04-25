@@ -20,7 +20,7 @@ urllib3.disable_warnings(InsecureRequestWarning)
 BASE_URL = "https://monex.ifis.co.jp/"
 
 def hcCode():
-  url = "http://127.0.0.1/ifis/ifis.php"
+  url = "http://127.0.0.1/ifis.php"
   resp = requests.get(url, verify=False)
   return "&hc=" + resp.text
 
@@ -94,6 +94,11 @@ try:
       nm, cd = splitStock(stock.text)
 
       msg = fields.find('div', class_='title_link')
+      bad1 = '引き下げ'
+      bad2 = '弱気'
+      if bad1 in msg or bad2 in msg.text:
+        continue
+
       urlLnk = 'http://stocks.finance.yahoo.co.jp/stocks/detail/?code=' + cd + '.T&d=6m'
 
       href = msg.find('a')['href']
@@ -129,6 +134,8 @@ try:
 
   url_items = 'web送信API'
   json_str = json.dumps(json_data, ensure_ascii=False, indent=1).encode('utf-8')
+
+  # json_str = json.dumps(json_data, ensure_ascii=False, indent=1)
   # print(json_str)
   # r_post = requests.post(url_items, json_str, headers={'Content-type': 'application/json; charset=utf8'})
 
