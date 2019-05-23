@@ -19,12 +19,14 @@ OPT_PUT  = "put"
 OPT_CALL = "call"
 
 class OptInfo:
-    def __init__(self, atm, val, bp, sp, delta=0.02, iv=1.1, gama=2.2):
+    def __init__(self, atm, val, bp, sp, delta=0.02, biv=12.12, siv=13.13, iv = 12.55, gama=2.2):
         self.atm   = atm
         self.val   = val
         self.bp    = bp
         self.sp    = sp
         self.delta = delta
+        self.biv   = biv
+        self.siv   = siv
         self.iv    = iv
         self.gama  = gama # // Delta, Gamma, Theta, Vega
 
@@ -42,6 +44,12 @@ class OptInfo:
 
     def getDelta(self):
         return self.delta
+
+    def getBiv(self):
+        return self.biv
+
+    def getSiv(self):
+        return self.siv
 
     def getIv(self):
         return self.iv
@@ -89,11 +97,12 @@ class Target:
         return self.tgt
 
 targets = [
-    Target("https://www.jpx.co.jp/markets/derivatives/index.html", "https://svc.qri.jp/jpx/nkopm/"),
-    Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/1"),
-    Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/2"),
-    Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopw/"),
-    Target("https://svc.qri.jp/jpx/nkopw/", "https://svc.qri.jp/jpx/nkopw/1")
+    Target("https://www.jpx.co.jp/markets/derivatives/index.html", "https://svc.qri.jp/jpx/nkopm/")
+    # Target("https://www.jpx.co.jp/markets/derivatives/index.html", "https://svc.qri.jp/jpx/nkopm/"),
+    # Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/1"),
+    # Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/2"),
+    # Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopw/"),
+    # Target("https://svc.qri.jp/jpx/nkopw/", "https://svc.qri.jp/jpx/nkopw/1")
 ]
 
 ipsilon1 = 0.06
@@ -138,12 +147,12 @@ def convDelta(str):
 
 
 def getKp(str):
-    rtn = re.sub('[,|リスク指標|A T M]', '', str.strip())
+    rtn = re.sub('[,|リスク指標|A T M]', '', str.strip())
     return int(rtn.strip())
 
 
 def isATM(str):
-    return str.find("A T M") != -1
+    return str.find("A T M") != -1
 
 
 def crawler(t):
@@ -180,12 +189,26 @@ def crawler(t):
                 atm = isATM(tds[idx-16])
                 kp = getKp(tds[idx-16])
 
+                # callOpt info
                 csp, cbp = getPrices(tds[idx-20])
                 # print("call::", csp, " :: ", intDelComma(tds[idx-24]), " :: ", cbp)
+
+                # csiv, cbiv = getIvs(tds[idx-21])
+                # print("call::", csp, " :: ", intDelComma(tds[idx-24]), " :: ", cbp)
+                # print("call2::", tds[idx-3])
+                # print("call::", tds[idx-19])
+                # options.append(Option(OPT_CALL, dd, kp, OptInfo(atm, intDelComma(tds[idx-24]), cbp, csp, convDelta(tds[idx-7]), cbiv, csiv, tds[idx-19]), tm, ts))
                 options.append(Option(OPT_CALL, dd, kp, OptInfo(atm, intDelComma(tds[idx-24]), cbp, csp, convDelta(tds[idx-7])), tm, ts))
 
+                # putOpt info
                 psp, pbp = getPrices(tds[idx-12])
                 # print("put::", psp, " :: ", intDelComma(tds[idx-8]), " :: ", pbp)
+
+                # psiv, pbiv = getIvs(tds[idx-11])
+                # print("put::", psp, " :: ", intDelComma(tds[idx-8]), " :: ", pbp)
+                # print("put2::", tds[idx-11])
+                # print("put::", tds[idx-13])
+                # options.append(Option(OPT_PUT,  dd, kp, OptInfo(atm, intDelComma(tds[idx-8]),  pbp, psp, convDelta(tds[idx-3]), pbiv, psiv, tds[idx-13]), tm, ts))
                 options.append(Option(OPT_PUT,  dd, kp, OptInfo(atm, intDelComma(tds[idx-8]),  pbp, psp, convDelta(tds[idx-3])), tm, ts))
             ''' 
             elif plus1 % ITEM_NUM == 1:
