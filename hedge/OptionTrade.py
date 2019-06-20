@@ -19,7 +19,7 @@ OPT_PUT  = "put"
 OPT_CALL = "call"
 
 class OptInfo:
-    def __init__(self, atm, val, bp, sp, delta=0.02, biv=12.12, siv=13.13, iv = 12.55, gama=2.2):
+    def __init__(self, atm, val, bp, sp, delta, iv, biv=12.12, siv=13.13, gama=2.2):
         self.atm   = atm
         self.val   = val
         self.bp    = bp
@@ -97,12 +97,11 @@ class Target:
         return self.tgt
 
 targets = [
-    Target("https://www.jpx.co.jp/markets/derivatives/index.html", "https://svc.qri.jp/jpx/nkopm/")
-    # Target("https://www.jpx.co.jp/markets/derivatives/index.html", "https://svc.qri.jp/jpx/nkopm/"),
-    # Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/1"),
-    # Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/2"),
-    # Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopw/"),
-    # Target("https://svc.qri.jp/jpx/nkopw/", "https://svc.qri.jp/jpx/nkopw/1")
+    Target("https://www.jpx.co.jp/markets/derivatives/index.html", "https://svc.qri.jp/jpx/nkopm/"),
+    Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/1"),
+    Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/2"),
+    Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopw/"),
+    Target("https://svc.qri.jp/jpx/nkopw/", "https://svc.qri.jp/jpx/nkopw/1")
 ]
 
 ipsilon1 = 0.06
@@ -133,6 +132,12 @@ def getPrices(str):
         bp = convPrice(val[2])
 
     return sp, bp
+
+def getIvs(str):
+    ivs = str.replace("-", "0%")
+    val = re.split('%', ivs)
+
+    return val[0], val[1]
 
 
 def convDelta(str):
@@ -189,27 +194,23 @@ def crawler(t):
                 atm = isATM(tds[idx-16])
                 kp = getKp(tds[idx-16])
 
-                # callOpt info
+                ### callOpt info
                 csp, cbp = getPrices(tds[idx-20])
                 # print("call::", csp, " :: ", intDelComma(tds[idx-24]), " :: ", cbp)
 
-                # csiv, cbiv = getIvs(tds[idx-21])
-                # print("call::", csp, " :: ", intDelComma(tds[idx-24]), " :: ", cbp)
-                # print("call2::", tds[idx-3])
+                csiv, cbiv = getIvs(tds[idx-21])
+                # common call iv
                 # print("call::", tds[idx-19])
-                # options.append(Option(OPT_CALL, dd, kp, OptInfo(atm, intDelComma(tds[idx-24]), cbp, csp, convDelta(tds[idx-7]), cbiv, csiv, tds[idx-19]), tm, ts))
-                options.append(Option(OPT_CALL, dd, kp, OptInfo(atm, intDelComma(tds[idx-24]), cbp, csp, convDelta(tds[idx-7])), tm, ts))
+                options.append(Option(OPT_CALL, dd, kp, OptInfo(atm, intDelComma(tds[idx-24]), cbp, csp, convDelta(tds[idx-7]), tds[idx-19].replace("-", "0%"), cbiv, csiv), tm, ts))
 
-                # putOpt info
+                ### putOpt info
                 psp, pbp = getPrices(tds[idx-12])
                 # print("put::", psp, " :: ", intDelComma(tds[idx-8]), " :: ", pbp)
 
-                # psiv, pbiv = getIvs(tds[idx-11])
-                # print("put::", psp, " :: ", intDelComma(tds[idx-8]), " :: ", pbp)
-                # print("put2::", tds[idx-11])
+                psiv, pbiv = getIvs(tds[idx-11])
+                # common put iv
                 # print("put::", tds[idx-13])
-                # options.append(Option(OPT_PUT,  dd, kp, OptInfo(atm, intDelComma(tds[idx-8]),  pbp, psp, convDelta(tds[idx-3]), pbiv, psiv, tds[idx-13]), tm, ts))
-                options.append(Option(OPT_PUT,  dd, kp, OptInfo(atm, intDelComma(tds[idx-8]),  pbp, psp, convDelta(tds[idx-3])), tm, ts))
+                options.append(Option(OPT_PUT,  dd, kp, OptInfo(atm, intDelComma(tds[idx-8]),  pbp, psp, convDelta(tds[idx-3]), tds[idx-13].replace("-", "0%"), pbiv, psiv), tm, ts))
             ''' 
             elif plus1 % ITEM_NUM == 1:
                 print('清算値 <C>: ', item)
@@ -308,12 +309,14 @@ def dbgPrint(o):
     val = o.getInfo().getVal()
     sp  = o.getInfo().getSp()
     bp  = o.getInfo().getBp()
+    iv  = o.getInfo().getIv()
+
     rateSp = '*' if val == 0 else round(sp/val - 1, 3)
     rateBp = '*' if val == 0 else round(bp/val - 1, 3)
 
-    print(o.getDd(), ' :: ', o.getKp(), ' :: ', o.getType(),    \
+    print(o.getDd(), ' :: ', o.getKp(), ' :: ', o.getType(),  \
         ' :: (SELL)', sp,  \
-        ' :: < (', rateSp,') :: (val) ', val,  \
+        ' :: < (', rateSp,') :: (val) ', val, ' :: (IV) ', iv, \
         ' :: > (', rateBp,') :: (BUY) ', bp)
 
 def main(argv):
@@ -330,6 +333,8 @@ def main(argv):
     print(">>> Short:")
     optSs = list(filter(tradeS, options))
     list(map(dbgPrint, optSs))
+
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])
