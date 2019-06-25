@@ -5,6 +5,7 @@ from __future__ import print_function
 
 import csv
 import datetime
+import json
 import os
 import re
 import requests
@@ -30,7 +31,7 @@ class OptInfo:
         self.iv    = iv
         self.gama  = gama # // Delta, Gamma, Theta, Vega
 
-    def getAtm(self):
+    def isAtm(self):
         return self.atm
 
     def getVal(self):
@@ -57,6 +58,11 @@ class OptInfo:
     def getGamma(self):
         return self.gamma
 
+class OptionEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Option):
+            return obj.strftime('%Y/%m/%d')
+        return super(OptionEncoder, self).default(obj) # 他の型はdefaultのエンコード方式を使用
 
 class Option:
     def __init__(self, type, dd, kp, info, tm, ts):
@@ -109,6 +115,9 @@ ipsilon2 = 0.11
 
 options = []
 
+tm = datetime.datetime.now()
+ts = 0
+
 def intDelComma(str):
     rtn = 0
     if str.find("-") == -1:
@@ -152,12 +161,12 @@ def convDelta(str):
 
 
 def getKp(str):
-    rtn = re.sub('[,|リスク指標|A T M]', '', str.strip())
+    rtn = re.sub('[,|リスク指標|ATM]', '', str.strip())
     return int(rtn.strip())
 
 
 def isATM(str):
-    return str.find("A T M") != -1
+    return str.find("ATM") != -1
 
 
 def crawler(t):
@@ -170,9 +179,6 @@ def crawler(t):
     try:
         r = requests.get(t.getTgt(), headers=headers, verify=False) #requestsを使って、webから取得
         soup = BeautifulSoup(r.text, 'lxml')                        #要素を抽出 (lxml)
-
-        tm = datetime.datetime.now()
-        ts = int(tm.timestamp())
 
         # delivery date
         dd = soup.find('div', class_='date-table last-tradingday').find('dd').text
@@ -191,8 +197,9 @@ def crawler(t):
             plus1 = idx + 1
             if plus1 % ITEM_NUM == 0:
                 # print('ベガ <P>: ', item)
-                atm = isATM(tds[idx-16])
-                kp = getKp(tds[idx-16])
+                kpStr = tds[idx-16].replace(u"\xa0",u"")
+                atm = isATM(kpStr)
+                kp = getKp(kpStr)
 
                 ### callOpt info
                 csp, cbp = getPrices(tds[idx-20])
@@ -260,7 +267,7 @@ def crawler(t):
                 print('ガンマ <P>: ', item)
             else:
                 print('セータ <P>: ', item)
-            ''' 
+            '''
 
     except Exception as e:
         print("error: {0}".format(e), file=sys.stderr)
@@ -319,7 +326,22 @@ def dbgPrint(o):
         ' :: < (', rateSp,') :: (val) ', val, ' :: (IV) ', iv, \
         ' :: > (', rateBp,') :: (BUY) ', bp)
 
+def smileData():
+    arr = []
+    atm = 0
+    smileObj = {}
+
+    for opt in options:
+        # find ATM price for ALL options
+        if atm == 0 and opt.getInfo().isAtm():
+            atm = opt.getKp()
+
+    return atm, arr
+
+
 def main(argv):
+    ts = int(tm.timestamp())
+
     list(map(crawler, targets))
 
     print(">>> Common Buy:")
@@ -334,6 +356,16 @@ def main(argv):
     optSs = list(filter(tradeS, options))
     list(map(dbgPrint, optSs))
 
+    optObj   = {}
+    optObj["ts"] = ts
+
+    atm, optObj["data"] = smileData()
+    optObj["atm"] = atm
+
+    # write json
+    f = open(str(ts) + ".json", "w")
+    f.write(json.dumps(optObj, cls=OptionEncoder, ensure_ascii=False, indent=2, sort_keys=False, separators=(',', ': '))) # JPN utf-8
+    f.close()
 
 
 if __name__ == "__main__":
