@@ -146,7 +146,7 @@ def getIvs(str):
     ivs = str.replace("-", "0%")
     val = re.split('%', ivs)
 
-    return val[0], val[1]
+    return float(val[0]), float(val[1])
 
 
 def convDelta(str):
@@ -301,7 +301,8 @@ def trade(o, t):
     # ret3 = (o.getInfo().getBp() > 0 and o.getInfo().getSp() < 150 and o.getType() == type)
 
     return (ret1 or ret2 or ret3)
- 
+
+
 def tradeL(o):
     # Long
     return trade(o, "long")
@@ -326,17 +327,32 @@ def dbgPrint(o):
         ' :: < (', rateSp,') :: (val) ', val, ' :: (IV) ', iv, \
         ' :: > (', rateBp,') :: (BUY) ', bp)
 
+
 def smileData():
-    arr = []
     atm = 0
+    smiles = []
     smileObj = {}
+    smileMap = {}
 
     for opt in options:
+        info = opt.getInfo()
+
         # find ATM price for ALL options
-        if atm == 0 and opt.getInfo().isAtm():
+        if atm == 0 and info.isAtm():
             atm = opt.getKp()
 
-    return atm, arr
+        # {20190523, call} - [kp, bp, sp, biv, siv]
+        # key = opt.getDd() + "::" + opt.getType();
+        key = str({"end": opt.getDd(), "type": opt.getType()})
+        if key not in smileMap:
+          smileMap.setdefault(key, [])
+
+        smileMap[key].append([opt.getKp(), info.getBp(), info.getSp(), info.getBiv(), info.getSiv()])
+
+    print(smileMap)
+
+
+    return atm, smiles
 
 
 def main(argv):
@@ -359,8 +375,7 @@ def main(argv):
     optObj   = {}
     optObj["ts"] = ts
 
-    atm, optObj["data"] = smileData()
-    optObj["atm"] = atm
+    optObj["atm"], optObj["data"] = smileData()
 
     # write json
     f = open(str(ts) + ".json", "w")
