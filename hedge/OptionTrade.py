@@ -6,6 +6,7 @@ from __future__ import print_function
 import csv
 import datetime
 import json
+import numpy as np
 import os
 import re
 import requests
@@ -328,11 +329,10 @@ def dbgPrint(o):
         ' :: > (', rateBp,') :: (BUY) ', bp)
 
 
-def smileData():
+def smilesData():
     atm = 0
     smiles = []
-    smileObj = {}
-    smileMap = {}
+    smilesMap = {}
 
     for opt in options:
         info = opt.getInfo()
@@ -342,15 +342,20 @@ def smileData():
             atm = opt.getKp()
 
         # {20190523, call} - [kp, bp, sp, biv, siv]
-        # key = opt.getDd() + "::" + opt.getType();
-        key = str({"end": opt.getDd(), "type": opt.getType()})
-        if key not in smileMap:
-          smileMap.setdefault(key, [])
+        key = json.dumps({"end": opt.getDd(), "type": opt.getType()})
+        if key not in smilesMap:
+          smilesMap.setdefault(key, [])
 
-        smileMap[key].append([opt.getKp(), info.getBp(), info.getSp(), info.getBiv(), info.getSiv()])
+        smilesMap[key].append([opt.getKp(), info.getBp(), info.getSp(), info.getBiv(), info.getSiv()])
 
-    print(smileMap)
+    # transpose map & sorting by k-price
+    for key, value in smilesMap.items():
+        keyObj = json.loads(key)
+        e = re.sub('[\/]', '', keyObj["end"])
+        t = keyObj["type"]
+        s = np.array(value).transpose().tolist()
 
+        smiles.append({"end": e, "type": t, "smile": s})
 
     return atm, smiles
 
@@ -375,7 +380,7 @@ def main(argv):
     optObj   = {}
     optObj["ts"] = ts
 
-    optObj["atm"], optObj["data"] = smileData()
+    optObj["atm"], optObj["data"] = smilesData()
 
     # write json
     f = open(str(ts) + ".json", "w")
