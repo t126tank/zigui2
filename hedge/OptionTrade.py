@@ -346,7 +346,10 @@ def smilesData():
         if key not in smilesMap:
           smilesMap.setdefault(key, [])
 
-        smilesMap[key].append([opt.getKp(), info.getBp(), info.getSp(), info.getBiv(), info.getSiv()])
+        biv = info.getBiv()
+        siv = info.getSiv()
+        if biv > 0 and siv > 0:
+            smilesMap[key].append([opt.getKp(), info.getBp(), info.getSp(), biv, siv])
 
     # transpose map & sorting by k-price
     for key, value in smilesMap.items():
