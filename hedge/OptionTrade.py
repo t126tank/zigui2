@@ -356,7 +356,12 @@ def smilesData():
         keyObj = json.loads(key)
         e = re.sub('[\/]', '', keyObj["end"])
         t = keyObj["type"]
-        s = np.array(value).transpose().tolist()
+
+        tmp = np.array(value)
+        #
+        # 先頭の列でソート
+        #
+        s = tmp[tmp[:,0].argsort(), :].transpose().tolist()
 
         smiles.append({"end": e, "type": t, "smile": s})
 
