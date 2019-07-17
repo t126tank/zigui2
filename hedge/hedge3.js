@@ -68,7 +68,7 @@ require([
         return v['bullPrice'] * v['bullVol'];
     };
 
-    var dates = _.compose(_.map(_.compose(cnvt, _.prop('ts'))));
+    var dates = _.compose(cnvt, _.prop('ts'));
 
     var smiles = _.compose(_.map(_.prop('data')));
 
@@ -84,7 +84,7 @@ require([
     var renderResults = function (val) {
       setTimeout(function() {
         var kps = dates(val);
-        var end = "20190523";
+        var end = "20190725";
         var type = "call";
 
         var l1 = lbl(val, end, type);
@@ -96,7 +96,7 @@ require([
         var lnChartData = {
           labels: l1,
           datasets: [{
-            label: '# of Sells',
+            label: '# Selling IV',
             type: 'line',
             data: s1,
             fill: false,
@@ -108,7 +108,7 @@ require([
             pointHoverBorderColor: '#EC932F',
             yAxisID: 'y-axis-1'
           }, {
-            label: '# of Buys',
+            label: '# Buying IV',
             type: 'line',
             data: b1,
             fill: false,
@@ -126,6 +126,14 @@ require([
           type: 'line',
           data: lnChartData,
           options: {
+            title : {
+              display: true,
+              text: end + '-' + type + '(' + kps + ')',
+              fontStyle: 'bold',
+              fontSize: 18,
+              fontFamily: "sans-serif",
+              position: 'bottom'
+            },
             responsive: true,
             maintainAspectRatio: false,
             tooltips: {

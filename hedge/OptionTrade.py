@@ -360,8 +360,11 @@ def smilesData():
         tmp = np.array(value)
         #
         # 先頭の列でソート
-        #
+        # 按第0列，把各行排序
         s = tmp[tmp[:,0].argsort(), :].transpose().tolist()
+
+        # 按第1行，把各列排序
+        # tmp[:, tmp[1,:].argsort()]
 
         smiles.append({"end": e, "type": t, "smile": s})
 
@@ -369,7 +372,8 @@ def smilesData():
 
 
 def main(argv):
-    ts = int(tm.timestamp())
+    # delay for 20min
+    ts = int(tm.timestamp()) - (20 * 60)
 
     list(map(crawler, targets))
 
