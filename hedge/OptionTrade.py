@@ -319,11 +319,21 @@ def dbgPrint(o):
     sp  = o.getInfo().getSp()
     bp  = o.getInfo().getBp()
     iv  = o.getInfo().getIv()
+    kp  = o.getKp()
+    t   = o.getType()
 
     rateSp = '*' if val == 0 else round(sp/val - 1, 3)
     rateBp = '*' if val == 0 else round(bp/val - 1, 3)
 
-    print(o.getDd(), ' :: ', o.getKp(), ' :: ', o.getType(),  \
+    # b & s target range of index
+    # OPT_CALL
+    min = bp
+    max = sp
+    if t == OPT_PUT:
+      min = -1 * sp
+      max = -1 * bp
+
+    print(o.getDd(), ' :: ', kp, ' :(', (kp+min), ' .vs. ', (kp+max), '): ', t,  \
         ' :: (SELL)', sp,  \
         ' :: < (', rateSp,') :: (val) ', val, ' :: (IV) ', iv, \
         ' :: > (', rateBp,') :: (BUY) ', bp)
