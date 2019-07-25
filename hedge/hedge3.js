@@ -84,7 +84,7 @@ require([
     var renderResults = function (val) {
       setTimeout(function() {
         var kps = dates(val);
-        var end = "20190725";
+        var end = "20190808";
         var type = "call";
 
         var l1 = lbl(val, end, type);

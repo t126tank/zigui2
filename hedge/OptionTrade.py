@@ -348,6 +348,13 @@ def smilesData():
     for opt in options:
         info = opt.getInfo()
 
+        # we dont care of whose IV is abnormal
+        biv = info.getBiv()
+        siv = info.getSiv()
+
+        if not (biv > 0 and siv > 0):
+          continue;
+
         # find ATM price for ALL options
         if atm == 0 and info.isAtm():
             atm = opt.getKp()
@@ -357,10 +364,7 @@ def smilesData():
         if key not in smilesMap:
           smilesMap.setdefault(key, [])
 
-        biv = info.getBiv()
-        siv = info.getSiv()
-        if biv > 0 and siv > 0:
-            smilesMap[key].append([opt.getKp(), info.getBp(), info.getSp(), biv, siv])
+        smilesMap[key].append([opt.getKp(), info.getBp(), info.getSp(), biv, siv])
 
     # transpose map & sorting by k-price
     for key, value in smilesMap.items():
