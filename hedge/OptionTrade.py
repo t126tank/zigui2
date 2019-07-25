@@ -332,11 +332,12 @@ def dbgPrint(o):
     if t == OPT_PUT:
       min = -1 * sp
       max = -1 * bp
+      t += ' '
 
-    print(o.getDd(), ' :: ', kp, ' :(', (kp+min), ' .vs. ', (kp+max), '): ', t,  \
-        ' :: (SELL)', sp,  \
-        ' :: < (', rateSp,') :: (val) ', val, ' :: (IV) ', iv, \
-        ' :: > (', rateBp,') :: (BUY) ', bp)
+    print(o.getDd(), '::', kp, '::',  t, ':(', (kp+min), '.vs.', (kp+max), '):',  \
+        '(SELL)', sp,                                                             \
+        '::< (', rateSp,')::(val) ', val, '::(IV) ', iv,                          \
+        '::> (', rateBp,')::(BUY) ', bp)
 
 
 def smilesData():
