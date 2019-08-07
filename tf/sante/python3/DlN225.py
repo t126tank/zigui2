@@ -2,6 +2,7 @@
 # coding: utf-8
 
 from __future__ import print_function
+from __future__ import division
 
 import csv
 import datetime
@@ -30,33 +31,34 @@ def main(argv):
     # print(year)
 
     # good data was from 1985y-3m-25d
-    for y in range(2018, y+1):
+    for y in range(2018, year+1):
 
         rows = []
         for m in range (12):
             if y == year and m + 1 > month:
                 break   # over current month
 
-            csvfile = 'stocks_' + code + '-T_1d_' + y + '.csv'
+            csvfile = 'stocks_' + code + '-T_1d_' + str(y) + '.csv'
             # print(csvfile)
+            cnt = 0
+            lines = []
 
-            target_url = 'https://indexes.nikkei.co.jp/nkave/statistics/dataload?list=daily&year=' + y + '&month=' + m
+            target_url = 'https://indexes.nikkei.co.jp/nkave/statistics/dataload?list=daily&year=' + str(y) + '&month=' + str(m)
 
             try:
                 r = requests.get(target_url)            #requestsを使って、webから取得
                 soup = BeautifulSoup(r.text, 'lxml')    #要素を抽出 (lxml)
 
                 tbl = soup.find('table', class_='table_size100per')
-                cnt = 0
-                lines = []
 
                 for td in tbl.find_all('td', class_='list-row-dashed'):
+                    tt = td.text
                     if cnt % 5 == 0 and cnt > 4:
-                        lines.append(re.sub('.', '-', td.text))
+                        lines.append(re.sub('.', '-', tt))
                     elif cnt % 5 != 0 and cnt > 4:
-                        lines.append(float(td.text))
+                        lines.append(float(re.sub(',', '', tt)))
                     else:
-                        lines.append(str(td.text)) # titles
+                        lines.append(str(tt)) # titles
 
                     cnt += 1
                     if cnt % 5 == 0:
@@ -65,18 +67,19 @@ def main(argv):
                             lines.append("avg")
                         else:
                             lines.append(1)
-                            lines.append((lines[2]+lines[3]+lines[4]+lines[4])/4) # h+l+c+c/4
+                            lines.append(round((lines[2]+lines[3]+lines[4]+lines[4])/4, 2)) # h+l+c+c/4
 
                         rows.append(lines)
+                        lines = []
+
+            except Exception as e:
+                print("error: {0}".format(e), file=sys.stderr)
+                exitCode = 2
 
         with open(csvfile, 'a', newline='') as f:
             writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
             writer.writerow(rows)
 
-
-    except Exception as e:
-        print("error: {0}".format(e), file=sys.stderr)
-        exitCode = 2
 
 if __name__ == "__main__":
    main(sys.argv[1:])
