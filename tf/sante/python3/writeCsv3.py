@@ -11,8 +11,8 @@ import json
 # Classification [0] < bad < [1] < bdraw < [2] < gdraw < [3] < good < [4]
 bdraw = -0.01  # bad  draw
 gdraw =  0.01  # good draw
-bad   = -0.021
-good  =  0.022
+bad   = -0.0119
+good  =  0.0121
 
 def o_f():
    outpath = "out"
@@ -92,15 +92,16 @@ def comp_f(row, d, p, q, o, dm, ma, l):
    else:
       r = 0
 
+   # binary classification
    if (result > good):     # good
-      r = 2
-   elif (result > bad):  # bad
       r = 1
    else:
       r = 0
    '''
 
    if (result > good):     # good
+      r = 2
+   elif (result > bad):    # bad
       r = 1
    else:
       r = 0
@@ -152,11 +153,11 @@ def main(argv):
    if len(argv) != 0:
       srcDir = argv[0]
 
-   dim = 125
-   ma  = 10
-   p   = 3
+   dim = 81
+   ma  = 9
+   p   = 2
    q   = 3
-   offset = 0
+   offset = 1
 
    # Specify datasets saved location/path
    os.chdir(srcDir)
