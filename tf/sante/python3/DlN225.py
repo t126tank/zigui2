@@ -32,7 +32,12 @@ def main(argv):
     month = int(datetime.datetime.today().strftime('%m'))
     # print(year)
 
-    for y in range(1985, year+1):
+    for y in range(2019, year+1):
+        csvfile = 'stocks_' + code + '-T_1d_' + str(y) + '.csv'
+        # print(csvfile)
+        print("delete ... " + csvfile)
+        os.remove(csvfile)
+
         for m in range (12):
             mon = m + 1
             # good data was from 1985y-3m-25d
@@ -42,8 +47,6 @@ def main(argv):
             if y == year and mon > month:
                 break   # over current month
 
-            csvfile = 'stocks_' + code + '-T_1d_' + str(y) + '.csv'
-            # print(csvfile)
             lines = []
             cnt = 0
 
@@ -51,7 +54,7 @@ def main(argv):
 
             #debug
             print("download ... " + str(y) + str(mon))
-            sleep(2)  # not too heavy to access
+            sleep(1)  # not too heavy to access
 
             try:
                 r = requests.get(target_url)            #requestsを使って、webから取得
@@ -80,7 +83,7 @@ def main(argv):
                             lines.append("vol")
                             lines.append("avg")
                         else:
-                            lines.append(1)
+                            lines.append(100)
                             lines.append(round((lines[2]+lines[3]+lines[4]+lines[4])/4, 2)) # h+l+c+c/4
 
                         with open(csvfile, 'a', newline='') as f:
