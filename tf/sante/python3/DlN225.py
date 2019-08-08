@@ -10,7 +10,9 @@ import os
 import re
 import requests
 import sys
+
 from bs4 import BeautifulSoup
+from time import sleep
 
 def main(argv):
     srcDir = "."
@@ -30,20 +32,26 @@ def main(argv):
     month = int(datetime.datetime.today().strftime('%m'))
     # print(year)
 
-    # good data was from 1985y-3m-25d
-    for y in range(2018, year+1):
-
-        rows = []
+    for y in range(1985, year+1):
         for m in range (12):
-            if y == year and m + 1 > month:
+            mon = m + 1
+            # good data was from 1985y-3m-25d
+            if y == 1985 and mon < 4:
+                continue
+
+            if y == year and mon > month:
                 break   # over current month
 
             csvfile = 'stocks_' + code + '-T_1d_' + str(y) + '.csv'
             # print(csvfile)
-            cnt = 0
             lines = []
+            cnt = 0
 
-            target_url = 'https://indexes.nikkei.co.jp/nkave/statistics/dataload?list=daily&year=' + str(y) + '&month=' + str(m)
+            target_url = 'https://indexes.nikkei.co.jp/nkave/statistics/dataload?list=daily&year=' + str(y) + '&month=' + str(mon)
+
+            #debug
+            print("download ... " + str(y) + str(mon))
+            sleep(2)  # not too heavy to access
 
             try:
                 r = requests.get(target_url)            #requestsを使って、webから取得
@@ -53,32 +61,37 @@ def main(argv):
 
                 for td in tbl.find_all('td', class_='list-row-dashed'):
                     tt = td.text
-                    if cnt % 5 == 0 and cnt > 4:
-                        lines.append(re.sub('.', '-', tt))
-                    elif cnt % 5 != 0 and cnt > 4:
-                        lines.append(float(re.sub(',', '', tt)))
+                    if cnt < 5:
+                        if mon == 1: # add titles
+                            lines.append(str(tt)) # titles
+                        else:
+                            cnt += 1
+                            continue  # ignore titles from Feb
                     else:
-                        lines.append(str(tt)) # titles
+                        if cnt % 5 == 0:
+                            lines.append(re.sub('\.', '-', tt))
+                        elif cnt % 5 != 0:
+                            lines.append(float(re.sub(',', '', tt)))
 
                     cnt += 1
+
                     if cnt % 5 == 0:
-                        if cnt < 6:
+                        if cnt < 6 and mon == 1:
                             lines.append("vol")
                             lines.append("avg")
                         else:
                             lines.append(1)
                             lines.append(round((lines[2]+lines[3]+lines[4]+lines[4])/4, 2)) # h+l+c+c/4
 
-                        rows.append(lines)
+                        with open(csvfile, 'a', newline='') as f:
+                            writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
+                            writer.writerow(lines)
+
                         lines = []
 
             except Exception as e:
                 print("error: {0}".format(e), file=sys.stderr)
                 exitCode = 2
-
-        with open(csvfile, 'a', newline='') as f:
-            writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
-            writer.writerow(rows)
 
 
 if __name__ == "__main__":
