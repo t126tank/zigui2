@@ -86,7 +86,7 @@ def main(argv):
                         else:
                             lines.append(10)
                             # lines.append(round((lines[2]+lines[3]+lines[4]+lines[4])/4, 2)) # h+l+c+c/4
-                            lines.append(lines[4])
+                            lines.append(round(lines[4], 2))
 
                         with open(csvfile, 'a', newline='') as f:
                             writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
