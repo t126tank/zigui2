@@ -84,13 +84,12 @@ def main(argv):
                 # i.e. in the case the last line is null we delete the last line
                 # and the penultimate one
                 pos = f.tell() - 1 # cannot handle ended by '\n'
-                print(pos)
 
                 # Read each character in the file one at a time from the penultimate
                 # character going backwards, searching for a newline character
                 # If we find a new line, exit the search
                 cnt = 0
-                while pos > 0 and cnt != 2:
+                while pos > 0 and cnt < 2:
                     if f.read(1) == '\n':
                         cnt += 1
 
@@ -100,8 +99,7 @@ def main(argv):
                 # So long as we're not at the start of the file, delete all the characters ahead
                 # of this position
                 if pos > 0:
-                    print(pos)
-                    f.seek(pos+1, os.SEEK_SET)
+                    f.seek(pos+2, os.SEEK_SET)  # CRLF '\r\n'
                     f.truncate()
 
             # http://codepad.org/S3zjnKoD
