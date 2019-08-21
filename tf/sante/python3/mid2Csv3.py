@@ -44,7 +44,9 @@ def main(argv):
 
         # <span class="arial_26 inlineblock pid-178-last" id="last_last" dir="ltr">20,677.22</span>
         stoksPrice = stoksPrice.find('span', id='last_last').text # find_next_sibling?
-        stoksPrice = float(re.sub('[,]', '', stoksPrice))
+        # stoksPrice = float(re.sub('[,]', '', stoksPrice))
+        stoksPrice = re.sub('[,]', '', stoksPrice)
+        print(stoksPrice)
 
         fields = []
 
@@ -62,18 +64,44 @@ def main(argv):
                 break
         '''
 
-        fields.append(str(dt))              # "tradeTime"
-        fields.append(str(stoksPrice))      # "o"
-        fields.append(str(stoksPrice))      # "h"
-        fields.append(str(stoksPrice))      # "l"
-        fields.append(str(stoksPrice))      # "c"
-        fields.append('100')                # "volume"
-        fields.append(str(stoksPrice))      # "modified p"
+        fields.append(dt)             # "tradeTime"
+        fields.append(stoksPrice)     # "o"
+        fields.append(stoksPrice)     # "h"
+        fields.append(stoksPrice)     # "l"
+        fields.append(stoksPrice)     # "c"
+        fields.append('100')          # "volume"
+        fields.append(stoksPrice)     # "modified p"
 
         # if last line isn't empty but has EOF
         with open(csvfile, 'r+') as f:
+            final = f.readlines()[-1]
+
+            if dt in final:
+                # Move the pointer (similar to a cursor in a text editor) to the end of the file
+                f.seek(0, os.SEEK_END)
+
+                # This code means the following code skips the very last character in the file -
+                # i.e. in the case the last line is null we delete the last line
+                # and the penultimate one
+                pos = f.tell() - 1 # cannot handle ended by '\n'
+                # print(pos)
+
+                # Read each character in the file one at a time from the penultimate
+                # character going backwards, searching for a newline character
+                # If we find a new line, exit the search
+                while pos > 0 and f.read(1) != '\n':
+                    pos -= 1
+                    f.seek(pos, os.SEEK_SET)
+
+                # So long as we're not at the start of the file, delete all the characters ahead
+                # of this position
+                if pos > 0:
+                    # print(pos - len(final))
+                    f.seek(pos - len(final) + 1, os.SEEK_SET)
+                    f.truncate()
+
             # http://codepad.org/S3zjnKoD
-            if f.readlines()[-1][-1:] != '\n':
+            if final[-1:] != '\n':
                 f.write('\n')
 
         with open(csvfile, 'a', newline='') as f:
