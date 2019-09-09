@@ -33,7 +33,8 @@ def main(argv):
    dim = 81
 
    rows = rd.sample(range(sz), tstsz)
-   df_20 = df.ix[rows]
+   # df_20 = df.ix[rows]  .ix is deprecated. Please use ...
+   df_20 = df.iloc[rows]
    df_20.columns.values[0] = tstsz
    df_20.columns.values[1] = dim
    df_20.to_csv('iris_test.csv', index=False)
