@@ -13,7 +13,9 @@ if "%1" == "" (
 py -3 writeCsv3.py stocks/0000
 py -3 tfCsv3.py    stocks/0000
 
-copy /Y  stocks\0000\out\input.csv  iris\.
+copy /Y  stocks\0000\out\iris_test.csv      iris\.
+copy /Y  stocks\0000\out\iris_training.csv  iris\.
+copy /Y  stocks\0000\out\input.csv          iris\.
 
 cd iris/
 
@@ -27,4 +29,3 @@ if "%1" == "" (
 cd ..
 
 REM cls
-
