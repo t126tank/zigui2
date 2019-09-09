@@ -25,7 +25,7 @@ def main(argv):
 
    o_f()
 
-   df = pd.read_csv('data.csv', header=None)
+   df = pd.read_csv('data.csv') # header=None if no "header" at top
 
    sz = len(df.index)
    tstsz = int(round(sz * 0.2))
