@@ -409,7 +409,15 @@ def main(argv):
 
     optObj["atm"], optObj["data"] = smilesData()
 
-    # write json
+    # delete or move old json
+    dir_name = "./"
+    flst = os.listdir(dir_name)
+
+    for item in flst:
+        if item.endswith(".json"):
+            os.remove(os.path.join(dir_name, item))
+
+    # write new json
     f = open(str(ts) + ".json", "w")
     f.write(json.dumps(optObj, cls=OptionEncoder, ensure_ascii=False, indent=2, sort_keys=False, separators=(',', ': '))) # JPN utf-8
     f.close()
