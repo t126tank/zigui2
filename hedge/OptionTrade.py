@@ -10,6 +10,7 @@ import numpy as np
 import os
 import re
 import requests
+import shutil
 import urllib3
 from urllib3.exceptions import InsecureRequestWarning
 urllib3.disable_warnings(InsecureRequestWarning)
@@ -105,8 +106,8 @@ class Target:
 
 targets = [
     Target("https://www.jpx.co.jp/markets/derivatives/index.html", "https://svc.qri.jp/jpx/nkopm/"),
-    Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/1"),
-    Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/2"),
+    # Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/1"),
+    # Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopm/2"),
     Target("https://svc.qri.jp/jpx/nkopm/", "https://svc.qri.jp/jpx/nkopw/"),
     Target("https://svc.qri.jp/jpx/nkopw/", "https://svc.qri.jp/jpx/nkopw/1")
 ]
@@ -411,11 +412,15 @@ def main(argv):
 
     # delete or move old json
     dir_name = "./"
-    flst = os.listdir(dir_name)
+    old_name = dir_name + "old/"
+    if not os.path.isdir(old_name):
+        os.mkdir(old_name)
 
+    flst = os.listdir(dir_name)
     for item in flst:
         if item.endswith(".json"):
-            os.remove(os.path.join(dir_name, item))
+            # os.remove(os.path.join(dir_name, item))
+            shutil.move(os.path.join(dir_name, item), old_name)
 
     # write new json
     f = open(str(ts) + ".json", "w")
