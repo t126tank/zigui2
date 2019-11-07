@@ -180,6 +180,7 @@ def crawler(t):
 
     try:
         r = requests.get(t.getTgt(), headers=headers, verify=False) #requestsを使って、webから取得
+        # print(r.headers['Set-Cookie'])
         soup = BeautifulSoup(r.text, 'lxml')                        #要素を抽出 (lxml)
 
         # delivery date
