@@ -424,10 +424,13 @@ def main(argv):
             shutil.move(os.path.join(dir_name, item), old_name)
 
     # write new json
-    f = open(str(ts) + ".json", "w")
+    smilesJson = str(ts) + ".json"
+    f = open(smilesJson, "w")
     f.write(json.dumps(optObj, cls=OptionEncoder, ensure_ascii=False, indent=2, sort_keys=False, separators=(',', ': '))) # JPN utf-8
     f.close()
 
+    # This creates a symbolic link on python in current directory
+    os.symlink(smilesJson, "smiles.json")
 
 if __name__ == "__main__":
     main(sys.argv[1:])
@@ -474,4 +477,14 @@ if __name__ == "__main__":
 2019/03/07  ::  22250  ::  call  :: (SELL) 21  :: < ( 0.75 ) :: (val)  12  :: > ( 0.667 ) :: (BUY)  20
 2019/03/07  ::  22125  ::  call  :: (SELL) 37  :: < ( 0.85 ) :: (val)  20  :: > ( 0.8 ) :: (BUY)  36
 → 看空，36 卖价值 20 的 put option，溢价率 80%
+
+### symbolic link error 対策 (Windows 10 Pro)
+`SeCreateSymbolicLinkPrivilege` を対象のユーザーに与えます。
+1. コンピューターの構成 → Windowsの設定 → セキュリティの設定 → ローカルポリシー → ユーザー権限の割り当て → シンボリックリンクの作成
+2. ユーザーを追加する
+3. サインアウト  
+   一度サインアウトしないと反映されません
+
+### Windows 7 では `secpol.msc`
+
 '''
