@@ -417,11 +417,12 @@ def main(argv):
     if not os.path.isdir(old_name):
         os.mkdir(old_name)
 
-    flst = os.listdir(dir_name)
     for item in flst:
         if item.endswith(".json"):
-            # os.remove(os.path.join(dir_name, item))
-            shutil.move(os.path.join(dir_name, item), old_name)
+            if item == "smiles.json":
+                os.remove(os.path.join(dir_name, item))
+            else:
+                shutil.move(os.path.join(dir_name, item), old_name)
 
     # write new json
     smilesJson = str(ts) + ".json"
