@@ -1,12 +1,15 @@
 
 @echo off
 
+d:
+cd D:\PQS\tf\python3\
+
 
 if "%1" == "" (
   py -3 mid2Csv3.py  stocks/0000
   py -3 readCsv3.py  stocks/0000
 ) else (
-  py -3 DlN225.py  stocks/0000
+  py -3 DlN225.py    stocks/0000
   py -3 readCsv3.py  stocks/0000 %1
 )
 
@@ -24,8 +27,11 @@ if "%1" == "" (
   py -3 pqs3_0.py    0000
 ) else (
   py -3 pqs3_0.py    0000  %1
+  set time0=%TIME: =0%
+  copy /Y  ..\stocks\0000\out\item.json   ..\stocks\0000\out\history\item-%DATE:/=%_%time0::=%.json
 )
 
 cd ..
 
 REM cls
+
