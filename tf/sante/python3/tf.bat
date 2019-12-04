@@ -1,9 +1,12 @@
 
 @echo off
 
-d:
-cd D:\PQS\tf\python3\
+REM cd /d %~dp0
 
+d:
+set work="D:\PQS\tf\python3"
+
+cd %work%
 
 if "%1" == "" (
   py -3 mid2Csv3.py  stocks/0000
@@ -27,9 +30,18 @@ if "%1" == "" (
   py -3 pqs3_0.py    0000
 ) else (
   py -3 pqs3_0.py    0000  %1
+
+  timeout 1 /nobreak
+
   set time0=%TIME: =0%
-  copy /Y  ..\stocks\0000\out\item.json   ..\stocks\0000\out\history\item-%DATE:/=%_%time0::=%.json
+  set fn=item-%DATE:/=%_%time0::=%.json
+
+  for /F "tokens=2 delims==." %%I in ('%SystemRoot%\System32\wbem\wmic.exe OS GET LocalDateTime /VALUE') do set "FileNameDate=%%I"
+  set "FileNameDate=%FileNameDate:~0,4%-%FileNameDate:~4,2%-%FileNameDate:~6,2%"
+
+  copy /Y  %work%\stocks\0000\out\item.json   %work%\stocks\0000\out\history\item-%FileNameDate%.json
 )
+
 
 cd ..
 
