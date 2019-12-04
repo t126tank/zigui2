@@ -9,10 +9,15 @@
 
 import tensorflow as tf
 import tensorlayer as tl
+import datetime
 import numpy as np
 import json
 import sys
 import os.path
+import shutil
+
+tf.logging.set_verbosity(tf.logging.DEBUG)
+tl.logging.set_verbosity(tl.logging.DEBUG)
 
 def main(argv):
    code = "1301"
@@ -23,23 +28,23 @@ def main(argv):
       if len(argv) > 1:
          train = True
 
-   n_cls         = 2
+   n_cls         = 3
    INPUT_RECORD  = "input.csv"
 
    # though its name is "test", to be used for the evaluation
    IRIS_TEST     = "iris_test.csv"
-   # Read in test csv's where there are 81 features and a target
+   # Read in test csv's where there are 49 features and a target
    csvTest = np.genfromtxt(IRIS_TEST, delimiter=",", skip_header=1)
-   X_test = np.array(csvTest[:, :81])
-   y_test = csvTest[:,81]
+   X_test = np.array(csvTest[:, :49])
+   y_test = csvTest[:,49]
 
    IRIS_TRAINING = "iris_training.csv"
 
    # Data loading and preprocessing
-   # Read in train csv's where there are 81 features and a target
+   # Read in train csv's where there are 49 features and a target
    csvTrain = np.genfromtxt(IRIS_TRAINING, delimiter=",", skip_header=1)
-   X_train = np.array(csvTrain[:, :81])
-   y_train = csvTrain[:,81]
+   X_train = np.array(csvTrain[:, :49])
+   y_train = csvTrain[:,49]
 
    # X_train = X_train.reshape([-1,7,7,1])
    # X_test = X_test.reshape([-1,7,7,1])
@@ -63,7 +68,7 @@ def main(argv):
 
    # define placeholder
    with tf.name_scope('input'):
-      x = tf.placeholder(tf.float32, shape=[None, 81], name='x')
+      x = tf.placeholder(tf.float32, shape=[None, 49], name='x')
       y_ = tf.placeholder(tf.int64, shape=[None, ], name='y_')
 
    with tf.name_scope('input_reshape'):
@@ -87,7 +92,18 @@ def main(argv):
    network = tl.layers.DropoutLayer(network, keep=0.5, name='drop2')
    network = tl.layers.DenseLayer(network, n_units=800,
                                    act = tf.nn.relu, name='relu2')
-   network = tl.layers.DropoutLayer(network, keep=0.5, name='drop3')
+   '''
+   network = tl.layers.DropoutLayer(network, keep=0.8, name='drop3')
+   network = tl.layers.DenseLayer(network, n_units=800,
+                                   act = tf.nn.relu, name='relu3')
+   network = tl.layers.DropoutLayer(network, keep=0.8, name='drop4')
+   network = tl.layers.DenseLayer(network, n_units=800,
+                                   act = tf.nn.relu, name='relu4')
+   network = tl.layers.DropoutLayer(network, keep=0.8, name='drop5')
+   network = tl.layers.DenseLayer(network, n_units=800,
+                                   act = tf.nn.relu, name='relu5')
+   '''
+   network = tl.layers.DropoutLayer(network, keep=0.5, name='drop6')
    # the softmax is implemented internally in tl.cost.cross_entropy(y, y_) to
    # speed up computation, so we use identity here.
    # see tf.nn.sparse_softmax_cross_entropy_with_logits()
@@ -117,13 +133,13 @@ def main(argv):
       sess.run(tf.global_variables_initializer())
 
       # print network information
-      # network.print_params()
-      # network.print_layers()
+      network.print_params()
+      network.print_layers()
 
       # train the network
       # http://tensorlayer.readthedocs.io/en/latest/modules/utils.html
       tl.utils.fit(sess, network, train_op, cost, X_train, y_train, x, y_,
-                  acc=acc, batch_size=100, n_epoch=333, print_freq=50,
+                  acc=acc, batch_size=50, n_epoch=12, print_freq=111,
                   eval_train=True)
       #           X_val=X_val, y_val=y_val, eval_train=False)
 
@@ -154,12 +170,18 @@ def main(argv):
    with open(path0 + 'item.json') as infile:
       item = json.load(infile)
 
-   item['possibility'] = test_acc
+   item['possibility'] = round(test_acc, 6)
    item['result'] = int(result[0])
 
    # Write out
    with open(path0 + 'item.json', 'w') as outfile:
       json.dump(item, outfile)
+
+  # Backup
+  if train:
+      tm = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+      fn = 'item_' + tm + '.json'
+      shutil.copy(path0 + 'item.json', path0 + 'history/' + fn)
 
 
 if __name__ == "__main__":
