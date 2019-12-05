@@ -7,6 +7,9 @@ import pandas as pd
 import os, glob
 import random as rd
 import json
+from pathlib import Path
+sys.path.append(Path('.'))
+from confCsv3 import *
 
 def o_f():
    outpath = "out"
@@ -20,20 +23,23 @@ def main(argv):
    if len(argv) != 0:
       srcDir = argv[0]
 
+   pqsConf = loadConf('./pqsConf.json')
+   dim     = pqsConf['dim'] ** 2
+   ratio   = pqsConf['ratio']
+
    # Specify datasets saved location/path
    os.chdir(srcDir)
 
    o_f()
 
-   df = pd.read_csv('data.csv') # header=None if no "header" at top
+   df = pd.read_csv('data.csv')
 
    sz = len(df.index)
-   tstsz = int(round(sz * 0.2))
+   tstsz = int(round(sz * ratio))
    trnsz = sz - tstsz
-   dim = 81
 
    rows = rd.sample(range(sz), tstsz)
-   # df_20 = df.ix[rows]  .ix is deprecated. Please use ...
+   # df_20 = df.ix[rows]  .ix is deprecated.
    df_20 = df.iloc[rows]
    df_20.columns.values[0] = tstsz
    df_20.columns.values[1] = dim

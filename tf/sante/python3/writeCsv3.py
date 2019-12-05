@@ -7,12 +7,15 @@ import pandas as pd
 import os, glob
 import numpy as np
 import json
+from pathlib import Path
+sys.path.append(Path('.'))
+from confCsv3 import *
 
 # Classification [0] < bad < [1] < bdraw < [2] < gdraw < [3] < good < [4]
 bdraw = -0.01  # bad  draw
 gdraw =  0.01  # good draw
-bad   = -0.0119
-good  =  0.0121
+bad   = -0.0055
+good  =  0.0049
 
 def o_f():
    outpath = "out"
@@ -153,11 +156,15 @@ def main(argv):
    if len(argv) != 0:
       srcDir = argv[0]
 
-   dim = 81
-   ma  = 9
-   p   = 2
-   q   = 3
-   offset = 1
+   pqsConf = loadConf('./pqsConf.json')
+   dim     = pqsConf['dim'] ** 2
+   ma      = pqsConf['ma']
+   p       = pqsConf['p']
+   q       = pqsConf['q']
+   offset  = pqsConf['offset']
+
+   bad     = pqsConf['bad']
+   good    = pqsConf['good']
 
    # Specify datasets saved location/path
    os.chdir(srcDir)
