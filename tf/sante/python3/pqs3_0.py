@@ -15,6 +15,11 @@ import json
 import sys
 import os.path
 import shutil
+from pathlib import Path
+sys.path.append(str(Path('.').resolve().parent))
+print(sys.path)
+from confCsv3 import *
+
 
 tf.logging.set_verbosity(tf.logging.DEBUG)
 tl.logging.set_verbosity(tl.logging.DEBUG)
@@ -28,23 +33,28 @@ def main(argv):
       if len(argv) > 1:
          train = True
 
-   n_cls         = 3
+   pqsConf = loadConf('../pqsConf.json')
+   dim     = pqsConf['dim']
+   dim2    = dim ** 2
+   n_cls   = pqsConf['n_cls']
+   inepoch = pqsConf['n_epoch']
+
    INPUT_RECORD  = "input.csv"
 
    # though its name is "test", to be used for the evaluation
    IRIS_TEST     = "iris_test.csv"
-   # Read in test csv's where there are 49 features and a target
+   # Read in test csv's where there are 7*7 features and a target
    csvTest = np.genfromtxt(IRIS_TEST, delimiter=",", skip_header=1)
-   X_test = np.array(csvTest[:, :49])
-   y_test = csvTest[:,49]
+   X_test = np.array(csvTest[:, :dim2])
+   y_test = csvTest[:,dim2]
 
    IRIS_TRAINING = "iris_training.csv"
 
    # Data loading and preprocessing
-   # Read in train csv's where there are 49 features and a target
+   # Read in train csv's where there are 7*7 features and a target
    csvTrain = np.genfromtxt(IRIS_TRAINING, delimiter=",", skip_header=1)
-   X_train = np.array(csvTrain[:, :49])
-   y_train = csvTrain[:,49]
+   X_train = np.array(csvTrain[:, :dim2])
+   y_train = csvTrain[:,dim2]
 
    # X_train = X_train.reshape([-1,7,7,1])
    # X_test = X_test.reshape([-1,7,7,1])
@@ -68,11 +78,11 @@ def main(argv):
 
    # define placeholder
    with tf.name_scope('input'):
-      x = tf.placeholder(tf.float32, shape=[None, 49], name='x')
+      x = tf.placeholder(tf.float32, shape=[None, dim2], name='x')
       y_ = tf.placeholder(tf.int64, shape=[None, ], name='y_')
 
    with tf.name_scope('input_reshape'):
-      image_shaped_input = tf.reshape(x, [-1, 9, 9, 1])
+      image_shaped_input = tf.reshape(x, [-1, dim, dim, 1])
       tf.summary.image('input', image_shaped_input, 2)
 
    path0 = '../stocks/' + code + '/out/'
@@ -139,7 +149,7 @@ def main(argv):
       # train the network
       # http://tensorlayer.readthedocs.io/en/latest/modules/utils.html
       tl.utils.fit(sess, network, train_op, cost, X_train, y_train, x, y_,
-                  acc=acc, batch_size=50, n_epoch=12, print_freq=111,
+                  acc=acc, batch_size=50, n_epoch=inepoch, print_freq=111,
                   eval_train=True)
       #           X_val=X_val, y_val=y_val, eval_train=False)
 
@@ -177,8 +187,8 @@ def main(argv):
    with open(path0 + 'item.json', 'w') as outfile:
       json.dump(item, outfile)
 
-  # Backup
-  if train:
+   # Backup
+   if train:
       tm = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
       fn = 'item_' + tm + '.json'
       shutil.copy(path0 + 'item.json', path0 + 'history/' + fn)
