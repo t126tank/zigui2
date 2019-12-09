@@ -6,6 +6,7 @@ from tensorflow.examples.tutorials.mnist import input_data
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
 
 # > tensorboard --logdir=mylogs:C:\path\tf\python3\distribution\log
+# > python -m tensorboard.main --logdir=[PATH_TO_LOGDIR
 # <https://qiita.com/FukuharaYohei/items/2834cc054a8b8884e150>
 # TensorBoard情報出力ディレクトリ
 log_dir = 'C:\\path\\tf\\python3\\distribution\\log'
