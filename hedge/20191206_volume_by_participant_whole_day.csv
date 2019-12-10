@@ -1,0 +1,571 @@
+﻿
+,Trade Date,,20191206
+
+JPX Code,164120005
+Instrument,FUT_TOPIX_1912
+11788,ソシエテ・ジェネラル,Societe Generale,23002,11788,ソシエテ・ジェネラル,Societe Generale,20219
+12479,ＡＢＮアムロクリア,ABN AMRO Clearing,22172,12479,ＡＢＮアムロクリア,ABN AMRO Clearing,17133
+12800,モルガンスタンレー,Morgan Stanley MUFG,8889,12400,野村證券,Nomura Securities,7248
+11714,ＪＰモルガン証券,JPMorgan Japan,3408,12792,メリルリンチ日本証券,Merrill Lynch Japan,4664
+12410,バークレイズ証券,Barclays Japan,3339,11560,ゴールドマンサックス,Goldman Sachs Japan,3760
+12792,メリルリンチ日本証券,Merrill Lynch Japan,3134,12328,ＳＭＢＣ日興証券,SMBC Nikko Sec,3381
+11560,ゴールドマンサックス,Goldman Sachs Japan,2446,12800,モルガンスタンレー,Morgan Stanley MUFG,2844
+12428,ＢＮＰパリバ証券,BNP Paribas (Japan),2390,12176,ドイツ証券,Deutsche Securities,2701
+12400,野村證券,Nomura Securities,1456,12724,ＨＳＢＣ証券,HSBC (Japan),2512
+11696,みずほ証券,Mizuho Securities,1393,11714,ＪＰモルガン証券,JPMorgan Japan,1910
+11520,三菱ＵＦＪモルガン,Mitsubishi UFJ Mor,1071,11696,みずほ証券,Mizuho Securities,1875
+12328,ＳＭＢＣ日興証券,SMBC Nikko Sec,839,12410,バークレイズ証券,Barclays Japan,1379
+12176,ドイツ証券,Deutsche Securities,688,11746,ＵＢＳ証券,UBS Securities Japan,1353
+11635,クレディ・スイス証券,Credit Suisse Japan,489,11520,三菱ＵＦＪモルガン,Mitsubishi UFJ Mor,1081
+11746,ＵＢＳ証券,UBS Securities Japan,444,11792,シティグループ証券,Citigroup Japan,864
+12000,大和証券,Daiwa Securities,425,11635,クレディ・スイス証券,Credit Suisse Japan,818
+12336,日産証券,Nissan Securities,210,12000,大和証券,Daiwa Securities,664
+12464,廣田証券,HIROTA SECURITIES,167,12428,ＢＮＰパリバ証券,BNP Paribas (Japan),645
+11792,シティグループ証券,Citigroup Japan,67,12336,日産証券,Nissan Securities,449
+12896,豊証券,Yutaka Securities,62,12072,東海東京証券,Tokai Tokyo Sec,260
+
+JPX Code,165030005
+Instrument,FUT_TOPIX_2003
+12400,野村證券,Nomura Securities,6489,12800,モルガンスタンレー,Morgan Stanley MUFG,8351
+11788,ソシエテ・ジェネラル,Societe Generale,4452,11788,ソシエテ・ジェネラル,Societe Generale,6389
+11560,ゴールドマンサックス,Goldman Sachs Japan,3246,12479,ＡＢＮアムロクリア,ABN AMRO Clearing,5416
+12328,ＳＭＢＣ日興証券,SMBC Nikko Sec,3002,12428,ＢＮＰパリバ証券,BNP Paribas (Japan),2000
+12724,ＨＳＢＣ証券,HSBC (Japan),2500,12410,バークレイズ証券,Barclays Japan,1175
+12792,メリルリンチ日本証券,Merrill Lynch Japan,2400,11714,ＪＰモルガン証券,JPMorgan Japan,973
+11696,みずほ証券,Mizuho Securities,1348,11560,ゴールドマンサックス,Goldman Sachs Japan,608
+11520,三菱ＵＦＪモルガン,Mitsubishi UFJ Mor,986,12176,ドイツ証券,Deutsche Securities,580
+11792,シティグループ証券,Citigroup Japan,733,11696,みずほ証券,Mizuho Securities,514
+12479,ＡＢＮアムロクリア,ABN AMRO Clearing,701,11520,三菱ＵＦＪモルガン,Mitsubishi UFJ Mor,391
+12000,大和証券,Daiwa Securities,510,12400,野村證券,Nomura Securities,353
+12336,日産証券,Nissan Securities,290,12792,メリルリンチ日本証券,Merrill Lynch Japan,186
+12176,ドイツ証券,Deutsche Securities,187,12336,日産証券,Nissan Securities,82
+11714,ＪＰモルガン証券,JPMorgan Japan,105,12464,廣田証券,HIROTA SECURITIES,28
+12410,バークレイズ証券,Barclays Japan,33,11792,シティグループ証券,Citigroup Japan,10
+11272,岡三証券,OKASAN SECURITIES,29,12000,大和証券,Daiwa Securities,10
+12800,モルガンスタンレー,Morgan Stanley MUFG,22,11635,クレディ・スイス証券,Credit Suisse Japan,4
+12072,東海東京証券,Tokai Tokyo Sec,15,12795,インタラクティブ証券,Interactive Brokers,3
+12428,ＢＮＰパリバ証券,BNP Paribas (Japan),11,11746,ＵＢＳ証券,UBS Securities Japan,2
+11512,光世証券,The Kosei Securities,10,11272,岡三証券,OKASAN SECURITIES,2
+-,-,-,-,11512,光世証券,The Kosei Securities,2
+
+JPX Code,164120018
+Instrument,FUT_NK225_1912
+12479,ＡＢＮアムロクリア,ABN AMRO Clearing,12366,12479,ＡＢＮアムロクリア,ABN AMRO Clearing,11588
+11788,ソシエテ・ジェネラル,Societe Generale,12349,11788,ソシエテ・ジェネラル,Societe Generale,10736
+12792,メリルリンチ日本証券,Merrill Lynch Japan,1862,12400,野村證券,Nomura Securities,5183
+11560,ゴールドマンサックス,Goldman Sachs Japan,1621,12328,ＳＭＢＣ日興証券,SMBC Nikko Sec,4074
+11714,ＪＰモルガン証券,JPMorgan Japan,1551,12792,メリルリンチ日本証券,Merrill Lynch Japan,2038
+12328,ＳＭＢＣ日興証券,SMBC Nikko Sec,1304,12800,モルガンスタンレー,Morgan Stanley MUFG,680
+12410,バークレイズ証券,Barclays Japan,1253,11256,ＳＢＩ証券,SBI SECURITIES,647
+12428,ＢＮＰパリバ証券,BNP Paribas (Japan),1040,11714,ＪＰモルガン証券,JPMorgan Japan,632
+12400,野村證券,Nomura Securities,992,11060,ａｕカブコム証券,au Kabucom Securitie,480
+11256,ＳＢＩ証券,SBI SECURITIES,972,12057,楽天証券,Rakuten Securities,474
+11696,みずほ証券,Mizuho Securities,822,11635,クレディ・スイス証券,Credit Suisse Japan,433
+12336,日産証券,Nissan Securities,783,12176,ドイツ証券,Deutsche Securities,409
+11060,ａｕカブコム証券,au Kabucom Securitie,561,12336,日産証券,Nissan Securities,392
+12057,楽天証券,Rakuten Securities,553,12560,松井証券,MATSUI SECURITIES,308
+11746,ＵＢＳ証券,UBS Securities Japan,355,12072,東海東京証券,Tokai Tokyo Sec,256
+11635,クレディ・スイス証券,Credit Suisse Japan,304,12428,ＢＮＰパリバ証券,BNP Paribas (Japan),223
+12560,松井証券,MATSUI SECURITIES,241,12410,バークレイズ証券,Barclays Japan,216
+12330,マネックス証券,Monex,124,11696,みずほ証券,Mizuho Securities,198
+12000,大和証券,Daiwa Securities,117,12000,大和証券,Daiwa Securities,139
+12072,東海東京証券,Tokai Tokyo Sec,112,11746,ＵＢＳ証券,UBS Securities Japan,94
+
+JPX Code,165030018
+Instrument,FUT_NK225_2003
+12400,野村證券,Nomura Securities,4426,12479,ＡＢＮアムロクリア,ABN AMRO Clearing,2684
+12328,ＳＭＢＣ日興証券,SMBC Nikko Sec,3994,11788,ソシエテ・ジェネラル,Societe Generale,2250
+12479,ＡＢＮアムロクリア,ABN AMRO Clearing,1309,11560,ゴールドマンサックス,Goldman Sachs Japan,1245
+11788,ソシエテ・ジェネラル,Societe Generale,817,12328,ＳＭＢＣ日興証券,SMBC Nikko Sec,1176
+12792,メリルリンチ日本証券,Merrill Lynch Japan,648,12428,ＢＮＰパリバ証券,BNP Paribas (Japan),1000
+11256,ＳＢＩ証券,SBI SECURITIES,208,12410,バークレイズ証券,Barclays Japan,946
+11060,ａｕカブコム証券,au Kabucom Securitie,158,11714,ＪＰモルガン証券,JPMorgan Japan,724
+12560,松井証券,MATSUI SECURITIES,109,12792,メリルリンチ日本証券,Merrill Lynch Japan,644
+12057,楽天証券,Rakuten Securities,64,11696,みずほ証券,Mizuho Securities,501
+12800,モルガンスタンレー,Morgan Stanley MUFG,60,12400,野村證券,Nomura Securities,200
+12336,日産証券,Nissan Securities,42,11060,ａｕカブコム証券,au Kabucom Securitie,120
+12330,マネックス証券,Monex,29,12336,日産証券,Nissan Securities,108
+11714,ＪＰモルガン証券,JPMorgan Japan,22,12072,東海東京証券,Tokai Tokyo Sec,72
+12072,東海東京証券,Tokai Tokyo Sec,21,12000,大和証券,Daiwa Securities,70
+11272,岡三証券,OKASAN SECURITIES,19,11256,ＳＢＩ証券,SBI SECURITIES,63
+11696,みずほ証券,Mizuho Securities,10,12560,松井証券,MATSUI SECURITIES,61
+11784,ライブスター証券,livestar Securities,10,12057,楽天証券,Rakuten Securities,44
+12410,バークレイズ証券,Barclays Japan,9,11272,岡三証券,OKASAN SECURITIES,36
+11727,ＧＭＯクリック証券,GMO CLICK Securities,6,12330,マネックス証券,Monex,8
+12888,山和証券,YAMAWA SECURITIES,2,12800,モルガンスタンレー,Morgan Stanley MUFG,8
+12208,内藤証券,NAITO SECURITIES,2,-,-,-,-
+12000,大和証券,Daiwa Securities,2,-,-,-,-
+12428,ＢＮＰパリバ証券,BNP Paribas (Japan),2,-,-,-,-
+
+JPX Code,164120019
+Instrument,FUT_NK225M_1912
+12479,ＡＢＮアムロクリア,ABN AMRO Clearing,146132,12479,ＡＢＮアムロクリア,ABN AMRO Clearing,143107
+11788,ソシエテ・ジェネラル,Societe Generale,93028,11788,ソシエテ・ジェネラル,Societe Generale,90326
+11256,ＳＢＩ証券,SBI SECURITIES,15134,12792,メリルリンチ日本証券,Merrill Lynch Japan,15890
+12057,楽天証券,Rakuten Securities,12197,11256,ＳＢＩ証券,SBI SECURITIES,13353
+12560,松井証券,MATSUI SECURITIES,11867,12057,楽天証券,Rakuten Securities,11203
+12792,メリルリンチ日本証券,Merrill Lynch Japan,10346,12560,松井証券,MATSUI SECURITIES,10330
+11060,ａｕカブコム証券,au Kabucom Securitie,6347,11060,ａｕカブコム証券,au Kabucom Securitie,5555
+11272,岡三証券,OKASAN SECURITIES,4437,11272,岡三証券,OKASAN SECURITIES,4084
+12428,ＢＮＰパリバ証券,BNP Paribas (Japan),3837,12428,ＢＮＰパリバ証券,BNP Paribas (Japan),4044
+12330,マネックス証券,Monex,3445,11714,ＪＰモルガン証券,JPMorgan Japan,3434
+12800,モルガンスタンレー,Morgan Stanley MUFG,2568,12330,マネックス証券,Monex,3084
+11635,クレディ・スイス証券,Credit Suisse Japan,2208,12800,モルガンスタンレー,Morgan Stanley MUFG,2938
+11784,ライブスター証券,livestar Securities,2024,12176,ドイツ証券,Deutsche Securities,2750
+12336,日産証券,Nissan Securities,1945,12410,バークレイズ証券,Barclays Japan,2339
+11714,ＪＰモルガン証券,JPMorgan Japan,1916,12336,日産証券,Nissan Securities,2329
+11727,ＧＭＯクリック証券,GMO CLICK Securities,1857,12400,野村證券,Nomura Securities,1743
+12000,大和証券,Daiwa Securities,1261,11727,ＧＭＯクリック証券,GMO CLICK Securities,1648
+12464,廣田証券,HIROTA SECURITIES,1001,11635,クレディ・スイス証券,Credit Suisse Japan,1532
+12410,バークレイズ証券,Barclays Japan,856,11784,ライブスター証券,livestar Securities,1091
+12400,野村證券,Nomura Securities,645,12464,廣田証券,HIROTA SECURITIES,1075
+
+JPX Code,165010019
+Instrument,FUT_NK225M_2001
+12479,ＡＢＮアムロクリア,ABN AMRO Clearing,2783,12479,ＡＢＮアムロクリア,ABN AMRO Clearing,2956
+11788,ソシエテ・ジェネラル,Societe Generale,1808,11788,ソシエテ・ジェネラル,Societe Generale,1820
+12792,メリルリンチ日本証券,Merrill Lynch Japan,797,12792,メリルリンチ日本証券,Merrill Lynch Japan,884
+11784,ライブスター証券,livestar Securities,265,11784,ライブスター証券,livestar Securities,269
+11256,ＳＢＩ証券,SBI SECURITIES,217,12057,楽天証券,Rakuten Securities,131
+12057,楽天証券,Rakuten Securities,208,11060,ａｕカブコム証券,au Kabucom Securitie,93
+11060,ａｕカブコム証券,au Kabucom Securitie,97,11256,ＳＢＩ証券,SBI SECURITIES,72
+12560,松井証券,MATSUI SECURITIES,74,12560,松井証券,MATSUI SECURITIES,70
+12330,マネックス証券,Monex,62,12330,マネックス証券,Monex,24
+12000,大和証券,Daiwa Securities,28,11272,岡三証券,OKASAN SECURITIES,18
+12336,日産証券,Nissan Securities,19,12288,フィリップ証券,Phillip Securities,15
+11272,岡三証券,OKASAN SECURITIES,9,12336,日産証券,Nissan Securities,12
+11727,ＧＭＯクリック証券,GMO CLICK Securities,7,11727,ＧＭＯクリック証券,GMO CLICK Securities,6
+11544,岩井コスモ証券,IwaiCosmo Securities,4,12000,大和証券,Daiwa Securities,5
+11056,安藤証券,ANDO SECURITIES,1,11544,岩井コスモ証券,IwaiCosmo Securities,3
+-,-,-,-,11056,安藤証券,ANDO SECURITIES,1
+
+JPX Code,165020019
+Instrument,FUT_NK225M_2002
+11788,ソシエテ・ジェネラル,Societe Generale,47,12479,ＡＢＮアムロクリア,ABN AMRO Clearing,76
+12560,松井証券,MATSUI SECURITIES,31,11788,ソシエテ・ジェネラル,Societe Generale,42
+12479,ＡＢＮアムロクリア,ABN AMRO Clearing,28,12560,松井証券,MATSUI SECURITIES,20
+11060,ａｕカブコム証券,au Kabucom Securitie,28,11256,ＳＢＩ証券,SBI SECURITIES,17
+12057,楽天証券,Rakuten Securities,23,11060,ａｕカブコム証券,au Kabucom Securitie,14
+11256,ＳＢＩ証券,SBI SECURITIES,19,12057,楽天証券,Rakuten Securities,9
+12000,大和証券,Daiwa Securities,6,11272,岡三証券,OKASAN SECURITIES,5
+12330,マネックス証券,Monex,5,12330,マネックス証券,Monex,4
+11727,ＧＭＯクリック証券,GMO CLICK Securities,1,12000,大和証券,Daiwa Securities,2
+11272,岡三証券,OKASAN SECURITIES,1,-,-,-,-
+
+JPX Code,134122318
+Instrument,PUT_NK225_191213_22375
+12428,ＢＮＰパリバ証券,BNP Paribas (Japan),302,11788,ソシエテ・ジェネラル,Societe Generale,311
+11788,ソシエテ・ジェネラル,Societe Generale,260,12428,ＢＮＰパリバ証券,BNP Paribas (Japan),291
+12479,ＡＢＮアムロクリア,ABN AMRO Clearing,231,12479,ＡＢＮアムロクリア,ABN AMRO Clearing,206
+11256,ＳＢＩ証券,SBI SECURITIES,48,11256,ＳＢＩ証券,SBI SECURITIES,40
+12057,楽天証券,Rakuten Securities,28,11060,ａｕカブコム証券,au Kabucom Securitie,22
+12560,松井証券,MATSUI SECURITIES,14,12057,楽天証券,Rakuten Securities,14
+11016,藍澤證券,AIZAWA SECURITIES,6,12560,松井証券,MATSUI SECURITIES,13
+11784,ライブスター証券,livestar Securities,4,11784,ライブスター証券,livestar Securities,3
+11060,ａｕカブコム証券,au Kabucom Securitie,3,11727,ＧＭＯクリック証券,GMO CLICK Securities,3
+11272,岡三証券,OKASAN SECURITIES,2,12888,山和証券,YAMAWA SECURITIES,1
+11544,岩井コスモ証券,IwaiCosmo Securities,2,-,-,-,-
+12000,大和証券,Daiwa Securities,2,-,-,-,-
+12888,山和証券,YAMAWA SECURITIES,1,-,-,-,-
+12330,マネックス証券,Monex,1,-,-,-,-
+
+JPX Code,134122518
+Instrument,PUT_NK225_191213_22500
+11714,ＪＰモルガン証券,JPMorgan Japan,651,12479,ＡＢＮアムロクリア,ABN AMRO Clearing,985
+12479,ＡＢＮアムロクリア,ABN AMRO Clearing,581,11788,ソシエテ・ジェネラル,Societe Generale,636
+12428,ＢＮＰパリバ証券,BNP Paribas (Japan),479,12428,ＢＮＰパリバ証券,BNP Paribas (Japan),434
+11788,ソシエテ・ジェネラル,Societe Generale,437,11256,ＳＢＩ証券,SBI SECURITIES,245
+12560,松井証券,MATSUI SECURITIES,249,12560,松井証券,MATSUI SECURITIES,207
+12800,モルガンスタンレー,Morgan Stanley MUFG,200,12896,豊証券,Yutaka Securities,190
+12896,豊証券,Yutaka Securities,168,12057,楽天証券,Rakuten Securities,122
+12057,楽天証券,Rakuten Securities,91,11060,ａｕカブコム証券,au Kabucom Securitie,99
+11256,ＳＢＩ証券,SBI SECURITIES,81,12464,廣田証券,HIROTA SECURITIES,57
+12464,廣田証券,HIROTA SECURITIES,64,12176,ドイツ証券,Deutsche Securities,39
+11060,ａｕカブコム証券,au Kabucom Securitie,46,12888,山和証券,YAMAWA SECURITIES,39
+12000,大和証券,Daiwa Securities,26,12330,マネックス証券,Monex,18
+11696,みずほ証券,Mizuho Securities,10,12000,大和証券,Daiwa Securities,16
+11784,ライブスター証券,livestar Securities,7,11272,岡三証券,OKASAN SECURITIES,14
+11272,岡三証券,OKASAN SECURITIES,6,11727,ＧＭＯクリック証券,GMO CLICK Securities,13
+11056,安藤証券,ANDO SECURITIES,6,11056,安藤証券,ANDO SECURITIES,8
+11016,藍澤證券,AIZAWA SECURITIES,6,11784,ライブスター証券,livestar Securities,7
+12888,山和証券,YAMAWA SECURITIES,5,11840,立花証券,TACHIBANA SECURITIES,2
+12368,証券ジャパン,Securities Japan,4,11544,岩井コスモ証券,IwaiCosmo Securities,1
+11544,岩井コスモ証券,IwaiCosmo Securities,3,12368,証券ジャパン,Securities Japan,1
+12176,ドイツ証券,Deutsche Securities,3,-,-,-,-
+12330,マネックス証券,Monex,3,-,-,-,-
+
+JPX Code,134122618
+Instrument,PUT_NK225_191213_22625
+12479,ＡＢＮアムロクリア,ABN AMRO Clearing,850,12479,ＡＢＮアムロクリア,ABN AMRO Clearing,702
+11714,ＪＰモルガン証券,JPMorgan Japan,370,11746,ＵＢＳ証券,UBS Securities Japan,465
+11788,ソシエテ・ジェネラル,Societe Generale,292,11788,ソシエテ・ジェネラル,Societe Generale,268
+12428,ＢＮＰパリバ証券,BNP Paribas (Japan),248,12428,ＢＮＰパリバ証券,BNP Paribas (Japan),226
+11256,ＳＢＩ証券,SBI SECURITIES,38,11714,ＪＰモルガン証券,JPMorgan Japan,100
+12795,インタラクティブ証券,Interactive Brokers,15,11256,ＳＢＩ証券,SBI SECURITIES,38
+12057,楽天証券,Rakuten Securities,14,12795,インタラクティブ証券,Interactive Brokers,15
+11056,安藤証券,ANDO SECURITIES,12,12560,松井証券,MATSUI SECURITIES,15
+11060,ａｕカブコム証券,au Kabucom Securitie,10,12176,ドイツ証券,Deutsche Securities,12
+12560,松井証券,MATSUI SECURITIES,8,12057,楽天証券,Rakuten Securities,12
+11784,ライブスター証券,livestar Securities,5,12000,大和証券,Daiwa Securities,10
+11016,藍澤證券,AIZAWA SECURITIES,5,11060,ａｕカブコム証券,au Kabucom Securitie,4
+12330,マネックス証券,Monex,3,11544,岩井コスモ証券,IwaiCosmo Securities,4
+12176,ドイツ証券,Deutsche Securities,3,12330,マネックス証券,Monex,2
+11272,岡三証券,OKASAN SECURITIES,2,11056,安藤証券,ANDO SECURITIES,2
+12336,日産証券,Nissan Securities,1,12368,証券ジャパン,Securities Japan,1
+
+JPX Code,184122718
+Instrument,PUT_NK225_191213_22750
+12479,ＡＢＮアムロクリア,ABN AMRO Clearing,500,12479,ＡＢＮアムロクリア,ABN AMRO Clearing,662
+11714,ＪＰモルガン証券,JPMorgan Japan,472,12428,ＢＮＰパリバ証券,BNP Paribas (Japan),324
+12428,ＢＮＰパリバ証券,BNP Paribas (Japan),284,11788,ソシエテ・ジェネラル,Societe Generale,318
+11788,ソシエテ・ジェネラル,Societe Generale,230,12560,松井証券,MATSUI SECURITIES,131
+11256,ＳＢＩ証券,SBI SECURITIES,115,11256,ＳＢＩ証券,SBI SECURITIES,101
+12464,廣田証券,HIROTA SECURITIES,71,11696,みずほ証券,Mizuho Securities,50
+12057,楽天証券,Rakuten Securities,39,12057,楽天証券,Rakuten Securities,43
+11784,ライブスター証券,livestar Securities,25,12410,バークレイズ証券,Barclays Japan,40
+11635,クレディ・スイス証券,Credit Suisse Japan,15,12464,廣田証券,HIROTA SECURITIES,31
+11060,ａｕカブコム証券,au Kabucom Securitie,14,11784,ライブスター証券,livestar Securities,25
+12560,松井証券,MATSUI SECURITIES,14,11060,ａｕカブコム証券,au Kabucom Securitie,20
+12888,山和証券,YAMAWA SECURITIES,12,12176,ドイツ証券,Deutsche Securities,20
+12176,ドイツ証券,Deutsche Securities,4,11727,ＧＭＯクリック証券,GMO CLICK Securities,13
+11727,ＧＭＯクリック証券,GMO CLICK Securities,3,12888,山和証券,YAMAWA SECURITIES,6
+11696,みずほ証券,Mizuho Securities,3,11016,藍澤證券,AIZAWA SECURITIES,6
+12368,証券ジャパン,Securities Japan,2,12330,マネックス証券,Monex,5
+12336,日産証券,Nissan Securities,2,12072,東海東京証券,Tokai Tokyo Sec,5
+11016,藍澤證券,AIZAWA SECURITIES,2,12336,日産証券,Nissan Securities,4
+12024,むさし証券,Musashi Securities,1,12024,むさし証券,Musashi Securities,1
+12330,マネックス証券,Monex,1,11056,安藤証券,ANDO SECURITIES,1
+-,-,-,-,12795,インタラクティブ証券,Interactive Brokers,1
+-,-,-,-,11544,岩井コスモ証券,IwaiCosmo Securities,1
+-,-,-,-,12896,豊証券,Yutaka Securities,1
+
+JPX Code,134122818
+Instrument,PUT_NK225_191213_22875
+12479,ＡＢＮアムロクリア,ABN AMRO Clearing,415,12479,ＡＢＮアムロクリア,ABN AMRO Clearing,491
+11714,ＪＰモルガン証券,JPMorgan Japan,277,11788,ソシエテ・ジェネラル,Societe Generale,295
+12428,ＢＮＰパリバ証券,BNP Paribas (Japan),216,12428,ＢＮＰパリバ証券,BNP Paribas (Japan),218
+11788,ソシエテ・ジェネラル,Societe Generale,183,11727,ＧＭＯクリック証券,GMO CLICK Securities,193
+11727,ＧＭＯクリック証券,GMO CLICK Securities,92,11784,ライブスター証券,livestar Securities,49
+11784,ライブスター証券,livestar Securities,51,11256,ＳＢＩ証券,SBI SECURITIES,17
+11256,ＳＢＩ証券,SBI SECURITIES,17,12057,楽天証券,Rakuten Securities,14
+12464,廣田証券,HIROTA SECURITIES,15,12560,松井証券,MATSUI SECURITIES,7
+11060,ａｕカブコム証券,au Kabucom Securitie,11,11060,ａｕカブコム証券,au Kabucom Securitie,6
+12560,松井証券,MATSUI SECURITIES,9,12464,廣田証券,HIROTA SECURITIES,6
+12057,楽天証券,Rakuten Securities,7,11016,藍澤證券,AIZAWA SECURITIES,2
+12795,インタラクティブ証券,Interactive Brokers,4,11272,岡三証券,OKASAN SECURITIES,2
+11544,岩井コスモ証券,IwaiCosmo Securities,3,12000,大和証券,Daiwa Securities,2
+11272,岡三証券,OKASAN SECURITIES,2,12330,マネックス証券,Monex,1
+12330,マネックス証券,Monex,1,12724,ＨＳＢＣ証券,HSBC (Japan),1
+12792,メリルリンチ日本証券,Merrill Lynch Japan,1,-,-,-,-
+
+JPX Code,184123018
+Instrument,PUT_NK225_191213_23000
+12479,ＡＢＮアムロクリア,ABN AMRO Clearing,769,12479,ＡＢＮアムロクリア,ABN AMRO Clearing,561
+11788,ソシエテ・ジェネラル,Societe Generale,319,11788,ソシエテ・ジェネラル,Societe Generale,357
+12428,ＢＮＰパリバ証券,BNP Paribas (Japan),268,12428,ＢＮＰパリバ証券,BNP Paribas (Japan),260
+12800,モルガンスタンレー,Morgan Stanley MUFG,100,11256,ＳＢＩ証券,SBI SECURITIES,155
+12560,松井証券,MATSUI SECURITIES,87,12800,モルガンスタンレー,Morgan Stanley MUFG,150
+11256,ＳＢＩ証券,SBI SECURITIES,71,12560,松井証券,MATSUI SECURITIES,128
+11714,ＪＰモルガン証券,JPMorgan Japan,50,12057,楽天証券,Rakuten Securities,82
+12464,廣田証券,HIROTA SECURITIES,45,11784,ライブスター証券,livestar Securities,22
+12057,楽天証券,Rakuten Securities,42,11060,ａｕカブコム証券,au Kabucom Securitie,20
+11060,ａｕカブコム証券,au Kabucom Securitie,18,12464,廣田証券,HIROTA SECURITIES,20
+11056,安藤証券,ANDO SECURITIES,12,11272,岡三証券,OKASAN SECURITIES,15
+12792,メリルリンチ日本証券,Merrill Lynch Japan,12,12328,ＳＭＢＣ日興証券,SMBC Nikko Sec,11
+12330,マネックス証券,Monex,9,11696,みずほ証券,Mizuho Securities,10
+11272,岡三証券,OKASAN SECURITIES,8,12330,マネックス証券,Monex,10
+12795,インタラクティブ証券,Interactive Brokers,5,11727,ＧＭＯクリック証券,GMO CLICK Securities,8
+11488,あかつき証券,Akatsuki Securities,5,12000,大和証券,Daiwa Securities,5
+11727,ＧＭＯクリック証券,GMO CLICK Securities,4,11488,あかつき証券,Akatsuki Securities,5
+12888,山和証券,YAMAWA SECURITIES,4,12072,東海東京証券,Tokai Tokyo Sec,5
+11784,ライブスター証券,livestar Securities,4,11840,立花証券,TACHIBANA SECURITIES,5
+12336,日産証券,Nissan Securities,2,11056,安藤証券,ANDO SECURITIES,2
+
+JPX Code,134123118
+Instrument,PUT_NK225_191213_23125
+11788,ソシエテ・ジェネラル,Societe Generale,294,12479,ＡＢＮアムロクリア,ABN AMRO Clearing,297
+12479,ＡＢＮアムロクリア,ABN AMRO Clearing,215,12428,ＢＮＰパリバ証券,BNP Paribas (Japan),175
+12428,ＢＮＰパリバ証券,BNP Paribas (Japan),132,11788,ソシエテ・ジェネラル,Societe Generale,132
+12560,松井証券,MATSUI SECURITIES,15,11256,ＳＢＩ証券,SBI SECURITIES,21
+11256,ＳＢＩ証券,SBI SECURITIES,13,11635,クレディ・スイス証券,Credit Suisse Japan,15
+12057,楽天証券,Rakuten Securities,6,12560,松井証券,MATSUI SECURITIES,14
+11016,藍澤證券,AIZAWA SECURITIES,4,11784,ライブスター証券,livestar Securities,7
+12795,インタラクティブ証券,Interactive Brokers,3,12057,楽天証券,Rakuten Securities,7
+11784,ライブスター証券,livestar Securities,3,12464,廣田証券,HIROTA SECURITIES,5
+11060,ａｕカブコム証券,au Kabucom Securitie,2,11060,ａｕカブコム証券,au Kabucom Securitie,5
+12000,大和証券,Daiwa Securities,2,12410,バークレイズ証券,Barclays Japan,3
+12792,メリルリンチ日本証券,Merrill Lynch Japan,1,12330,マネックス証券,Monex,3
+-,-,-,-,11520,三菱ＵＦＪモルガン,Mitsubishi UFJ Mor,2
+-,-,-,-,11544,岩井コスモ証券,IwaiCosmo Securities,1
+-,-,-,-,11840,立花証券,TACHIBANA SECURITIES,1
+-,-,-,-,11727,ＧＭＯクリック証券,GMO CLICK Securities,1
+-,-,-,-,11512,光世証券,The Kosei Securities,1
+
+JPX Code,184123218
+Instrument,PUT_NK225_191213_23250
+12479,ＡＢＮアムロクリア,ABN AMRO Clearing,162,12428,ＢＮＰパリバ証券,BNP Paribas (Japan),105
+11788,ソシエテ・ジェネラル,Societe Generale,129,12479,ＡＢＮアムロクリア,ABN AMRO Clearing,80
+12428,ＢＮＰパリバ証券,BNP Paribas (Japan),106,11788,ソシエテ・ジェネラル,Societe Generale,64
+11256,ＳＢＩ証券,SBI SECURITIES,27,11520,三菱ＵＦＪモルガン,Mitsubishi UFJ Mor,55
+12400,野村證券,Nomura Securities,10,12800,モルガンスタンレー,Morgan Stanley MUFG,50
+12560,松井証券,MATSUI SECURITIES,9,11256,ＳＢＩ証券,SBI SECURITIES,34
+11520,三菱ＵＦＪモルガン,Mitsubishi UFJ Mor,5,12560,松井証券,MATSUI SECURITIES,21
+12057,楽天証券,Rakuten Securities,5,12464,廣田証券,HIROTA SECURITIES,12
+11060,ａｕカブコム証券,au Kabucom Securitie,5,12057,楽天証券,Rakuten Securities,10
+12795,インタラクティブ証券,Interactive Brokers,4,12400,野村證券,Nomura Securities,10
+11544,岩井コスモ証券,IwaiCosmo Securities,3,11060,ａｕカブコム証券,au Kabucom Securitie,7
+12000,大和証券,Daiwa Securities,3,11056,安藤証券,ANDO SECURITIES,7
+12792,メリルリンチ日本証券,Merrill Lynch Japan,2,11544,岩井コスモ証券,IwaiCosmo Securities,5
+11784,ライブスター証券,livestar Securities,1,12795,インタラクティブ証券,Interactive Brokers,3
+-,-,-,-,11784,ライブスター証券,livestar Securities,2
+-,-,-,-,12410,バークレイズ証券,Barclays Japan,2
+-,-,-,-,11272,岡三証券,OKASAN SECURITIES,1
+-,-,-,-,12000,大和証券,Daiwa Securities,1
+-,-,-,-,12024,むさし証券,Musashi Securities,1
+-,-,-,-,12330,マネックス証券,Monex,1
+
+JPX Code,134123318
+Instrument,PUT_NK225_191213_23375
+12479,ＡＢＮアムロクリア,ABN AMRO Clearing,70,12479,ＡＢＮアムロクリア,ABN AMRO Clearing,105
+12428,ＢＮＰパリバ証券,BNP Paribas (Japan),58,12428,ＢＮＰパリバ証券,BNP Paribas (Japan),39
+11788,ソシエテ・ジェネラル,Societe Generale,41,11788,ソシエテ・ジェネラル,Societe Generale,31
+11714,ＪＰモルガン証券,JPMorgan Japan,16,12410,バークレイズ証券,Barclays Japan,18
+12400,野村證券,Nomura Securities,10,11256,ＳＢＩ証券,SBI SECURITIES,10
+11256,ＳＢＩ証券,SBI SECURITIES,9,12057,楽天証券,Rakuten Securities,9
+12560,松井証券,MATSUI SECURITIES,8,12560,松井証券,MATSUI SECURITIES,7
+11060,ａｕカブコム証券,au Kabucom Securitie,6,11746,ＵＢＳ証券,UBS Securities Japan,3
+12057,楽天証券,Rakuten Securities,6,11016,藍澤證券,AIZAWA SECURITIES,2
+12795,インタラクティブ証券,Interactive Brokers,5,11060,ａｕカブコム証券,au Kabucom Securitie,2
+12000,大和証券,Daiwa Securities,1,11272,岡三証券,OKASAN SECURITIES,2
+11512,光世証券,The Kosei Securities,1,12000,大和証券,Daiwa Securities,1
+12724,ＨＳＢＣ証券,HSBC (Japan),1,11784,ライブスター証券,livestar Securities,1
+-,-,-,-,12176,ドイツ証券,Deutsche Securities,1
+-,-,-,-,12795,インタラクティブ証券,Interactive Brokers,1
+
+JPX Code,184123518
+Instrument,PUT_NK225_191213_23500
+12479,ＡＢＮアムロクリア,ABN AMRO Clearing,35,11788,ソシエテ・ジェネラル,Societe Generale,27
+11788,ソシエテ・ジェネラル,Societe Generale,27,12428,ＢＮＰパリバ証券,BNP Paribas (Japan),20
+11256,ＳＢＩ証券,SBI SECURITIES,9,12410,バークレイズ証券,Barclays Japan,15
+12428,ＢＮＰパリバ証券,BNP Paribas (Japan),8,12479,ＡＢＮアムロクリア,ABN AMRO Clearing,14
+12792,メリルリンチ日本証券,Merrill Lynch Japan,3,11256,ＳＢＩ証券,SBI SECURITIES,6
+12560,松井証券,MATSUI SECURITIES,2,12560,松井証券,MATSUI SECURITIES,2
+11544,岩井コスモ証券,IwaiCosmo Securities,1,12057,楽天証券,Rakuten Securities,1
+11060,ａｕカブコム証券,au Kabucom Securitie,1,12792,メリルリンチ日本証券,Merrill Lynch Japan,1
+12330,マネックス証券,Monex,1,12330,マネックス証券,Monex,1
+
+JPX Code,144124318
+Instrument,CAL_NK225_191213_24375
+12428,ＢＮＰパリバ証券,BNP Paribas (Japan),83,12479,ＡＢＮアムロクリア,ABN AMRO Clearing,81
+12464,廣田証券,HIROTA SECURITIES,56,12428,ＢＮＰパリバ証券,BNP Paribas (Japan),71
+11512,光世証券,The Kosei Securities,50,11512,光世証券,The Kosei Securities,68
+12479,ＡＢＮアムロクリア,ABN AMRO Clearing,43,12464,廣田証券,HIROTA SECURITIES,55
+12400,野村證券,Nomura Securities,22,11272,岡三証券,OKASAN SECURITIES,21
+11272,岡三証券,OKASAN SECURITIES,20,12057,楽天証券,Rakuten Securities,10
+11788,ソシエテ・ジェネラル,Societe Generale,14,12328,ＳＭＢＣ日興証券,SMBC Nikko Sec,7
+12560,松井証券,MATSUI SECURITIES,7,11256,ＳＢＩ証券,SBI SECURITIES,2
+12057,楽天証券,Rakuten Securities,7,12330,マネックス証券,Monex,2
+11256,ＳＢＩ証券,SBI SECURITIES,6,11784,ライブスター証券,livestar Securities,2
+11784,ライブスター証券,livestar Securities,6,11788,ソシエテ・ジェネラル,Societe Generale,2
+12288,フィリップ証券,Phillip Securities,4,11060,ａｕカブコム証券,au Kabucom Securitie,1
+11060,ａｕカブコム証券,au Kabucom Securitie,3,12560,松井証券,MATSUI SECURITIES,1
+12000,大和証券,Daiwa Securities,2,12888,山和証券,YAMAWA SECURITIES,1
+12888,山和証券,YAMAWA SECURITIES,1,-,-,-,-
+
+JPX Code,194124218
+Instrument,CAL_NK225_191213_24250
+11788,ソシエテ・ジェネラル,Societe Generale,237,11788,ソシエテ・ジェネラル,Societe Generale,241
+12428,ＢＮＰパリバ証券,BNP Paribas (Japan),175,12479,ＡＢＮアムロクリア,ABN AMRO Clearing,201
+12479,ＡＢＮアムロクリア,ABN AMRO Clearing,162,12428,ＢＮＰパリバ証券,BNP Paribas (Japan),201
+12888,山和証券,YAMAWA SECURITIES,145,12888,山和証券,YAMAWA SECURITIES,95
+11256,ＳＢＩ証券,SBI SECURITIES,72,11256,ＳＢＩ証券,SBI SECURITIES,47
+12057,楽天証券,Rakuten Securities,44,12057,楽天証券,Rakuten Securities,46
+11272,岡三証券,OKASAN SECURITIES,41,12464,廣田証券,HIROTA SECURITIES,40
+12560,松井証券,MATSUI SECURITIES,39,12560,松井証券,MATSUI SECURITIES,38
+11784,ライブスター証券,livestar Securities,18,12176,ドイツ証券,Deutsche Securities,32
+11727,ＧＭＯクリック証券,GMO CLICK Securities,13,11060,ａｕカブコム証券,au Kabucom Securitie,30
+11056,安藤証券,ANDO SECURITIES,13,11056,安藤証券,ANDO SECURITIES,10
+11060,ａｕカブコム証券,au Kabucom Securitie,11,12000,大和証券,Daiwa Securities,3
+12464,廣田証券,HIROTA SECURITIES,10,11272,岡三証券,OKASAN SECURITIES,2
+11544,岩井コスモ証券,IwaiCosmo Securities,6,11784,ライブスター証券,livestar Securities,2
+12000,大和証券,Daiwa Securities,2,12330,マネックス証券,Monex,1
+12330,マネックス証券,Monex,1,-,-,-,-
+
+JPX Code,144124118
+Instrument,CAL_NK225_191213_24125
+12479,ＡＢＮアムロクリア,ABN AMRO Clearing,710,11788,ソシエテ・ジェネラル,Societe Generale,427
+12428,ＢＮＰパリバ証券,BNP Paribas (Japan),336,11696,みずほ証券,Mizuho Securities,411
+11788,ソシエテ・ジェネラル,Societe Generale,336,12428,ＢＮＰパリバ証券,BNP Paribas (Japan),310
+11727,ＧＭＯクリック証券,GMO CLICK Securities,50,12479,ＡＢＮアムロクリア,ABN AMRO Clearing,214
+11256,ＳＢＩ証券,SBI SECURITIES,39,12176,ドイツ証券,Deutsche Securities,72
+12016,ちばぎん証券,Chibagin Securities,35,11727,ＧＭＯクリック証券,GMO CLICK Securities,50
+12464,廣田証券,HIROTA SECURITIES,30,11256,ＳＢＩ証券,SBI SECURITIES,38
+12240,ひびき証券,Hibiki Securities,20,12240,ひびき証券,Hibiki Securities,20
+12057,楽天証券,Rakuten Securities,11,12057,楽天証券,Rakuten Securities,16
+12176,ドイツ証券,Deutsche Securities,8,11784,ライブスター証券,livestar Securities,16
+12560,松井証券,MATSUI SECURITIES,6,11060,ａｕカブコム証券,au Kabucom Securitie,8
+11060,ａｕカブコム証券,au Kabucom Securitie,6,12560,松井証券,MATSUI SECURITIES,5
+11784,ライブスター証券,livestar Securities,5,11056,安藤証券,ANDO SECURITIES,4
+12330,マネックス証券,Monex,4,12795,インタラクティブ証券,Interactive Brokers,4
+11056,安藤証券,ANDO SECURITIES,4,12330,マネックス証券,Monex,3
+11272,岡三証券,OKASAN SECURITIES,2,12888,山和証券,YAMAWA SECURITIES,3
+-,-,-,-,11272,岡三証券,OKASAN SECURITIES,1
+
+JPX Code,194124018
+Instrument,CAL_NK225_191213_24000
+12479,ＡＢＮアムロクリア,ABN AMRO Clearing,640,12428,ＢＮＰパリバ証券,BNP Paribas (Japan),498
+12428,ＢＮＰパリバ証券,BNP Paribas (Japan),420,12479,ＡＢＮアムロクリア,ABN AMRO Clearing,486
+11788,ソシエテ・ジェネラル,Societe Generale,389,11788,ソシエテ・ジェネラル,Societe Generale,480
+11256,ＳＢＩ証券,SBI SECURITIES,219,11256,ＳＢＩ証券,SBI SECURITIES,210
+12560,松井証券,MATSUI SECURITIES,146,12560,松井証券,MATSUI SECURITIES,81
+12464,廣田証券,HIROTA SECURITIES,126,12330,マネックス証券,Monex,76
+11060,ａｕカブコム証券,au Kabucom Securitie,79,12057,楽天証券,Rakuten Securities,61
+12330,マネックス証券,Monex,70,12176,ドイツ証券,Deutsche Securities,59
+12057,楽天証券,Rakuten Securities,58,11060,ａｕカブコム証券,au Kabucom Securitie,55
+11056,安藤証券,ANDO SECURITIES,17,11696,みずほ証券,Mizuho Securities,50
+12724,ＨＳＢＣ証券,HSBC (Japan),15,11272,岡三証券,OKASAN SECURITIES,44
+11784,ライブスター証券,livestar Securities,9,12464,廣田証券,HIROTA SECURITIES,33
+12792,メリルリンチ日本証券,Merrill Lynch Japan,8,12016,ちばぎん証券,Chibagin Securities,30
+11488,あかつき証券,Akatsuki Securities,8,11056,安藤証券,ANDO SECURITIES,22
+11727,ＧＭＯクリック証券,GMO CLICK Securities,6,12328,ＳＭＢＣ日興証券,SMBC Nikko Sec,17
+11272,岡三証券,OKASAN SECURITIES,5,11784,ライブスター証券,livestar Securities,10
+12795,インタラクティブ証券,Interactive Brokers,5,12792,メリルリンチ日本証券,Merrill Lynch Japan,8
+11544,岩井コスモ証券,IwaiCosmo Securities,5,12795,インタラクティブ証券,Interactive Brokers,7
+12888,山和証券,YAMAWA SECURITIES,4,12888,山和証券,YAMAWA SECURITIES,3
+12176,ドイツ証券,Deutsche Securities,3,11727,ＧＭＯクリック証券,GMO CLICK Securities,3
+
+JPX Code,144123818
+Instrument,CAL_NK225_191213_23875
+11788,ソシエテ・ジェネラル,Societe Generale,522,12479,ＡＢＮアムロクリア,ABN AMRO Clearing,634
+12479,ＡＢＮアムロクリア,ABN AMRO Clearing,467,12428,ＢＮＰパリバ証券,BNP Paribas (Japan),314
+12428,ＢＮＰパリバ証券,BNP Paribas (Japan),284,11788,ソシエテ・ジェネラル,Societe Generale,209
+11256,ＳＢＩ証券,SBI SECURITIES,43,11256,ＳＢＩ証券,SBI SECURITIES,103
+12057,楽天証券,Rakuten Securities,27,12795,インタラクティブ証券,Interactive Brokers,50
+12464,廣田証券,HIROTA SECURITIES,23,12464,廣田証券,HIROTA SECURITIES,49
+12724,ＨＳＢＣ証券,HSBC (Japan),20,12057,楽天証券,Rakuten Securities,41
+11696,みずほ証券,Mizuho Securities,20,12560,松井証券,MATSUI SECURITIES,14
+12560,松井証券,MATSUI SECURITIES,19,11060,ａｕカブコム証券,au Kabucom Securitie,10
+11060,ａｕカブコム証券,au Kabucom Securitie,12,12016,ちばぎん証券,Chibagin Securities,10
+12330,マネックス証券,Monex,10,11727,ＧＭＯクリック証券,GMO CLICK Securities,8
+11727,ＧＭＯクリック証券,GMO CLICK Securities,6,12330,マネックス証券,Monex,8
+12024,むさし証券,Musashi Securities,5,11784,ライブスター証券,livestar Securities,5
+12888,山和証券,YAMAWA SECURITIES,5,12410,バークレイズ証券,Barclays Japan,4
+11272,岡三証券,OKASAN SECURITIES,3,12176,ドイツ証券,Deutsche Securities,3
+12176,ドイツ証券,Deutsche Securities,2,12024,むさし証券,Musashi Securities,2
+12000,大和証券,Daiwa Securities,2,12336,日産証券,Nissan Securities,2
+11544,岩井コスモ証券,IwaiCosmo Securities,1,11272,岡三証券,OKASAN SECURITIES,2
+12795,インタラクティブ証券,Interactive Brokers,1,12000,大和証券,Daiwa Securities,1
+-,-,-,-,12792,メリルリンチ日本証券,Merrill Lynch Japan,1
+-,-,-,-,11544,岩井コスモ証券,IwaiCosmo Securities,1
+-,-,-,-,12724,ＨＳＢＣ証券,HSBC (Japan),1
+
+JPX Code,194123718
+Instrument,CAL_NK225_191213_23750
+11746,ＵＢＳ証券,UBS Securities Japan,799,12479,ＡＢＮアムロクリア,ABN AMRO Clearing,1164
+12479,ＡＢＮアムロクリア,ABN AMRO Clearing,490,12428,ＢＮＰパリバ証券,BNP Paribas (Japan),368
+11788,ソシエテ・ジェネラル,Societe Generale,388,11788,ソシエテ・ジェネラル,Societe Generale,306
+12428,ＢＮＰパリバ証券,BNP Paribas (Japan),370,11256,ＳＢＩ証券,SBI SECURITIES,170
+11256,ＳＢＩ証券,SBI SECURITIES,117,12464,廣田証券,HIROTA SECURITIES,86
+12464,廣田証券,HIROTA SECURITIES,90,12560,松井証券,MATSUI SECURITIES,85
+12560,松井証券,MATSUI SECURITIES,45,12288,フィリップ証券,Phillip Securities,63
+12057,楽天証券,Rakuten Securities,44,12888,山和証券,YAMAWA SECURITIES,53
+12888,山和証券,YAMAWA SECURITIES,43,11784,ライブスター証券,livestar Securities,36
+11784,ライブスター証券,livestar Securities,30,12057,楽天証券,Rakuten Securities,34
+11060,ａｕカブコム証券,au Kabucom Securitie,21,11696,みずほ証券,Mizuho Securities,30
+11056,安藤証券,ANDO SECURITIES,14,11056,安藤証券,ANDO SECURITIES,19
+12016,ちばぎん証券,Chibagin Securities,10,11060,ａｕカブコム証券,au Kabucom Securitie,17
+12330,マネックス証券,Monex,4,12795,インタラクティブ証券,Interactive Brokers,14
+11272,岡三証券,OKASAN SECURITIES,3,12016,ちばぎん証券,Chibagin Securities,10
+11727,ＧＭＯクリック証券,GMO CLICK Securities,3,12330,マネックス証券,Monex,8
+12795,インタラクティブ証券,Interactive Brokers,3,11272,岡三証券,OKASAN SECURITIES,5
+11544,岩井コスモ証券,IwaiCosmo Securities,2,12410,バークレイズ証券,Barclays Japan,4
+12368,証券ジャパン,Securities Japan,2,12176,ドイツ証券,Deutsche Securities,3
+12000,大和証券,Daiwa Securities,2,11016,藍澤證券,AIZAWA SECURITIES,2
+
+JPX Code,144123618
+Instrument,CAL_NK225_191213_23625
+12479,ＡＢＮアムロクリア,ABN AMRO Clearing,733,12479,ＡＢＮアムロクリア,ABN AMRO Clearing,708
+12428,ＢＮＰパリバ証券,BNP Paribas (Japan),313,12428,ＢＮＰパリバ証券,BNP Paribas (Japan),365
+11788,ソシエテ・ジェネラル,Societe Generale,285,11788,ソシエテ・ジェネラル,Societe Generale,350
+12400,野村證券,Nomura Securities,140,12057,楽天証券,Rakuten Securities,106
+11256,ＳＢＩ証券,SBI SECURITIES,81,11256,ＳＢＩ証券,SBI SECURITIES,102
+12057,楽天証券,Rakuten Securities,54,12560,松井証券,MATSUI SECURITIES,20
+12560,松井証券,MATSUI SECURITIES,39,12016,ちばぎん証券,Chibagin Securities,15
+11272,岡三証券,OKASAN SECURITIES,20,11512,光世証券,The Kosei Securities,10
+12016,ちばぎん証券,Chibagin Securities,15,11060,ａｕカブコム証券,au Kabucom Securitie,10
+11784,ライブスター証券,livestar Securities,9,11727,ＧＭＯクリック証券,GMO CLICK Securities,9
+11060,ａｕカブコム証券,au Kabucom Securitie,8,11784,ライブスター証券,livestar Securities,9
+11512,光世証券,The Kosei Securities,8,12464,廣田証券,HIROTA SECURITIES,3
+12795,インタラクティブ証券,Interactive Brokers,2,12792,メリルリンチ日本証券,Merrill Lynch Japan,2
+12464,廣田証券,HIROTA SECURITIES,1,11544,岩井コスモ証券,IwaiCosmo Securities,1
+12330,マネックス証券,Monex,1,-,-,-,-
+12336,日産証券,Nissan Securities,1,-,-,-,-
+
+JPX Code,194123518
+Instrument,CAL_NK225_191213_23500
+12479,ＡＢＮアムロクリア,ABN AMRO Clearing,305,12479,ＡＢＮアムロクリア,ABN AMRO Clearing,201
+12428,ＢＮＰパリバ証券,BNP Paribas (Japan),159,12428,ＢＮＰパリバ証券,BNP Paribas (Japan),151
+11788,ソシエテ・ジェネラル,Societe Generale,82,11788,ソシエテ・ジェネラル,Societe Generale,104
+11696,みずほ証券,Mizuho Securities,52,12176,ドイツ証券,Deutsche Securities,100
+11256,ＳＢＩ証券,SBI SECURITIES,37,11256,ＳＢＩ証券,SBI SECURITIES,47
+12795,インタラクティブ証券,Interactive Brokers,23,11272,岡三証券,OKASAN SECURITIES,27
+12057,楽天証券,Rakuten Securities,18,12057,楽天証券,Rakuten Securities,25
+12072,東海東京証券,Tokai Tokyo Sec,15,12410,バークレイズ証券,Barclays Japan,24
+12560,松井証券,MATSUI SECURITIES,15,12464,廣田証券,HIROTA SECURITIES,22
+12328,ＳＭＢＣ日興証券,SMBC Nikko Sec,14,12560,松井証券,MATSUI SECURITIES,17
+12208,内藤証券,NAITO SECURITIES,10,12792,メリルリンチ日本証券,Merrill Lynch Japan,12
+11727,ＧＭＯクリック証券,GMO CLICK Securities,10,11696,みずほ証券,Mizuho Securities,10
+12400,野村證券,Nomura Securities,10,12330,マネックス証券,Monex,10
+12464,廣田証券,HIROTA SECURITIES,7,11727,ＧＭＯクリック証券,GMO CLICK Securities,8
+12330,マネックス証券,Monex,5,11056,安藤証券,ANDO SECURITIES,6
+11060,ａｕカブコム証券,au Kabucom Securitie,4,11060,ａｕカブコム証券,au Kabucom Securitie,3
+11544,岩井コスモ証券,IwaiCosmo Securities,2,12795,インタラクティブ証券,Interactive Brokers,2
+11840,立花証券,TACHIBANA SECURITIES,2,12888,山和証券,YAMAWA SECURITIES,1
+11784,ライブスター証券,livestar Securities,2,11520,三菱ＵＦＪモルガン,Mitsubishi UFJ Mor,1
+12336,日産証券,Nissan Securities,1,12336,日産証券,Nissan Securities,1
+11272,岡三証券,OKASAN SECURITIES,1,11784,ライブスター証券,livestar Securities,1
+-,-,-,-,11840,立花証券,TACHIBANA SECURITIES,1
+
+JPX Code,144123318
+Instrument,CAL_NK225_191213_23375
+12479,ＡＢＮアムロクリア,ABN AMRO Clearing,197,12479,ＡＢＮアムロクリア,ABN AMRO Clearing,229
+12428,ＢＮＰパリバ証券,BNP Paribas (Japan),96,12428,ＢＮＰパリバ証券,BNP Paribas (Japan),114
+11788,ソシエテ・ジェネラル,Societe Generale,67,11788,ソシエテ・ジェネラル,Societe Generale,67
+11256,ＳＢＩ証券,SBI SECURITIES,54,12410,バークレイズ証券,Barclays Japan,15
+12057,楽天証券,Rakuten Securities,10,11256,ＳＢＩ証券,SBI SECURITIES,10
+11272,岡三証券,OKASAN SECURITIES,10,12560,松井証券,MATSUI SECURITIES,8
+11060,ａｕカブコム証券,au Kabucom Securitie,10,11272,岡三証券,OKASAN SECURITIES,7
+12560,松井証券,MATSUI SECURITIES,9,12057,楽天証券,Rakuten Securities,5
+12330,マネックス証券,Monex,1,11746,ＵＢＳ証券,UBS Securities Japan,3
+11512,光世証券,The Kosei Securities,1,11060,ａｕカブコム証券,au Kabucom Securitie,1
+12795,インタラクティブ証券,Interactive Brokers,1,12792,メリルリンチ日本証券,Merrill Lynch Japan,1
+12792,メリルリンチ日本証券,Merrill Lynch Japan,1,11544,岩井コスモ証券,IwaiCosmo Securities,1
+12000,大和証券,Daiwa Securities,1,11784,ライブスター証券,livestar Securities,1
+11784,ライブスター証券,livestar Securities,1,-,-,-,-
+12724,ＨＳＢＣ証券,HSBC (Japan),1,-,-,-,-
+11746,ＵＢＳ証券,UBS Securities Japan,1,-,-,-,-
+11727,ＧＭＯクリック証券,GMO CLICK Securities,1,-,-,-,-
+
+JPX Code,194123218
+Instrument,CAL_NK225_191213_23250
+12479,ＡＢＮアムロクリア,ABN AMRO Clearing,92,12479,ＡＢＮアムロクリア,ABN AMRO Clearing,119
+11256,ＳＢＩ証券,SBI SECURITIES,43,11256,ＳＢＩ証券,SBI SECURITIES,50
+12428,ＢＮＰパリバ証券,BNP Paribas (Japan),35,11788,ソシエテ・ジェネラル,Societe Generale,25
+11788,ソシエテ・ジェネラル,Societe Generale,30,12428,ＢＮＰパリバ証券,BNP Paribas (Japan),19
+12000,大和証券,Daiwa Securities,10,12792,メリルリンチ日本証券,Merrill Lynch Japan,6
+12057,楽天証券,Rakuten Securities,7,11060,ａｕカブコム証券,au Kabucom Securitie,3
+12560,松井証券,MATSUI SECURITIES,4,12057,楽天証券,Rakuten Securities,3
+11060,ａｕカブコム証券,au Kabucom Securitie,2,12330,マネックス証券,Monex,1
+11544,岩井コスモ証券,IwaiCosmo Securities,2,11840,立花証券,TACHIBANA SECURITIES,1
+12792,メリルリンチ日本証券,Merrill Lynch Japan,1,-,-,-,-
+12330,マネックス証券,Monex,1,-,-,-,-
+
+JPX Code,144123118
+Instrument,CAL_NK225_191213_23125
+12560,松井証券,MATSUI SECURITIES,3,12479,ＡＢＮアムロクリア,ABN AMRO Clearing,5
+12428,ＢＮＰパリバ証券,BNP Paribas (Japan),1,11256,ＳＢＩ証券,SBI SECURITIES,1
+12057,楽天証券,Rakuten Securities,1,11788,ソシエテ・ジェネラル,Societe Generale,1
+12479,ＡＢＮアムロクリア,ABN AMRO Clearing,1,12428,ＢＮＰパリバ証券,BNP Paribas (Japan),1
+12330,マネックス証券,Monex,1,-,-,-,-
+11256,ＳＢＩ証券,SBI SECURITIES,1,-,-,-,-
+
