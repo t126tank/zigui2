@@ -22,7 +22,7 @@ from bs4 import BeautifulSoup
 
 FUTURE = "FUT"
 OPT_PUT  = "PUT"
-OPT_CALL = "CALL"
+OPT_CALL = "CAL"
 
 
 class Trader:
@@ -134,7 +134,7 @@ def main(argv):
             # print(date)
             continue
 
-         if r == '' or '-,-,' in r:
+         if r == '' in r:
             if start:
                start = False
 
@@ -144,11 +144,11 @@ def main(argv):
             # to create ONE target
             if num != 0:
                target = Target(jpxCd, instrument, qty)
-
                data['info'].append(target)
 
                # new target re-init
                target = {}
+               jpxCd = ''
                instrument = {}
                qty = []
             else:
@@ -173,16 +173,31 @@ def main(argv):
 
                # seller
                codes = np.array(traders)[:, 0].tolist()
-               if items[0] not in codes:
-                  traders.append([items[0], items[1], items[2]])
+               scd  = "0"
+               sqty = 0
+               if items[0] != '-' and items[1] != '-' and items[2] != '-':
+                  scd  = items[0]
+                  sqty = int(items[3])
+                  if scd not in codes:
+                     traders.append([scd, items[1], items[2]])
 
                # buyer
                codes = np.array(traders)[:, 0].tolist()
-               if items[-4] not in codes:
-                  traders.append([items[-4], items[-3], items[-2]])
+               bcd  = "0"
+               bqty = 0
+               if items[-4] != '-' and items[-3] != '-' and items[-2] != '-':
+                  bcd  = items[-4]
+                  bqty = int(items[-1])
+                  if bcd not in codes:
+                     traders.append([bcd, items[-3], items[-2]])
 
                # quantity info
-               qty.append([items[0], int(items[3]), items[-4], int(items[-1])])
+               qty.append([scd, sqty, bcd, bqty])
+
+      # to create LAST target
+      if num != 0:
+         target = Target(jpxCd, instrument, qty)
+         data['info'].append(target)
 
    # write all data
    with codecs.open('test.json','w','utf-8') as f:
