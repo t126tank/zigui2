@@ -10,9 +10,11 @@ import io
 import json
 import numpy as np
 import os
+from os import listdir
 import re
 import requests
 import shutil
+from time import sleep
 import urllib3
 from urllib3.exceptions import InsecureRequestWarning
 urllib3.disable_warnings(InsecureRequestWarning)
@@ -23,6 +25,11 @@ from bs4 import BeautifulSoup
 FUTURE = "FUT"
 OPT_PUT  = "PUT"
 OPT_CALL = "CAL"
+
+BASE_URL = "https://www.jpx.co.jp"
+VOLUME_URI = "/markets/derivatives/participant-volume/index.html"
+
+DATA_DIR = "./voldata/"
 
 
 class Trader:
@@ -101,16 +108,62 @@ def createInstrument(row):
    return Instrument(items[0], items[1], int(items[2]), kp)
 
 
-def main(argv):
+def crawler():
+   csvs = []
+
+   # existing volume csv files by date
+   volcsvs = list(set([ volcsv.split('_')[0] for volcsv in listdir(DATA_DIR) if volcsv.endswith("csv") ]))
+
+   headers = requests.utils.default_headers()
+   headers.update({
+      'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0'
+      # 'Referer': t.getRef()
+   })
+
+   try:
+      r = requests.get(BASE_URL + VOLUME_URI, headers=headers, verify=False) #requestsを使って、webから取得
+      # print(r.headers['Set-Cookie'])
+      soup = BeautifulSoup(r.text, 'lxml')                        #要素を抽出 (lxml)
+
+      # csv file uri: a要素を全て取得
+      allcsv = []
+      for table in soup.find_all('table'):
+         for tr in table.find_all('tr'):
+            allcsv.extend([a['href'] for a in tr.find_all('a', href=True) if a['href'].endswith('.csv')])
+
+      # download and rename saving
+      for csv in allcsv:
+         csvfile = csv.split('/')[-1]
+         if csvfile.split('_')[0] not in volcsvs: # not downloaded yet
+            print("sleeping 2s ...: " + BASE_URL + csv)
+            sleep(2)
+            response = requests.get(BASE_URL + csv)
+
+            if response.ok:
+               csvpath = DATA_DIR + csvfile
+               csvs.append(csvpath)
+               with open(csvpath, mode='wb+') as f:   # write, binary, allow creation
+                  f.write(response.content)
+
+      return csvs
+
+   except Exception as e:
+      print("error: {0}".format(e), file=sys.stderr)
+      exitCode = 2
+
+
+def convCsv2Json(csv):
+   jsonfile = os.path.splitext(csv)[0] + '.json'
+
    # load traders' info
    traders = []
 
    # Relative Path, depends on OS utf-8 -> sjis
-   with open('traders.json', encoding='utf-8') as f:
+   with open(DATA_DIR + 'traders.json', encoding='utf-8') as f:
       traders = json.load(f)
 
    # read csv line-by-line (BOM of UTF-8)
-   with io.open('20191206_volume_by_participant_whole_day.csv', 'rt', encoding='utf_8_sig') as f:
+   with io.open(csv, 'rt', encoding='utf_8_sig') as f:
       # one target starts
       data  = {}
       start = False
@@ -200,13 +253,20 @@ def main(argv):
          data['info'].append(target)
 
    # write all data
-   with codecs.open('test.json','w','utf-8') as f:
+   with codecs.open(jsonfile, 'w','utf-8') as f:
       f.write(json.dumps(data, default=default_method, ensure_ascii=False, indent=2, sort_keys=False, separators=(',', ': '))) # JPN utf-8, cls=TargetEncoder?
 
    # write all traders
    # [x.encode('utf-8') for x in traders]
-   with codecs.open('traders.json','w','utf-8') as f:
+   with codecs.open(DATA_DIR + 'traders.json','w','utf-8') as f:
       f.write(json.dumps(traders, ensure_ascii=False, indent=2, sort_keys=False, separators=(',', ': ')))
+
+
+def main(argv):
+
+   # convert each csv into json
+   list(map(convCsv2Json, crawler()))
+
 
 if __name__ == "__main__":
    main(sys.argv[1:])
