@@ -42,10 +42,10 @@ class Trader:
 
 
 class Target:
-   def __init__(self, jpxCd, instrument, qty):
+   def __init__(self, jpxCd, instrument, vol):
       self.jpxCd = jpxCd
       self.instrument = instrument
-      self.qty = qty
+      self.vol = vol
 
    def getJpxCd(self):
       return self.jpxCd
@@ -53,8 +53,8 @@ class Target:
    def getInstrument(self):
       return self.instrument
 
-   def getQty(self):
-      return self.qty
+   def getVol(self):
+      return self.vol
 
 
 class Instrument:
@@ -123,7 +123,7 @@ def main(argv):
       target = {}
       jpxCd = ''
       instrument = {}
-      qty = []
+      vol = []
 
       for row in f:
          r = row.strip()
@@ -143,14 +143,14 @@ def main(argv):
          if 'JPX Code' in r:
             # to create ONE target
             if num != 0:
-               target = Target(jpxCd, instrument, qty)
+               target = Target(jpxCd, instrument, vol)
                data['info'].append(target)
 
                # new target re-init
                target = {}
                jpxCd = ''
                instrument = {}
-               qty = []
+               vol = []
             else:
                data['date'] = date
                data['info'] = info
@@ -167,36 +167,36 @@ def main(argv):
             if 'Instrument' in r:
                instrument = createInstrument(r)
 
-            # data["info"]["qty"]
+            # data["info"]["vol"]
             else:
                items = list(map(str.strip, r.split(',')))
 
                # seller
                codes = np.array(traders)[:, 0].tolist()
                scd  = "0"
-               sqty = 0
+               svol = 0
                if items[0] != '-' and items[1] != '-' and items[2] != '-':
                   scd  = items[0]
-                  sqty = int(items[3])
+                  svol = int(items[3])
                   if scd not in codes:
                      traders.append([scd, items[1], items[2]])
 
                # buyer
                codes = np.array(traders)[:, 0].tolist()
                bcd  = "0"
-               bqty = 0
+               bvol = 0
                if items[-4] != '-' and items[-3] != '-' and items[-2] != '-':
                   bcd  = items[-4]
-                  bqty = int(items[-1])
+                  bvol = int(items[-1])
                   if bcd not in codes:
                      traders.append([bcd, items[-3], items[-2]])
 
-               # quantity info
-               qty.append([scd, sqty, bcd, bqty])
+               # volume info
+               vol.append([scd, svol, bcd, bvol])
 
       # to create LAST target
       if num != 0:
-         target = Target(jpxCd, instrument, qty)
+         target = Target(jpxCd, instrument, vol)
          data['info'].append(target)
 
    # write all data
