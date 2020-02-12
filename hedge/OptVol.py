@@ -98,6 +98,17 @@ class TargetEncoder(json.JSONEncoder):
       return super(TargetEncoder, self).default(obj) # 他の型はdefaultのエンコード方式を使用
 
 
+def loadJsonData(path):
+   jsonData = {}
+
+   if os.path.exists(path):
+      # Relative Path
+      with open(path, 'r', encoding='utf-8') as infile:
+         jsonData = json.load(infile)
+
+   return jsonData
+
+
 def createInstrument(row):
    kp = 0
    items = row.split(',')[1].split('_')
@@ -162,6 +173,10 @@ def convCsv2Json(csv):
    with open(DATA_DIR + 'traders.json', encoding='utf-8') as f:
       traders = json.load(f)
 
+   # initial data of [date].json
+   jsonData = {}
+   jsonDataFile = ''
+
    # read csv line-by-line (BOM of UTF-8)
    with io.open(csv, 'rt', encoding='utf_8_sig') as f:
       # one target starts
@@ -207,6 +222,13 @@ def convCsv2Json(csv):
             else:
                data['date'] = date
                data['info'] = info
+               '''
+               basedir = os.path.dirname(path)
+               if not os.path.exists(basedir):
+                  os.makedirs(basedir)
+               '''
+               jsonDataFile = DATA_DIR + str(date) + '.json'
+               jsonData = loadJsonData(jsonDataFile)
 
             num = num + 1
             start = True
@@ -260,6 +282,11 @@ def convCsv2Json(csv):
    # [x.encode('utf-8') for x in traders]
    with codecs.open(DATA_DIR + 'traders.json','w','utf-8') as f:
       f.write(json.dumps(traders, ensure_ascii=False, indent=2, sort_keys=False, separators=(',', ': ')))
+
+   # over-written all [date].json
+   jsonData = data
+   with codecs.open(jsonDataFile, 'w','utf-8') as f:
+      f.write(json.dumps(jsonData, default=default_method, ensure_ascii=False, indent=2, sort_keys=False, separators=(',', ': '))) # JPN utf-8, cls=TargetEncoder?
 
 
 def main(argv):
