@@ -30,7 +30,10 @@ BASE_URL = "https://www.jpx.co.jp"
 VOLUME_URI = "/markets/derivatives/participant-volume/index.html"
 
 DATA_DIR = "./voldata/"
+CMN_DATA_DIR = "./cmndata/"
 
+traders = []
+files = []
 
 class Trader:
    def __init__(self, cd, ja, en):
@@ -166,13 +169,6 @@ def crawler():
 def convCsv2Json(csv):
    jsonfile = os.path.splitext(csv)[0] + '.json'
 
-   # load traders' info
-   traders = []
-
-   # Relative Path, depends on OS utf-8 -> sjis
-   with open(DATA_DIR + 'traders.json', encoding='utf-8') as f:
-      traders = json.load(f)
-
    # initial data of [date].json
    jsonData = {}
    jsonDataFile = ''
@@ -227,7 +223,7 @@ def convCsv2Json(csv):
                if not os.path.exists(basedir):
                   os.makedirs(basedir)
                '''
-               jsonDataFile = DATA_DIR + str(date) + '.json'
+               jsonDataFile = CMN_DATA_DIR + str(date) + '.json'
                jsonData = loadJsonData(jsonDataFile)
 
             num = num + 1
@@ -278,22 +274,42 @@ def convCsv2Json(csv):
    with codecs.open(jsonfile, 'w','utf-8') as f:
       f.write(json.dumps(data, default=default_method, ensure_ascii=False, indent=2, sort_keys=False, separators=(',', ': '))) # JPN utf-8, cls=TargetEncoder?
 
-   # write all traders
-   # [x.encode('utf-8') for x in traders]
-   with codecs.open(DATA_DIR + 'traders.json','w','utf-8') as f:
-      f.write(json.dumps(traders, ensure_ascii=False, indent=2, sort_keys=False, separators=(',', ': ')))
-
    # over-written all [date].json
    '''
    with codecs.open(jsonDataFile, 'w','utf-8') as f:
       f.write(json.dumps(jsonData, default=default_method, ensure_ascii=False, indent=2, sort_keys=False, separators=(',', ': '))) # JPN utf-8, cls=TargetEncoder?
    '''
+   files.append(jsonDataFile)
 
 
 def main(argv):
+   # load traders' info
+   tradersPath = CMN_DATA_DIR + 'traders.json'
+
+   # Relative Path, depends on OS utf-8 -> sjis
+   with open(tradersPath, encoding='utf-8') as f:
+      traders = json.load(f)
+
+   # load files' list
+   filesPath = CMN_DATA_DIR + 'files.json'
+
+   # Relative Path, depends on OS utf-8 -> sjis
+   with open(filesPath, encoding='utf-8') as f:
+      files = json.load(f)
+
 
    # convert each csv into json
    list(map(convCsv2Json, crawler()))
+
+   # write all traders
+   # [x.encode('utf-8') for x in traders]
+   with codecs.open(tradersPath,'w','utf-8') as f:
+      f.write(json.dumps(traders, ensure_ascii=False, indent=2, sort_keys=False, separators=(',', ': ')))
+
+   # write all files
+   # [x.encode('utf-8') for x in files]
+   with codecs.open(filesPath,'w','utf-8') as f:
+      f.write(json.dumps(list(set(files)), ensure_ascii=False, indent=2, sort_keys=False, separators=(',', ': ')))
 
 
 if __name__ == "__main__":
