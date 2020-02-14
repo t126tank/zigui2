@@ -29,9 +29,11 @@ OPT_CALL = "CAL"
 BASE_URL = "https://www.jpx.co.jp"
 VOLUME_URI = "/markets/derivatives/participant-volume/index.html"
 
+# mkdir ...
 DATA_DIR = "./voldata/"
 CMN_DATA_DIR = "./cmndata/"
 
+# echo "[]" > ...
 traders = []
 files = []
 
@@ -243,7 +245,11 @@ def convCsv2Json(csv):
                items = list(map(str.strip, r.split(',')))
 
                # seller
-               codes = np.array(traders)[:, 0].tolist()
+               codes = []
+               global traders
+               if len(traders) > 0:
+                  codes = np.array(traders)[:, 0].tolist()
+
                if items[0] != '-' and items[1] != '-' and items[2] != '-':
                   scd  = items[0]
                   svol = int(items[3])
@@ -279,12 +285,15 @@ def convCsv2Json(csv):
    with codecs.open(jsonDataFile, 'w','utf-8') as f:
       f.write(json.dumps(jsonData, default=default_method, ensure_ascii=False, indent=2, sort_keys=False, separators=(',', ': '))) # JPN utf-8, cls=TargetEncoder?
    '''
-   files.append(jsonDataFile)
+   global files
+   if jsonDataFile not in files:
+      files.append(jsonDataFile)
 
 
 def main(argv):
    # load traders' info
    tradersPath = CMN_DATA_DIR + 'traders.json'
+   global traders
 
    # Relative Path, depends on OS utf-8 -> sjis
    with open(tradersPath, encoding='utf-8') as f:
@@ -292,11 +301,11 @@ def main(argv):
 
    # load files' list
    filesPath = CMN_DATA_DIR + 'files.json'
+   global files
 
    # Relative Path, depends on OS utf-8 -> sjis
    with open(filesPath, encoding='utf-8') as f:
       files = json.load(f)
-
 
    # convert each csv into json
    list(map(convCsv2Json, crawler()))
@@ -306,12 +315,22 @@ def main(argv):
    with codecs.open(tradersPath,'w','utf-8') as f:
       f.write(json.dumps(traders, ensure_ascii=False, indent=2, sort_keys=False, separators=(',', ': ')))
 
-   # write all files
+   # write all files as sorted & unique
    # [x.encode('utf-8') for x in files]
    with codecs.open(filesPath,'w','utf-8') as f:
-      f.write(json.dumps(list(set(files)), ensure_ascii=False, indent=2, sort_keys=False, separators=(',', ': ')))
+      f.write(json.dumps(sorted(list(set(files)), reverse=True), ensure_ascii=False, indent=2, sort_keys=False, separators=(',', ': ')))
 
 
 if __name__ == "__main__":
    main(sys.argv[1:])
 
+'''
+sudo pip3 install BeautifulSoup4
+sudo apt-get install libxml2-dev libxslt-dev python-dev
+sudo apt-get install python3-lxml python-lxml
+
+
+sudo pip3 install lxml==3.4.2
+$ pip install 'xkcdpass==1.2.5' --force-reinstall
+$ pip install 'python-jenkins>=1.1.1'
+'''
