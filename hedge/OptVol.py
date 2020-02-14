@@ -191,7 +191,7 @@ def convCsv2Json(csv):
       target = {}
       jpxCd = ''
       instrument = {}
-      vol = []
+      vol = [[], []]
 
       for row in f:
          r = row.strip()
@@ -218,7 +218,7 @@ def convCsv2Json(csv):
                target = {}
                jpxCd = ''
                instrument = {}
-               vol = []
+               vol = [[], []]
             else:
                data['date'] = date
                data['info'] = info
@@ -248,26 +248,26 @@ def convCsv2Json(csv):
 
                # seller
                codes = np.array(traders)[:, 0].tolist()
-               scd  = "0"
-               svol = 0
                if items[0] != '-' and items[1] != '-' and items[2] != '-':
                   scd  = items[0]
                   svol = int(items[3])
                   if scd not in codes:
                      traders.append([scd, items[1], items[2]])
 
+                  vol[0].append([scd, svol])
+
                # buyer
                codes = np.array(traders)[:, 0].tolist()
-               bcd  = "0"
-               bvol = 0
                if items[-4] != '-' and items[-3] != '-' and items[-2] != '-':
                   bcd  = items[-4]
                   bvol = int(items[-1])
                   if bcd not in codes:
                      traders.append([bcd, items[-3], items[-2]])
 
+                  vol[1].append([bcd, bvol])
+
                # volume info
-               vol.append([scd, svol, bcd, bvol])
+               # vol.append([scd, svol, bcd, bvol])
 
       # to create LAST target
       if num != 0:
@@ -284,9 +284,10 @@ def convCsv2Json(csv):
       f.write(json.dumps(traders, ensure_ascii=False, indent=2, sort_keys=False, separators=(',', ': ')))
 
    # over-written all [date].json
-   jsonData = data
+   '''
    with codecs.open(jsonDataFile, 'w','utf-8') as f:
       f.write(json.dumps(jsonData, default=default_method, ensure_ascii=False, indent=2, sort_keys=False, separators=(',', ': '))) # JPN utf-8, cls=TargetEncoder?
+   '''
 
 
 def main(argv):
