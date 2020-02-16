@@ -104,12 +104,27 @@ class TargetEncoder(json.JSONEncoder):
 
 
 def mergeJsonData(jdata, data):
-   ret = {}
    # this is the 1st [date].json
    if not 'info' in jdata:
       return data
 
-   # find jpxCd then add new instrument or accumulate vol
+   # find jpxCd then add new instrument or extend vol
+   for d in data['info']:
+      has = False
+
+      for j in jdata['info']:
+         if d['jpxCd'] == j['jpxCd']:
+            j['vol'][0].extend(d['vol'][0])
+            j['vol'][1].extend(d['vol'][1])
+            has = True
+            break
+
+      if not has:
+         jdata['info'].append(d)
+         continue
+
+   return jdata
+
 
 def loadJsonData(path, arrFlg=False):
    jsonData = {}
@@ -303,7 +318,7 @@ def convCsv2Json(csv):
       f.write(json.dumps(data, default=default_method, ensure_ascii=False, indent=2, sort_keys=False, separators=(',', ': '))) # JPN utf-8, cls=TargetEncoder?
 
    # over-written all [date].json
-   jsonData = mergeJsonData(jsonData, data)
+   jsonData = mergeJsonData(jsonData, loadJsonData(jsonfile))
    with codecs.open(jsonDataFile, 'w','utf-8') as f:
       f.write(json.dumps(jsonData, default=default_method, ensure_ascii=False, indent=2, sort_keys=False, separators=(',', ': '))) # JPN utf-8, cls=TargetEncoder?
 
