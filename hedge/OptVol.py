@@ -103,6 +103,20 @@ class TargetEncoder(json.JSONEncoder):
       return super(TargetEncoder, self).default(obj) # 他の型はdefaultのエンコード方式を使用
 
 
+def sumSortArr(arr):
+   arr_dict = {}
+   ret = []
+   for a in arr:  # [code, num]
+      if a[0] in arr_dict:
+         arr_dict[a[0]] = arr_dict[a[0]]+a[1]
+      else:
+         arr_dict[a[0]] = a[1] # code: num
+
+   for k in sorted(arr_dict, key=arr_dict.get, reverse=True):
+      ret.append([k, arr_dict[k]])
+
+   return ret
+
 def mergeJsonData(jdata, data):
    # this is the 1st [date].json
    if not 'info' in jdata:
@@ -122,6 +136,11 @@ def mergeJsonData(jdata, data):
       if not has:
          jdata['info'].append(d)
          continue
+
+   # sell/buy vol sum and resort
+   for j in jdata['info']:
+      j['vol'][0] = sumSortArr(j['vol'][0])
+      j['vol'][1] = sumSortArr(j['vol'][1])
 
    return jdata
 
