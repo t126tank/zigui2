@@ -1,0 +1,9 @@
+{
+  "shortMa": 5,
+  "longMa": 25,
+  "factor": 1.11,
+  "ratio": 0.9,
+  "seqN": 60,
+  "epochs": 200,
+  "batchSize" :32
+}
