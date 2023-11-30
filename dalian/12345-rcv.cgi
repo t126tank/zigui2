@@ -8,14 +8,14 @@ import cgitb; cgitb.enable()
 import json
 import re
 import requests
+import datetime
 
 import my
 
+MAIL_API = <MAIL_API>
+
 # http://tonop.cocolog-nifty.com/blog/2020/11/post-c6c35e.html
-
 form = cgi.FieldStorage()
-
-MAIL_API = 'MAIL_API'
 
 foo = form.getfirst("foo", "")
 bar = form.getfirst("bar", "")
@@ -26,17 +26,25 @@ r = json.dumps([{'key':'foo','value':foo},  \
                 {'key':'htm','value':htm2}],\
                 sort_keys=True, indent=4, ensure_ascii=False)
 
+# to analyze target page in html
+with open("./data/tgt.html", 'w', encoding="utf-8") as page:
+  page.write(htm2)
+
 # we have new data
 if '---' not in htm2:
   # for debug
-  with open("./data/aaa.txt", "w") as myfile:
-    myfile.write(htm2)
+  t_delta = datetime.timedelta(hours=8)
+  CST = datetime.timezone(t_delta, 'CST')
+  now = datetime.datetime.now(CST)
+  msg = now.strftime('%H:%M') + '\n有3条新增投诉'
 
-  my.tts(htm2)
+  with open("./data/aaa.txt", "w") as myfile:
+    myfile.write(msg)
+
+  my.tts(msg)
 
   # mail inform
-  requests.post(MAIL_API, json={"content": htm2})
-
+  requests.post(MAIL_API, json={"content": htm2}, timeout=(3.0, 30.5))
 
 if 'callback' in form:
   callback = form.getfirst('callback', "callback")
