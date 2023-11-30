@@ -10,6 +10,7 @@ git remote add origin https://github.com/username/project.git
 git remote set-url origin https://username@github.com/username/project.git
 git push -u origin master
 
+git remote show -n origin
 
 
 # nodejs part
