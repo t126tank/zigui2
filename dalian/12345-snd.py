@@ -58,7 +58,7 @@ service = ChromeService(executable_path=new_driver)
 browser = webdriver.Chrome(service=service, options=options, desired_capabilities=capabilities)
 
 # 页面访问delay 1.5秒
-browser.implicitly_wait(1.5)
+browser.implicitly_wait(2.5)
 
 # 取得登录时时间
 start = datetime.now()
@@ -66,7 +66,7 @@ start = datetime.now()
 try:
   browser.delete_all_cookies()
   browser.get(LOGIN_URL)  # 打开登录页面
-  sleep(2)
+  sleep(5)
 
   # 确认 cookies
   allCookies = browser.get_cookies()
@@ -93,7 +93,7 @@ try:
 
   # 点击 登录按钮
   login.click()
-  sleep(2)
+  sleep(10)
 
   # 登录成功后，继续打开「待分发页面 html」
   browser.get(TGT_PAGE)
