@@ -75,13 +75,15 @@ try:
 
   # 在登录页面寻找 用户名，密码，登录按钮的位置
   user_input 		= browser.find_element(By.XPATH, '//input[@data-selenium="login-email-input"]')
-  password 			= browser.find_element(By.XPATH, '//input[@data-selenium="login-password-input"]')
-  user_password = browser.find_element(By.XPATH, '//button[@data-selenium="login-submit-button"]')
-	''' XPATH 多种方式
+  user_password = browser.find_element(By.XPATH, '//input[@data-selenium="login-password-input"]')
+  login         = browser.find_element(By.XPATH, '//button[@data-selenium="login-submit-button"]')
+
+  '''
+  # XPATH 多种方式
   user_input    = browser.find_element(By.XPATH, '//*[@id="user_input"]/input')
   user_password = browser.find_element(By.XPATH, '//*[@id="password_input"]/input')
   login         = browser.find_element(By.XPATH, '//*[@id="new_login"]/form/p[2]/input')
-	'''
+  '''
 
   # 清空内容
   user_input.clear()
@@ -95,34 +97,43 @@ try:
   login.click()
   sleep(10)
 
+  handle_array = browser.window_handles
+  logging.debug(len(handle_array))
+  # browser.switch_to.window(handle_array[1])
+
   # 登录成功后，继续打开「待分发页面 html」
   browser.get(TGT_PAGE)
   sleep(2)
 
   # 取得「待分发页面 html」代码
   page_source = browser.page_source
+  # 经base64编码
+  page_source_b64 = base64.b64encode(page_source.encode()).decode()
 
-  # 调试用
+  # 调试用(可以注释掉 from ↓)
   with open("tgt.html", 'w', encoding="utf-8") as page:
-    page.write(ps)
+    page.write(page_source)
 
   w = browser.execute_script('return document.body.scrollWidth')
   h = browser.execute_script('return document.body.scrollHeight')
   logging.info("{}, {}".format(w, h))
   browser.set_window_size(w, 1280)  # Unable to locate element:
   browser.save_screenshot('screenshot.png')
+  # 调试用(可以注释掉 till　↑)
 
-  # 经base64编码
-  page_source_b64 = base64.b64encode(page_source.encode()).decode()
-  headers = {"Content-Type": "Content-Type:application/x-www-form-urlencoded"}
+  # 将经base64编码后「待分发页面 html」发送至后台解析
+  headers = {"Content-Type": "application/x-www-form-urlencoded"}
   data = {
     "foo": "foo-val",
     "bar": "bar-val",
     "htm": page_source_b64
   }
 
-  # 将经base64编码后「待分发页面 html」发送至后台解析
-  requests.post(url=POST_URL, data=data, headers=headers)
+  logging.debug(page_source_b64)
+  logging.debug(type(page_source_b64))
+
+  r = requests.post(url=POST_URL, data=data, headers=headers, timeout=(3.0, 30.5))
+  logging.info(r)
 
 except Exception as e:
   logging.error("error: {0}".format(e), file=sys.stderr)
