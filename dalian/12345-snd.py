@@ -45,7 +45,7 @@ options = Options()
 
 # 可以指定浏览器
 # options.binary_location = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
-options.add_argument('--headless')
+# options.add_argument('--headless')
 options.add_argument('--no-sandbox')
 options.add_argument('--disable-gpu')
 options.add_argument('--ignore-certificate-errors')
@@ -55,9 +55,10 @@ options.add_argument('--window-size=1920,1080') # Unable to locate element:
 capabilities = DesiredCapabilities.CHROME
 new_driver = ChromeDriverManager().install()
 service = ChromeService(executable_path=new_driver)
-browser = webdriver.Chrome(service=service, options=options, desired_capabilities=capabilities)
+# browser = webdriver.Chrome(service=service, options=options, desired_capabilities=capabilities)
+browser = webdriver.Chrome(options=options)
 
-# 页面访问delay 1.5秒
+# 页面访问delay 2.5秒
 browser.implicitly_wait(2.5)
 
 # 取得登录时时间
