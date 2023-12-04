@@ -137,7 +137,7 @@ try:
   logging.info(r)
 
 except Exception as e:
-  logging.error("error: {0}".format(e), file=sys.stderr)
+  logging.error("error: {0}".format(e))
   # traceback.print_exc()
   exitCode = 2
 
