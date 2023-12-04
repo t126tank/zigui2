@@ -53,8 +53,8 @@ options.add_argument('--window-size=1920,1080') # Unable to locate element:
 
 # 生成模拟浏览器 browser
 capabilities = DesiredCapabilities.CHROME
-new_driver = ChromeDriverManager().install()
-service = ChromeService(executable_path=new_driver)
+# new_driver = ChromeDriverManager().install()
+# service = ChromeService(executable_path=new_driver)
 # browser = webdriver.Chrome(service=service, options=options, desired_capabilities=capabilities)
 browser = webdriver.Chrome(options=options)
 
@@ -115,10 +115,12 @@ try:
   with open("tgt.html", 'w', encoding="utf-8") as page:
     page.write(page_source)
 
+  '''
   w = browser.execute_script('return document.body.scrollWidth')
   h = browser.execute_script('return document.body.scrollHeight')
   logging.info("{}, {}".format(w, h))
   browser.set_window_size(w, 1280)  # Unable to locate element:
+  '''
   browser.save_screenshot('screenshot.png')
   # 调试用(可以注释掉 till　↑)
 
