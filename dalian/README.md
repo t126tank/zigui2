@@ -10,7 +10,7 @@ TBD
 * 功能： 仅在提醒播报 mp3 文件存在时自动播音
 
 【后台】
-* 环境： apache2/http WEB 服务器并配置 python cgi
+* 环境： apache2/httpd WEB 服务器并配置 python cgi
 * 功能
     1. 接受自动登录 POST 数据后，删除“旧 mp3”
     1. 解析 base64 解码后的 html 代码，并判断是否需要提醒播报最新待处理件数
@@ -31,6 +31,7 @@ TBD
 * 安全性（防止泄密）
 * 轮询遗漏（6分钟整数倍）
 
+
 ### 待改善
 * 浏览器插件实现自动登录
 * 『判断是否需要提醒播报最新待处理件数』处理可以在【自动登录】执行
@@ -42,4 +43,7 @@ TBD
 * PW
 * TGT_PAGE
 * POST_URL
+* XPATH 可参考 ![浏览器 F12 模式](https://raw.githubusercontent.com/t126tank/zigui2/master/dalian/login_example.png "サンプル")
+
+继续在 windows 里创建 [计划任务](https://blog.csdn.net/lihongzhai/article/details/128192199)
 
